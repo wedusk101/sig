@@ -58,6 +58,9 @@ class GsPolygons : public GsShareable
 	/*! Makes capacity to be equal to size. */
 	void compress () { _data.compress(); }
 
+	/*! Compresses memory used by each stored polygon. */
+	void compress_all ();
+
 	/*! Swaps polygons with positions i and j, which must be valid positions. */
 	void swap ( int i, int j );
 

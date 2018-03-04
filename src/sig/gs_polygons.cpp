@@ -22,8 +22,9 @@ GsPolygons::GsPolygons ( const GsPolygons& polys ): GsShareable()
 {
 	GS_TRACE1 ( "Copy Constructor" );
 	_data.size ( polys.size() );
-	for ( int i=0; i<_data.size(); i++ )
-	_data[i] = new GsPolygon ( polys.cget(i) );
+	for ( int i=_data.size()-1; i>=0; i-- )
+	{	_data[i] = new GsPolygon ( polys.cget(i) );
+	}
 }
 
 GsPolygons::~GsPolygons ()
@@ -53,6 +54,14 @@ void GsPolygons::capacity ( int nc )
 	{	for ( i=nc; i<s; i++ ) delete _data[i];
 	}
 	_data.capacity(nc);
+}
+
+void GsPolygons::compress_all ()
+{
+	compress ();
+	for ( int i=_data.size()-1; i>=0; i-- )
+	{	_data[i]->compress();
+	}
 }
 
 void GsPolygons::swap ( int i, int j )

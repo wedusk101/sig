@@ -6,7 +6,7 @@
 ===== Todo ====
 
 - Shader support for multiple lights
-- Port to linux and mac
+- Complete glfw integration
 - Review file loading by GsModel and KnSkeleton
 - Review title of example programs
 
