@@ -32,6 +32,7 @@ class SnPoints;
 class SnPolygons : public SnGroup
  { private :
 	GsPolygons* _pols;
+	GsArray<GsColor> _colors; // used only if size is same as _pols.size()
 	gscenum _solid;
 	gscbool _vertices;
 
@@ -71,6 +72,21 @@ class SnPolygons : public SnGroup
 	/*! Returns the interior color if e==0 (the default), the edge color if e==1,
 		or the vertex color is e==2. */
 	GsColor color ( int e=0 ) const;
+
+	/*! All the other methods for setting colors specify one color for all polygons.
+		The method below allows the definition of a different color per polygon.
+		If the array of colors accessible with the method below is set to have
+		the same size as the number of polygons, then each color in the array
+		will be	assigned to its corresponding polygon. */
+	GsArray<GsColor>& colors () { touch(); return _colors; }
+
+	/*! Returns the number of colors assigned per polygon. Only if the number
+		is the same as the number of polygons that the colors are used. */
+	int colors_per_polygon () const { return _colors.size(); }
+
+	/*! Returns true if the number of colors matches the number of polygons,
+		and false otherwise. */
+	bool has_colors_per_polygon () const { return _colors.size()==size(); }
 
 	/*! Will change the width of the lines to lw, and the size of the points to ps. */
 	void resolution ( float lw, float ps );

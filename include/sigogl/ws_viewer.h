@@ -110,6 +110,9 @@ class WsViewer : public WsWindow
 	/*! Access the string of the status bar message text only for inspection. */
 	const GsString& cmessage () const;
 
+	/*! Change the color of the message text */
+	void message_color ( GsColor c );
+
 	/*! Set a possibly multi-line text to appear at the graphics window. 
 		Use s as 0 to erase current message. */
 	void output ( const char* s );
@@ -119,6 +122,9 @@ class WsViewer : public WsWindow
 
 	/*! Set position for the output text in windows coordinates, default is 80,40 */
 	void output_pos ( int x, int y );
+
+	/*! Change the color of the output text */
+	void output_color ( GsColor c );
 
 	/*! Change the increment amount when zooming*/
 	void zoomfactor (float z);
@@ -130,9 +136,12 @@ class WsViewer : public WsWindow
 	/*! Returns true if the cmd is currently activated. */
 	bool cmd_activated ( ViewerCmd c );
 
+	/*! Returns the most recently computed bounding box of the scene. */
+	GsBox bbox () const;
+
 	/*! Forces to recompute the bounding box of the scene, displayable with cmd();
 		returns the computed box. */
-	GsBox update_bbox ( GsBox* boxpt=0 );
+	void update_bbox ( GsBox* boxpt=0 );
 
 	/*! Forces to recompute the axis lenght of the scene, displayable with cmd().
 		Returns the semiaxis length, which is half the longest bounding box side length.
@@ -191,10 +200,10 @@ class WsViewer : public WsWindow
 	/*! Returns the current view mode */
 	ViewMode viewmode ();
 
-	/*! Returns the current camview being used */
+	/*! Access to the camera parameters */
 	GsCamera& camera ();
 
-	/*! Sets a camview to be used */
+	/*! Sets a new camera to be used and resets any current spin animation */
 	void camera ( const GsCamera &cam );
 
 	/*! Returns a reference to the internal used light and mark light as changed. */

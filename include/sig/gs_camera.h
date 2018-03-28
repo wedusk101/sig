@@ -57,9 +57,9 @@ class GsCamera
 	void getpmat ( GsMat& p ) const { p.perspective ( fovy, aspect, znear, zfar ); }
 
 	/*! Gets the 3d ray (p1,p2) which projects exactly in the given window point
-		according to the camera current parameters. Points p1 and p2 lye in the 
-		near and far planes respectively. Window points are considered to be
-		in normalized coordinates, ranging between [-1,1]. */
+		according to the camera current parameters. Points p1 and p2 will be in
+		the near and far planes respectively. Window points are considered to
+		be in normalized coordinates, ranging in [-1,1]. */
 	void getray ( float winx, float winy, GsPnt& p1, GsPnt& p2 ) const;
 
 	/*! Update the camera parameters to achieve a rotation of dq around the camera

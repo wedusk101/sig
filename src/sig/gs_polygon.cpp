@@ -6,6 +6,7 @@
   =======================================================================*/
  
 # include <math.h>
+# include <sig/gs_box.h>
 # include <sig/gs_geo2.h>
 # include <sig/gs_string.h>
 # include <sig/gs_polygon.h>
@@ -515,6 +516,14 @@ void GsPolygon::get_bounding_box ( float& minx, float& miny, float& maxx, float&
 	{	GS_UPDMIN ( minx, get(i).x ); GS_UPDMAX ( maxx, get(i).x );
 		GS_UPDMIN ( miny, get(i).y ); GS_UPDMAX ( maxy, get(i).y );
 	}
+}
+
+void GsPolygon::get_bounding_box ( GsBox& b ) const
+{
+	GsVec2 min, max; // we could optimize with a type cast, but no need
+	get_bounding_box ( min, max );
+	b.a.set ( min.x, min.y, 0 );
+	b.b.set ( max.x, max.y, 0 );
 }
 
 void GsPolygon::get_bounding_disk ( GsPnt2& c, float& r ) const

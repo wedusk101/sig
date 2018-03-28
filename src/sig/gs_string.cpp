@@ -334,27 +334,27 @@ int GsString::searchcs ( const char *st, int i ) const
  }
 
 int GsString::replace ( int i, int n, const char* newst )
- {
-   int oldlen = n;
-   int newlen = newst? strlen(newst):0;
+{
+	int oldlen = n;
+	int newlen = newst? strlen(newst):0;
    
-   if ( oldlen<newlen ) // open space
-	{ insert ( i, newlen-oldlen );
+	if ( oldlen<newlen ) // open space
+	{	insert ( i, newlen-oldlen );
 	}
-   else if ( oldlen>newlen ) // remove space
-	{ remove ( i, oldlen-newlen );
+	else if ( oldlen>newlen ) // remove space
+	{	remove ( i, oldlen-newlen );
 	}
 
-   // void *memmove( void *dest, const void *src, size_t count );
-   // The memmove function copies count bytes of characters from src to dest.
-   // If some regions of the source area and the destination overlap,
-   // memmove ensures that the original source bytes in the overlapping
-   // region are copied before being overwritten.
-   if ( newlen>1 ) memmove ( &_data[i], newst, newlen );
+	// void *memmove( void *dest, const void *src, size_t count );
+	// The memmove function copies count bytes of characters from src to dest.
+	// If some regions of the source area and the destination overlap,
+	// memmove ensures that the original source bytes in the overlapping
+	// region are copied before being overwritten.
+	if ( newlen>1 ) memmove ( &_data[i], newst, newlen );
 	else if ( newlen==1 ) _data[i]=newst[0];
 
-   return i+newlen;
- }
+	return i+newlen;
+}
 
 int GsString::replace ( const char* oldst, const char* newst, int i )
  {
@@ -384,22 +384,22 @@ int GsString::replall ( const char* oldst, const char* newst )
  }
 
 int GsString::replall ( char oldc, char newc )
- {
-   int i, count=0;
-   for ( i=0; i<len(); i++ ) if ( _data[i]==oldc ) { _data[i]=newc; count++; }
-   return count;
- }
+{
+	int i, count=0;
+	for ( i=0; i<len(); i++ ) if ( _data[i]==oldc ) { _data[i]=newc; count++; }
+	return count;
+}
 
 int GsString::replallcs ( const char* oldst, const char* newst )
- {
-   int count=0, i=0, oldlen=strlen(oldst);
-   while ( true )
-	{ i = searchcs ( oldst, i );
-	  if ( i<0 ) return count;
-	  count++;
-	  i = replace ( i, oldlen, newst );
+{
+	int count=0, i=0, oldlen=strlen(oldst);
+	while ( true )
+	{	i = searchcs ( oldst, i );
+		if ( i<0 ) return count;
+		count++;
+		i = replace ( i, oldlen, newst );
 	}
- }
+}
 
 char* GsString::abandon ( char*& s )
 {

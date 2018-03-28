@@ -19,7 +19,7 @@
 //# define GS_USE_TRACE1 // Constructor and Destructor
 //# define GS_USE_TRACE2 // Render
 //# define GS_USE_TRACE3 // Model stats
-//# define GS_USE_TRACE4 // Render type
+//# define GS_USE_TRACE4 // Render messages
 # include <sig/gs_trace.h>
 
 //======================================= GlrModel ====================================

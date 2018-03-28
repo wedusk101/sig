@@ -15,6 +15,8 @@
 # include <sig/gs_vec2.h>
 # include <sig/gs_array.h>
 
+class GsBox;
+
 /*! \class GsPolygon gs_polygon.h
 	\brief Array of 2d points
 
@@ -151,6 +153,9 @@ class GsPolygon : public GsArray<GsPnt2>
 
 	/*! Same as the other get_bounding_box() method, but with GsVec2 arguments */
 	void get_bounding_box ( GsVec2& min, GsVec2& max ) const { get_bounding_box(min.x,min.y,max.x,max.y); } 
+
+	/*! Same as the other get_bounding_box() methods but receiving a GsBox as input */
+	void get_bounding_box ( GsBox& b ) const;
 
 	/*! Get the centroid c and the radius r of the minimum containing disk centered at c */
 	void get_bounding_disk ( GsPnt2& c, float& r ) const;

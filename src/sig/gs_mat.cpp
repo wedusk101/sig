@@ -348,6 +348,7 @@ void GsMat::inverse ( GsMat& inv ) const
 
 float GsMat::det () const
 {
+	if ( E41==0 && E42==0 && E43==0 ) return E44*det3x3();
 	float m12 = E21*E32 - E22*E31;
 	float m13 = E21*E33 - E23*E31;
 	float m14 = E21*E34 - E24*E31;

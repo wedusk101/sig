@@ -16,10 +16,10 @@
 //# define GS_USE_TRACE2 //Init/Open
 # include <sig/gs_trace.h>
 
-# define ISINVALID   _type==(gsbyte)TypeInvalid
-# define ISFILE	  _type==(gsbyte)TypeFile
+# define ISINVALID	_type==(gsbyte)TypeInvalid
+# define ISFILE		_type==(gsbyte)TypeFile
 # define ISSTRING	_type==(gsbyte)TypeString
-# define CHKDATA	 if ( !_data ) _data = new Data
+# define CHKDATA	if ( !_data ) _data = new Data
 # define INITDATA	if ( _data ) _data->init()
 
 //=============================== GsInput =================================
@@ -205,34 +205,35 @@ void GsInput::skipline ()
 }
 
 GsInput::TokenType GsInput::check ()
- { 
-   // skip white spaces ang get 1st char:
-   int c;
-   do { c = readchar();
+{ 
+	// skip white spaces ang get 1st char:
+	int c;
+	do
+	{	c = readchar();
 		if ( c==_comchar ) do { c=readchar(); } while ( c!=EOF && c!='\n' );
 		if ( c=='\n' ) _curline++;
 		if ( c==EOF ) return End;
-	  } while ( isspace(c) );
- 
-   // check if delimiter preceeding number:
-   if ( (c=='.'||c=='+'||c=='-') && isdigit(_peekbyte()) ) { unget(c); return Number; }
+	} while ( isspace(c) );
 
-   // check other cases:
-   unget(c);
-   if ( isdigit(c) ) return Number;
-   if ( isalpha(c) || c=='"' || c=='_' ) return String;
-   return Delimiter;
- }
+	// check if delimiter preceeding number:
+	if ( (c=='.'||c=='+'||c=='-') && isdigit(_peekbyte()) ) { unget(c); return Number; }
+
+	// check other cases:
+	unget(c);
+	if ( isdigit(c) ) return Number;
+	if ( isalpha(c) || c=='"' || c=='_' ) return String;
+	return Delimiter;
+}
 
 static char getescape ( char c )
- {
-   switch ( c )
-	{ case 'n' : return '\n';
-	  case 't' : return '\t';
-	  case '\n': return '\\';
-	  default  : return c;
+{
+	switch ( c )
+	{	case 'n' : return '\n';
+		case 't' : return '\t';
+		case '\n': return '\\';
+		default  : return c;
 	}
- }
+}
 
 GsInput::TokenType GsInput::get ()
 {
@@ -240,70 +241,70 @@ GsInput::TokenType GsInput::get ()
 }
 
 GsInput::TokenType GsInput::get ( TokenType type )
- {
-   _data->ltype = type;
-   _data->ltoken.len(0);
+{
+	_data->ltype = type;
+	_data->ltoken.len(0);
 
-   if ( type==End )
+	if ( type==End )
 	{
-	  GS_TRACE1 ( "Got End..." );
+		GS_TRACE1 ( "Got End..." );
 	}
-   else if ( type==String )
+	else if ( type==String )
 	{
-	  GsString &s = _data->ltoken;
-	  s.len ( _maxtoksize );
-	  int i, c = readchar();
-	  if ( c=='"' ) // inside quotes mode
-	   { GS_TRACE1 ( "Got String between quotes..." );
-		 for ( i=0; i<_maxtoksize; i++ )
-		  { c = readchar();
-			if ( c=='\\' ) c=getescape(readchar());
-			if ( c==EOF || c=='"' ) break;
-			s[i]=c;
-		  }
-	   }
-	  else // normal mode
-	   { GS_TRACE1 ( "Got String..." );
-		 for ( i=0; i<_maxtoksize; i++ )
-		  { if ( c==EOF ) break;
-			if ( !isalnum(c) && c!='_' ) { unget(c); break; }
-			s[i] = c;
-			c = readchar();
-		  }
-	   }
-	  s.len(i);
+		GsString &s = _data->ltoken;
+		s.len ( _maxtoksize );
+		int i, c = readchar();
+		if ( c=='"' ) // inside quotes mode
+		{	GS_TRACE1 ( "Got String between quotes..." );
+			for ( i=0; i<_maxtoksize; i++ )
+			{	c = readchar();
+				if ( c=='\\' ) c=getescape(readchar());
+				if ( c==EOF || c=='"' ) break;
+				s[i]=c;
+			}
+		}
+		else // normal mode
+		{	GS_TRACE1 ( "Got String..." );
+			for ( i=0; i<_maxtoksize; i++ )
+			{	if ( c==EOF ) break;
+				if ( !isalnum(c) && c!='_' ) { unget(c); break; }
+				s[i] = c;
+				c = readchar();
+			}
+		}
+		s.len(i);
 	}
-   else if ( type==Number )
-	{ GS_TRACE1 ( "Got Number..." );
-	  GsString& s = _data->ltoken;
-	  s.len ( _maxtoksize );
-	  bool pnt=false, exp=false;
-	  int i, c = readchar();
-	  s[0]=c; // we know the 1st is part of a number (can be +/-)
-	  for ( i=1; i<_maxtoksize; i++ )
-	   { c = readchar();
-		 if ( !isdigit(c) )
-		  { if ( c=='e' ) c='E';
-			if ( !pnt && c=='.' ) pnt=true;
-			else if ( pnt && c=='.' ) break;
-			else if ( !exp && c=='E' ) exp=pnt=true;
-			else if ( (c=='+'||c=='-') && s[i-1]=='E' ); // ok
-			else { unget(c); break; }
-		  }
-		 s[i]=c; 
-	   }
-	  s.len(i);
-	  _lnumreal = pnt? 1:0;
+	else if ( type==Number )
+	{	GS_TRACE1 ( "Got Number..." );
+		GsString& s = _data->ltoken;
+		s.len ( _maxtoksize );
+		bool pnt=false, exp=false;
+		int i, c = readchar();
+		s[0]=c; // we know the 1st is part of a number (can be +/-)
+		for ( i=1; i<_maxtoksize; i++ )
+		{	c = readchar();
+			if ( !isdigit(c) )
+			{	if ( c=='e' ) c='E';
+				if ( !pnt && c=='.' ) pnt=true;
+				else if ( pnt && c=='.' ) break;
+				else if ( !exp && c=='E' ) exp=pnt=true;
+				else if ( (c=='+'||c=='-') && s[i-1]=='E' ); // ok
+				else { unget(c); break; }
+			}
+			s[i]=c; 
+		}
+		s.len(i);
+		_lnumreal = pnt? 1:0;
 	}
-   else // Delimiter
-	{ GS_TRACE1 ( "Got Delimiter..." );
-	  _data->ltoken.len (1);
-	  _data->ltoken[0] = readchar();
+	else // Delimiter
+	{	GS_TRACE1 ( "Got Delimiter..." );
+		_data->ltoken.len (1);
+		_data->ltoken[0] = readchar();
 	} 
 
-   GS_TRACE1 ( "Token: "<<_data->ltoken );
-   return type;
- }
+	GS_TRACE1 ( "Token: "<<_data->ltoken );
+	return type;
+}
 
 char GsInput::getc ()
  {

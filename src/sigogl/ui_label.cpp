@@ -28,17 +28,17 @@ UiLabel::~UiLabel ()
 {
 }
 
-//UiKeyDev: -search_fkey() should become "search_cmdkey" and search for all combinations, for ex "Ctrl+A" etc
-//		 -formatting should align cmd keys independently from label
-// quickly  detect + char and then generically search?
+//UiKeyDev:
+// -search_fkey() should become "search_cmdkey" and search for all combinations, for ex "Ctrl+A" etc
+// -formatting should align cmd keys independently from label
+// -the other option is to declare using GsEvent enums
+// -could use: 	int search ( const char* st, int i=0 ) const;
 	/*! Returns the index of the first occurrence of str, or -1 if not found.
 		The search starts at index i, which has default value of 0.
 		In case of empty strings or st larger than GsString, -1 is returned.
-		Case-insensitve comparison is performed. 
-	int search ( const char* st, int i=0 ) const;
-Alt, Ctrl, Shift comninations
-void add_cmd_key ( int key, int cmd, gscbool alt=0, gscbool ctrl=0, gscbool shift=0 );
-*/
+		Case-insensitve comparison is performed. */
+// -all Alt, Ctrl, Shift combinations will be declared here:
+//  void add_cmd_key ( int key, int cmd, gscbool alt=0, gscbool ctrl=0, gscbool shift=0 );
 
 int UiLabel::search_fkey () const
 {

@@ -25,7 +25,8 @@
 class SnPolyEditor : public SnEditor
 {  public :
 	enum Mode { ModeAdd, ModeEdit, ModeMove, ModeOnlyMove, ModeNoEdition };
-	enum Event { PreMovement, PostMovement, PreEdition, PostEdition, PreRemoval, PostInsertion, PolygonSelected, EventNotUsed };
+	enum Event { PreMovement, PostMovement, PreEditionIns, PreEditionRem, PreEditionDrag, PostEdition,
+				 PreRemoval, PostInsertion, PolygonSelected, EventNotUsed };
 	enum SelType { Polygon, Hull, Box };
 	static const char* class_name; //<! Contains string SnPolyEditor
 

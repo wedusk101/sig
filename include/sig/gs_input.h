@@ -143,11 +143,11 @@ class GsInput
 		are correctly handled and curline is updated. */
 	int readchar (); // comments not handled, unget yes
 
-	/*! Reads all bytes of the current line, i.e. untill a '\n' is read,
-		and put them in the given buffer (including the '\n').
+	/*! Reads all bytes of the current line, i.e. until a '\n' is read,
+		and append them in the given buffer (including the '\n').
 		The input will point to the first byte after the new line character.
 		The last character read is returned and will be either '\n' or EOF/-1.
-		Uses method readchar(), and therefore comments are not parsed. */
+		This method uses readchar(), and therefore comments are not parsed. */
 	int readline ( GsString& buf );
 
 	/*! Read all bytes of the input, starting from the current position, and placing 
@@ -185,7 +185,7 @@ class GsInput
 		Note: strings between quotes are parsed and stored without the quotes*/
 	TokenType get ();
 
-	/*! Version of get for a when the type has been already determined by check(). */
+	/*! Version of get for when the type has been already determined by check(). */
 	TokenType get ( TokenType type );
 
 	/*! Parses the next token and returns the first character of it. */

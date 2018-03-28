@@ -41,6 +41,7 @@ void SnPolygons::init ()
 {
 	touch();
 	_pols->init();
+	_colors.sizecap(0,0);
 	triangles()->init();
 	lines()->init();
 	points()->init();
@@ -112,8 +113,9 @@ void SnPolygons::use_external_triangulator ( void (*f) (const GsPolygon& p,GsArr
 	ExternalTriangulator = f;
 }
 
-static void draw_polygon (	const GsPolygon& pol, SnPlanarObjects& o, SnLines2& l, SnPoints& p,
-							GsArray<GsPnt2>& P, GsArray<int>& T, gscenum solid, gscbool vertices )
+static void draw_polygon (	const GsPolygon& pol, GsColor color,
+							SnPlanarObjects& o, SnLines2& l, SnPoints& p, GsArray<GsPnt2>& P, GsArray<int>& T,
+							gscenum solid, gscbool vertices, gscenum multicolor )
 {
 	GS_TRACE2 ( "Rebuilding poly size: "<<pol.size() );
 
@@ -125,6 +127,7 @@ static void draw_polygon (	const GsPolygon& pol, SnPlanarObjects& o, SnLines2& l
 
 	if ( pol.open() || pol.size()<=2 )
 	{	l.push_polyline(pol);
+		if ( multicolor ) l.push ( color );
 	}
 	else
 	{	const GsArray<GsPnt2>* V;
@@ -144,7 +147,7 @@ static void draw_polygon (	const GsPolygon& pol, SnPlanarObjects& o, SnLines2& l
 				V = &pol;
 			}
 			o.set_zero_index();
-			o.push_points ( V->size(), o.color() );
+			o.push_points ( V->size(), color );
 			for ( i=0; i<V->size(); i++ ) o.set ( i, V->cget(i) );
 			for ( i=0; i<T.size(); i+=3 ) o.push_indices ( T[i], T[i+1], T[i+2] );
 		}
@@ -190,8 +193,14 @@ void SnPolygons::rebuild ()
 
 	GsArray<GsPnt2> P;
 	GsArray<int> T;
-	for ( int i=0; i<size; i++ )
-		::draw_polygon ( _pols->get(i), *t, *l, *p, P, T, _solid, _vertices );
+	if ( _colors.size()==size )
+	{	for ( int i=0; i<size; i++ )
+			::draw_polygon ( _pols->get(i), _colors[i], *t, *l, *p, P, T, _solid, _vertices, 1 );
+	}
+	else
+	{	for ( int i=0; i<size; i++ )
+			::draw_polygon ( _pols->get(i), t->color(), *t, *l, *p, P, T, _solid, _vertices, 0 );
+	}
 }
 
 //================================ EOF =================================================

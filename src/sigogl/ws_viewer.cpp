@@ -86,6 +86,7 @@ class WsViewerData
 	bool spinning;			// indicates if the model is currently spinning
 	WsViewerSpinData spindata; // Data for spin animation
 
+	GsBox	bbox;			// Most recently computed bounding box
 	GsColor	bcolor;			// Background color currently used
 	float	zoomfactor;		// Current zoom factor
 
@@ -305,9 +306,19 @@ const GsString& WsViewer::cmessage () const
 	return _data->message()->text();
 }
 
+void WsViewer::message_color ( GsColor c )
+{
+	_data->message()->color().fg=c;
+}
+
 void WsViewer::output_pos ( int x, int y )
 {
 	_data->output()->owner()->pos((float)x,(float)y);
+}
+
+void WsViewer::output_color ( GsColor c )
+{
+	_data->output()->color().fg=c;
 }
 
 void WsViewer::output ( const char* s )
@@ -430,21 +441,23 @@ bool WsViewer::cmd_activated ( ViewerCmd c )
 	}
 }
 
-GsBox WsViewer::update_bbox ( GsBox* boxpt )
+GsBox WsViewer::bbox () const
 {
-	GsBox b;
-	SaBBox bboxaction;
+	return _data->bbox;
+}
+
+void WsViewer::update_bbox ( GsBox* boxpt )
+{
 	if ( boxpt )
-	{	b = *boxpt; 
-		bboxaction.set(b);
+	{	_data->bbox = *boxpt; 
 	}
 	else
-	{	bboxaction.apply ( _data->uroot );
-		b = bboxaction.get();
+	{	SaBBox bboxaction;
+		bboxaction.apply ( _data->uroot );
+		_data->bbox = bboxaction.get();
 	}
 	SCENEBOX->init();
-	SCENEBOX->push_box ( b, &GsColor::red, &GsColor::blue, &GsColor::green );
-	return b;
+	SCENEBOX->push_box ( _data->bbox, &GsColor::red, &GsColor::blue, &GsColor::green );
 }
 
 float WsViewer::update_axis ( GsBox* boxpt )
@@ -504,7 +517,8 @@ void WsViewer::view_all ( GsBox* boxpt )
 	c.eye.z = 2.0f;
 
 	if ( _data->uroot )
-	{	GsBox box = update_bbox ( boxpt );
+	{	update_bbox ( boxpt );
+		GsBox& box = _data->bbox;
 		if ( !box.empty() )
 		{	// if ( SCENEAXIS->visible() ) box.extend(GsPnt::null); //CamDev: add option to consider or not axis in bbox 
 			GsVec center = box.center();
@@ -620,8 +634,6 @@ void WsViewer::camera ( const GsCamera& cam )
 	_data->spinning = false;
 	_data->lightneedsupdate = true;
 	_data->camera = cam;
-	GsBox box = update_bbox ();
-	update_axis(&box);
 }
 
 GsLight& WsViewer::light ()
@@ -725,7 +737,7 @@ void WsViewer::draw ( GlRenderer* wr )
 	{	_data->lightneedsupdate = false;
 		GsLight& l = _data->light;
 		glc->light = l;
-		//CamDev: define light position and add l.constant_attenuation = 1.0f/ dist(eye,center) (was using: _data->camera.scale)
+		//CamDev: define light position and add l.constant_attenuation = 1.0f/dist(eye,center) (was using: _data->camera.scale)
 	}
 
 	//----- Render user scene -------------------------------------------
@@ -796,6 +808,7 @@ int WsViewer::handle ( const GsEvent &e )
 			GsPnt pa = plane.intersect ( aray.p1, aray.p2 );
 			GsPnt pb = plane.intersect ( bray.p1, bray.p2 );
 			e.pixelsize = (GS_DIST(pa.x,pb.x)+GS_DIST(pa.y,pb.y))/2.0f;
+			if ( e.pixelsize<1E-4f ) e.pixelsize=1E-4f;
 		}
 	}
 

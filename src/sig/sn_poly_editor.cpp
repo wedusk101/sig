@@ -71,6 +71,7 @@ void SnPolyEditor::init ()
 	_selpol = _selvtx = -1;
 	if ( _mode!=ModeNoEdition && _mode!=ModeOnlyMove ) _mode = ModeAdd;
 	_stop_operation = 0;
+	touch ();
 }
 
 void SnPolyEditor::polygons ( GsPolygons* p )
@@ -187,7 +188,7 @@ bool SnPolyEditor::subdivide_polygon_edge ( const GsVec2& p )
 	if ( !_polygons->cpolygons()->pick_edge(p,_precision,_selpol,_selvtx) ) return false;
 
 	GS_TRACE2 ( "Edge picked!" );
-	if ( _user_cb ) _user_cb ( this, PreEdition, _selpol );
+	if ( _user_cb ) _user_cb ( this, PreEditionIns, _selpol );
 	if ( _stop_operation ) { _stop_operation=0; return false; }
 
 	GsPolygon& pol = _polygons->get(_selpol);
@@ -337,6 +338,7 @@ void SnPolyEditor::remove_selected_polygon ()
 	if ( _selpol<0 ) return;
 	if ( _user_cb ) _user_cb ( this, PreRemoval, _selpol );
 	if ( _stop_operation ) { _stop_operation=0; _selpol=-1; return; }
+	if ( _polygons->has_colors_per_polygon() ) _polygons->colors().remove(_selpol);
 	_polygons->polygons()->remove(_selpol);
 	_selpol=_selvtx=-1;
 	if ( _polygons->size()==0 ) mode(ModeAdd);
@@ -414,7 +416,7 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 			}
 			else if ( e.type==GsEvent::Drag && _selvtx>=0 )
 			{	GS_TRACE1 ( "Drag event pol:"<<_selpol << " vtx:"<<_selvtx ); 
-				if ( _user_cb ) _user_cb ( this, PreEdition, _selpol );
+				if ( _user_cb ) _user_cb ( this, PreEditionDrag, _selpol );
 				if ( _stop_operation ) { _stop_operation=0; _selvtx=-1; return 0; }
 				_polygons->get(_selpol)[_selvtx] = p;
 				if ( _user_cb ) _user_cb ( this, PostEdition, _selpol );
@@ -546,6 +548,8 @@ int SnPolyEditor::handle_keyboard ( const GsEvent& e )
 				mode ( ModeAdd );
 				if ( _user_cb ) _user_cb ( this, PostInsertion, _polygons->polygons()->size()-1 );
 				if ( _stop_operation ) { _stop_operation=0; _polygons->polygons()->pop(); }
+				if ( _polygons->colors_per_polygon()>0 ) // update colors array
+				{	while ( _polygons->colors().size()<_polygons->size() ) _polygons->colors().push_top(); }
 				return 1; // tell that I took the event
 			}
 		} break;
@@ -560,7 +564,7 @@ int SnPolyEditor::handle_keyboard ( const GsEvent& e )
 				{	remove_selected_polygon(); // this method will trigger its own event
 				}
 				else
-				{	if ( _user_cb ) _user_cb ( this, PreEdition, _selpol );
+				{	if ( _user_cb ) _user_cb ( this, PreEditionRem, _selpol );
 					if ( _stop_operation ) { _stop_operation=0; _selvtx=-1; return 0; }
 					p[_selpol].remove(_selvtx);
 					if ( _user_cb ) _user_cb ( this, PostEdition, _selpol );

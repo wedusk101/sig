@@ -122,6 +122,12 @@ class GsPolygons : public GsShareable
 	/*! Returns the bounding box of the set of polygons */
 	void get_bounding_box ( GsBox &b ) const;
 
+	/*! Adds dv to each vertex of each polygon */
+	void translate ( const GsVec2& dv );
+
+	/*! Scales each polygon by given s factor */
+	void scale ( float s );
+
 	/*! Copy operator */
 	void operator = ( const GsPolygons& p );
 

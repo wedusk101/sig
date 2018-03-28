@@ -35,7 +35,7 @@ GsPolygons::~GsPolygons ()
 
 void GsPolygons::size ( int ns )
 {
-	int i, s = _data.size();
+	int i, s=_data.size();
 	if ( ns>s )
 	{	_data.size(ns);
 		for ( i=s; i<ns; i++ ) _data[i] = new GsPolygon;
@@ -48,7 +48,7 @@ void GsPolygons::size ( int ns )
 
 void GsPolygons::capacity ( int nc )
 {
-	int i, s = _data.size();
+	int i, s=_data.size();
 	if ( nc<0 ) nc=0;
 	if ( nc<s )
 	{	for ( i=nc; i<s; i++ ) delete _data[i];
@@ -101,12 +101,13 @@ bool GsPolygons::pick_vertex ( const GsVec2& p, float epsilon, int& pid, int& vi
 	int i, j, s;
 	float distmin, dist;
 
-	if ( size()==0 ) return false;
+	int ps = size();
+	if ( ps==0 ) return false;
 
 	pid = vid = -1;
 	distmin = 0;
 
-	for ( i=0; i<size(); i++ )
+	for ( i=0; i<ps; i++ )
 	{	s = cget(i).size();
 		for ( j=0; j<s; j++ )
 		{	dist = dist2 ( cget(i,j), p );
@@ -163,10 +164,21 @@ void GsPolygons::get_bounding_box ( GsBox& b ) const
 	}
 }
 
+void GsPolygons::translate ( const GsVec2& dv )
+{
+	for ( int i=size()-1; i>=0; i-- ) get(i).translate(dv);
+}
+
+void GsPolygons::scale ( float s )
+{
+	for ( int i=size()-1; i>=0; i-- ) get(i).scale(s);
+}
+
 void GsPolygons::operator = ( const GsPolygons& p )
 {
-	size ( p.size() );
-	for ( int i=0; i<p.size(); i++ ) get(i)=p.cget(i);
+	int s=p.size();
+	size ( s );
+	for ( int i=0; i<s; i++ ) get(i)=p.cget(i);
 }
 
 GsOutput& operator<< ( GsOutput& o, const GsPolygons& p )
