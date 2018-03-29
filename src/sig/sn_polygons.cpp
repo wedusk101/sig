@@ -115,7 +115,7 @@ void SnPolygons::use_external_triangulator ( void (*f) (const GsPolygon& p,GsArr
 
 static void draw_polygon (	const GsPolygon& pol, GsColor color,
 							SnPlanarObjects& o, SnLines2& l, SnPoints& p, GsArray<GsPnt2>& P, GsArray<int>& T,
-							gscenum solid, gscbool vertices, gscenum multicolor )
+							gscenum solid, gscbool vertices, gscbool multicolor )
 {
 	GS_TRACE2 ( "Rebuilding poly size: "<<pol.size() );
 
@@ -126,8 +126,8 @@ static void draw_polygon (	const GsPolygon& pol, GsColor color,
 	}
 
 	if ( pol.open() || pol.size()<=2 )
-	{	l.push_polyline(pol);
-		if ( multicolor ) l.push ( color );
+	{	if ( multicolor ) l.push ( color );
+		l.push_polyline(pol);
 	}
 	else
 	{	const GsArray<GsPnt2>* V;
@@ -152,7 +152,8 @@ static void draw_polygon (	const GsPolygon& pol, GsColor color,
 			for ( i=0; i<T.size(); i+=3 ) o.push_indices ( T[i], T[i+1], T[i+2] );
 		}
 		if ( solid==2 || T.empty() )
-		{	l.push_polygon(pol);
+		{	if ( multicolor ) l.push ( color );
+			l.push_polygon(pol);
 		}
 	}
 
