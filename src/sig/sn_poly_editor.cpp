@@ -57,6 +57,7 @@ SnPolyEditor::SnPolyEditor ()
 	_genevnotused = 0;
 	_edjuststarted = 0;
 	_add_vertices = 1;
+	_polylinemode = 0;
 }
 
 SnPolyEditor::~SnPolyEditor ()
@@ -124,9 +125,22 @@ void SnPolyEditor::set_edition_color ( GsColor ci, GsColor ce, GsColor cp )
 	_polygons->color ( ci, ce, cp );
 }
 
-void SnPolyEditor::max_polygons ( int i )
+void SnPolyEditor::use_colors_per_polygon ( bool b )
 {
-	_max_polys = i;
+	if ( b )
+	{	int s = _polygons->size();
+		if ( s>0 )
+		{	int origs = _polygons->colors().size();
+			_polygons->colors().size(s);
+			if ( origs<s ) for ( int i=origs; i<s; i++ ) _polygons->colors()[i]=GsColor::gray;
+		}
+		else
+		{	_polygons->colors().sizeres(0,8); // capacity will mark it to be used
+		}
+	}
+	else
+	{	_polygons->colors().sizecap(0,0); // mark to not be maintained
+	}
 }
 
 void SnPolyEditor::mode ( SnPolyEditor::Mode m )
@@ -543,13 +557,18 @@ int SnPolyEditor::handle_keyboard ( const GsEvent& e )
 				GsPolygon& p = _polygons->polygons()->push();
 				p.size ( size );
 				for ( i=0; i<size; i++ ) p[i]=_creation->V[i];
-				if ( size==2 ) p.open(); // a segment
+				if ( size==2 || _polylinemode ) p.open(true); // a segment
 				else { if ( !p.ccw() ) p.reverse(); } // put in CCW orientation
 				mode ( ModeAdd );
 				if ( _user_cb ) _user_cb ( this, PostInsertion, _polygons->polygons()->size()-1 );
-				if ( _stop_operation ) { _stop_operation=0; _polygons->polygons()->pop(); }
-				if ( _polygons->colors_per_polygon()>0 ) // update colors array
-				{	while ( _polygons->colors().size()<_polygons->size() ) _polygons->colors().push_top(); }
+				if ( _stop_operation )
+				{	_stop_operation=0; _polygons->polygons()->pop(); }
+				else
+				{	if ( _polygons->colors().capacity()>0 ) // update colors array
+					{	if ( _polygons->colors().size()==0 ) _polygons->colors().push()=GsColor::gray;
+						else while ( _polygons->colors().size()<_polygons->size() ) _polygons->colors().push_top();
+					}
+				}
 				return 1; // tell that I took the event
 			}
 		} break;

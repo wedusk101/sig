@@ -39,17 +39,19 @@ SnPolygons::~SnPolygons ()
 
 void SnPolygons::init ()
 {
-	touch();
 	_pols->init();
-	_colors.sizecap(0,0);
-	triangles()->init();
-	lines()->init();
-	points()->init();
+	touch();
 }
 
 void SnPolygons::touch ()
 { 
 	_nodeuptodate = 0;
+	if ( _pols->empty() )
+	{	_colors.sizecap(0,0);
+		triangles()->init();
+		lines()->init();
+		points()->init();
+	}
 }
 
 void SnPolygons::draw_mode ( int solid, int vertices )

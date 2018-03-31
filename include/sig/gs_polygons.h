@@ -140,4 +140,4 @@ class GsPolygons : public GsShareable
 
 //================================ End of File =================================================
 
-# endif // GS_SCENE_POLYGONS_H
+# endif // GS_POLYGONS_H

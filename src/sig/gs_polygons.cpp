@@ -115,7 +115,7 @@ bool GsPolygons::pick_vertex ( const GsVec2& p, float epsilon, int& pid, int& vi
 		}
 	}
 
-	if ( distmin<=epsilon*epsilon )
+	if ( pid>=0 && distmin<=epsilon*epsilon )
 		return true;
 	else
 		return false;

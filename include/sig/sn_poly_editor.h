@@ -48,7 +48,7 @@ class SnPolyEditor : public SnEditor
 	gscenum _mode;
 	gscenum _seltype; // SelType enumerator
 	gscenum _solid; // 0:draw edges, 1:draw interior, 2:draw both
-	gscbool _stop_operation, _add_vertices, _edjuststarted, _genevnotused;
+	gscbool _stop_operation, _add_vertices, _edjuststarted, _genevnotused, _polylinemode;
 
    protected :
 	/*! Destructor only accessible through unref() */
@@ -89,13 +89,19 @@ class SnPolyEditor : public SnEditor
 	/*! Set colors for the polygon interior, edges and points, in that order */
 	void set_edition_color ( GsColor ci, GsColor ce, GsColor cp );
 	
+	/*! Indicates that one color per polygon is to be maintained. */
+	void use_colors_per_polygon ( bool b );
+
 	/*! Set limits to the coordinates of the polygons. To deactivate limits set
 		the max limits lower or equal to the min limits. Limits are deactivated by default. */
 	void set_limits ( float xmin, float xmax, float ymin, float ymax ) { _min.set(xmin,ymin); _max.set(xmax,ymax); }
 
-	/*! Limits the maximum allowed number of polygons to be created */
-	void max_polygons ( int i );
+	/*! Limits the maximum allowed number of polygons to be created, if -1 is given no limit is used. */
+	void max_polygons ( int i ) { _max_polys = i; }
 	
+	/*! Limits the maximum allowed number of polygons to be created, if -1 is given no limit is used. */
+	void polyline_mode ( bool b ) { _polylinemode = b==true; }
+
 	SnPolygons* snpolygons () const { return _polygons; }
 	const GsPolygon& cpolygon ( int i ) const { return _polygons->cpolygons()->cget(i); }
 	GsPolygon& polygon ( int i ) { return _polygons->polygons()->get(i); }

@@ -147,7 +147,7 @@ class GsPolygon : public GsArray<GsPnt2>
 		collinear vertices in order to improve robustness. */
 	void ear_triangulation ( GsArray<int>& tris, float prec=0.00001f ) const;
 
-	/*! Returns the min,max coords of the bounding square of the polygon.
+	/*! Returns the min,max coords of the bounding box of the polygon.
 		If this polygon is empty, (1,1),(0,0) is returned. */
 	void get_bounding_box ( float& minx, float& miny, float& maxx, float& maxy ) const;
 
