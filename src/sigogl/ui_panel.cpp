@@ -290,6 +290,8 @@ static UiLabel XButLabel; // Exit button is the same to all panels, so we have i
 // #undef GS_TRACE3 
 // #define GS_TRACE3(s) if (_format==Vertical && _elements.size()>15) gsout<<s<<gsnl;
 
+// UiKeyDev: divide panel in 3 columns: Text, KeyAccel, Submenu arrow
+
 void UiPanel::build ()
 {
 	GS_TRACE3 ( "Panel Build Starting - 1st Rect: "<<_rect );
@@ -393,7 +395,7 @@ void UiPanel::build ()
 		// Check if item is a button and process it:
 		if ( e->type()==UiElement::Button )
 		{	UiButton* b = (UiButton*)get(i);
-			if ( b->submenu() ) // buil attached submenu:
+			if ( b->submenu() ) // build attached submenu:
 			{	UiPanel* sm = ((UiButton*)get(i))->submenu();
 				sm->build();
 			}
@@ -464,7 +466,7 @@ void UiPanel::build ()
 
 	_sngroup->compress(); // free some memmory
 	_elements.compress();
-	GS_TRACE3("Final Rect: " << _rect);
+	GS_TRACE3 ( "Final Rect: "<<_rect );
 }
 
 void UiPanel::become_float_submenu ( float x, float y )

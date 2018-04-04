@@ -43,7 +43,8 @@ SnPolyEditor::SnPolyEditor ()
 
 	_user_cb = 0;
 	_userdata = 0;
-	_stop_operation = 0;
+	_stopop = 0;
+	_adved = 0;
 
 	_max.set(-1,-1); // deactivated: max limit lower than min limit
 
@@ -56,7 +57,7 @@ SnPolyEditor::SnPolyEditor ()
 	_max_polys = -1;
 	_genevnotused = 0;
 	_edjuststarted = 0;
-	_add_vertices = 1;
+	_addvertices = 1;
 	_polylinemode = 0;
 }
 
@@ -71,7 +72,7 @@ void SnPolyEditor::init ()
 	_selection->init();
 	_selpol = _selvtx = -1;
 	if ( _mode!=ModeNoEdition && _mode!=ModeOnlyMove ) _mode = ModeAdd;
-	_stop_operation = 0;
+	_stopop = 0;
 	touch ();
 }
 
@@ -191,7 +192,7 @@ bool SnPolyEditor::pick_polygon ( const GsVec2& p )
 
 	GS_TRACE2 ( "Polygon "<<_selpol<<" picked!" );
 	if ( _user_cb ) _user_cb ( this, PolygonSelected, _selpol );
-	if ( _stop_operation ) { _stop_operation=0; _selpol=-1; return false; }
+	if ( _stopop ) { _stopop=0; _selpol=-1; return false; }
 	create_polygon_selection ( _selpol );
 
 	return true;
@@ -203,7 +204,7 @@ bool SnPolyEditor::subdivide_polygon_edge ( const GsVec2& p )
 
 	GS_TRACE2 ( "Edge picked!" );
 	if ( _user_cb ) _user_cb ( this, PreEditionIns, _selpol );
-	if ( _stop_operation ) { _stop_operation=0; return false; }
+	if ( _stopop ) { _stopop=0; return false; }
 
 	GsPolygon& pol = _polygons->get(_selpol);
 	_selvtx = (_selvtx+1)%pol.size();
@@ -317,7 +318,7 @@ void SnPolyEditor::translate_polygon ( int i, const GsVec2& lp, const GsVec2& p 
 	{	if ( !inlimits(pol,tv,_min,_max) ) return; }
 
 	if ( _user_cb ) _user_cb ( this, PreMovement, i );
-	if ( _stop_operation ) { _stop_operation=0; return; }
+	if ( _stopop ) { _stopop=0; return; }
 
 	pol.translate ( p-lp );
 	if ( _user_cb ) _user_cb ( this, PostMovement, i );
@@ -334,13 +335,13 @@ void SnPolyEditor::rotate_polygon ( int i, const GsVec2& lp, const GsVec2& p )
 		rpol.rotate ( cent, ang );
 		if ( !inlimits(rpol,GsVec2::null,_min,_max) ) return; 
 		if ( _user_cb ) _user_cb ( this, PreMovement, i );
-		if ( _stop_operation ) { _stop_operation=0; return; }
+		if ( _stopop ) { _stopop=0; return; }
 		pol = rpol;
 		if ( _user_cb ) _user_cb ( this, PostMovement, i );
 	}
 	else // no limit check
 	{	if ( _user_cb ) _user_cb ( this, PreMovement, i );
-		if ( _stop_operation ) { _stop_operation=0; return; }
+		if ( _stopop ) { _stopop=0; return; }
 		pol.rotate ( cent, ang );
 		if ( _user_cb ) _user_cb ( this, PostMovement, i );
 	}
@@ -351,7 +352,7 @@ void SnPolyEditor::remove_selected_polygon ()
 	_selection->init ();
 	if ( _selpol<0 ) return;
 	if ( _user_cb ) _user_cb ( this, PreRemoval, _selpol );
-	if ( _stop_operation ) { _stop_operation=0; _selpol=-1; return; }
+	if ( _stopop ) { _stopop=0; _selpol=-1; return; }
 	if ( _polygons->has_colors_per_polygon() ) _polygons->colors().remove(_selpol);
 	_polygons->polygons()->remove(_selpol);
 	_selpol=_selvtx=-1;
@@ -413,10 +414,22 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 
 		case ModeEdit:
 		{	if ( e.type==GsEvent::Push )
-			{	if ( pick_polygon_vertex(p) )
+			{	GsPolygon* pol=0;
+				int selp=_selpol, selv=_selvtx; // save initial state
+				if ( _selpol>=0 ) pol = &polygon(_selpol);
+				if ( pick_polygon_vertex(p) )
 				{	GS_TRACE2 ( "Vertex selected: "<<p ); }
-				else if ( _add_vertices && subdivide_polygon_edge(p) )
+				else if ( _addvertices && subdivide_polygon_edge(p) )
 				{	GS_TRACE2 ( "Edge subdivided at: "<<p ); }
+				else if ( pol && pol->open() && (selv==0||selv==pol->size()-1) )
+				{	GS_TRACE2 ( "Appending point to polyline: "<<p );
+					if ( selv==0 )
+					{	pol->insert(0)=p; _selvtx=selv; }
+					else
+					{	pol->push()=p; _selvtx=selv+1; }
+					_selpol = selp;
+					create_vertex_selection ( _selpol, _selvtx );
+				}
 				else if ( pick_polygon(p) )
 				{	GS_TRACE2 ( "Polygon selected from point: "<<p ); 
 					_mode=ModeMove;
@@ -431,7 +444,7 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 			else if ( e.type==GsEvent::Drag && _selvtx>=0 )
 			{	GS_TRACE1 ( "Drag event pol:"<<_selpol << " vtx:"<<_selvtx ); 
 				if ( _user_cb ) _user_cb ( this, PreEditionDrag, _selpol );
-				if ( _stop_operation ) { _stop_operation=0; _selvtx=-1; return 0; }
+				if ( _stopop ) { _stopop=0; _selvtx=-1; return 0; }
 				_polygons->get(_selpol)[_selvtx] = p;
 				if ( _user_cb ) _user_cb ( this, PostEdition, _selpol );
 				create_vertex_selection ( _selpol, _selvtx );
@@ -524,17 +537,68 @@ int SnPolyEditor::handle_keyboard ( const GsEvent& e )
 	{	solid_drawing ( ++_solid%3 );
 		return 1;
 	}
-	else if ( e.key=='s' )
+	else if ( e.key=='t' )
 	{	selection_type ( SelType(++_seltype%3) );
 		return 1;
 	}
 	else if ( e.key==GsEvent::KeyEnter && _selpol>=0 )
 	{	if ( _user_cb ) _user_cb ( this, PolygonSelected, _selpol );
-		if ( _stop_operation ) { _stop_operation=0; _selpol=-1; _selvtx=-1; return 0; }
+		if ( _stopop ) { _stopop=0; _selpol=-1; _selvtx=-1; return 0; }
 		_selvtx=-2; // special marker to allow subsequent push and drag
 		create_polygon_selection ( _selpol );
 		_mode=ModeMove;
 	 	return 1;
+	}
+	else if ( e.key=='c' && _adved && _selpol>=0 ) // make it ccw
+	{	GsPolygon& p = _polygons->polygons()->get(_selpol);
+		if ( !p.ccw() ) p.reverse();
+	}
+	else if ( e.key=='s' && _adved && _selvtx>=0 ) // split
+	{	GsPolygon& pa = polygon(_selpol);
+		pa.open ( true );
+		int sa = pa.size();
+		if ( sa>2 && _selvtx>0 && _selvtx<sa ) // can split in valid polylines
+		{	GsPolygon& pb = _polygons->push();
+			pb.open ( true );
+			int sb = sa-_selvtx;
+			pb.size ( sb );
+			for ( int i=0; i<sb; i++ ) pb[i]=pa[i+_selvtx];
+			pa.size ( _selvtx+1 );
+			pa.top() += (pa[_selvtx-1]-pb[0])*0.25f;
+			pb[0] += (pb[1]-pb[0])*0.25f;
+			_selpol = _selvtx = -1; _selection->init(); 
+			if ( !pa.ccw() ) pa.reverse();
+			if ( !pb.ccw() ) pb.reverse();
+			return 1;
+		}
+	}
+	else if ( e.key=='j' && _adved && _selvtx>=0 ) // join
+	{	GsPolygon& pa = polygon(_selpol);
+		int sa = pa.size();
+		if ( _selvtx==0 || _selvtx==sa-1 ) // can only join endpoints
+		{	GsPnt2& p = pa[_selvtx];
+			float d2, dmin2 = dist2(pa[0],pa.top());
+			int pid=-1, vid=-1;
+			for ( int i=0, s=polygons()->size(); i<s; i++ ) // get closest endpoint
+			{	if ( i==_selpol ) continue;
+				GsPolygon& pb = polygon(i);
+				d2 = dist2(pb[0],p);
+				if ( d2<dmin2 ) { pid=i; vid=0; dmin2=d2; }
+				d2 = dist2(pb.top(),p);
+				if ( d2<dmin2 ) { pid=i; vid=pb.size()-1; dmin2=d2; }
+			}
+			if ( pid>=0 ) // join 
+			{	GsPolygon& pb = _polygons->polygons()->get(pid);
+				if ( vid==0 ) pb.reverse();
+				if ( _selvtx>0 ) pa.reverse();
+				pb.push ( pa );
+				pb.open ( true );
+				_polygons->polygons()->remove(_selpol);
+				_selpol = _selvtx = -1; _selection->init(); 
+				if ( !pb.ccw() ) pb.reverse();
+			}
+			return 1;
+		}
 	}
 
 	switch ( _mode )
@@ -561,8 +625,8 @@ int SnPolyEditor::handle_keyboard ( const GsEvent& e )
 				else { if ( !p.ccw() ) p.reverse(); } // put in CCW orientation
 				mode ( ModeAdd );
 				if ( _user_cb ) _user_cb ( this, PostInsertion, _polygons->polygons()->size()-1 );
-				if ( _stop_operation )
-				{	_stop_operation=0; _polygons->polygons()->pop(); }
+				if ( _stopop )
+				{	_stopop=0; _polygons->polygons()->pop(); }
 				else
 				{	if ( _polygons->colors().capacity()>0 ) // update colors array
 					{	if ( _polygons->colors().size()==0 ) _polygons->colors().push()=GsColor::gray;
@@ -584,10 +648,10 @@ int SnPolyEditor::handle_keyboard ( const GsEvent& e )
 				}
 				else
 				{	if ( _user_cb ) _user_cb ( this, PreEditionRem, _selpol );
-					if ( _stop_operation ) { _stop_operation=0; _selvtx=-1; return 0; }
+					if ( _stopop ) { _stopop=0; _selvtx=-1; return 0; }
 					p[_selpol].remove(_selvtx);
 					if ( _user_cb ) _user_cb ( this, PostEdition, _selpol );
-					if (--_selvtx<0) _selvtx=size-2;
+					if ( _selvtx>0 ) --_selvtx;
 					create_vertex_selection ( _selpol, _selvtx );
 				}
 				return 1;

@@ -41,13 +41,20 @@ PolyEdViewer::PolyEdViewer ( int x, int y, int w, int h, const char* l ) : WsVie
 { 
 	root ( polyed=new SnPolyEditor );
 	polyed->callback ( my_polyed_callback, this );
+	polyed->advanced_editing ( true );
 }
 
-const char* Msg = "Keys:\n"
-				  "Esc: switch edition mode\n"
-				  "Enter: select polygon being edited\n"
-				  "d: change drawing mode\n"
-				  "o: change polygon between open or closed";
+const char* Msg = 
+"Keys:\n"
+"Esc: switch edition mode\n"
+"Enter: select polygon being edited\n"
+"t: change selection type\n"
+"d: change drawing mode\n"
+"o: change polygon between open or closed\n"
+"\nAdvanced editing mode:\n"
+"c: make polygon ccw\n"
+"s: split at selected vertex\n"
+"j: join selected vertex with closest\n";
 
 int PolyEdViewer::uievent ( int e )
 {

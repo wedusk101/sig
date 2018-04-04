@@ -45,10 +45,10 @@ class SnPolyEditor : public SnEditor
 	GsPnt2 _ptmp, _min, _max;
 	void (*_user_cb)(SnPolyEditor*,Event,int);
 	void* _userdata;
-	gscenum _mode;
+	gscenum _mode; // Mode enumerator
 	gscenum _seltype; // SelType enumerator
 	gscenum _solid; // 0:draw edges, 1:draw interior, 2:draw both
-	gscbool _stop_operation, _add_vertices, _edjuststarted, _genevnotused, _polylinemode;
+	gscbool _stopop, _adved, _addvertices, _edjuststarted, _genevnotused, _polylinemode;
 
    protected :
 	/*! Destructor only accessible through unref() */
@@ -69,7 +69,10 @@ class SnPolyEditor : public SnEditor
 	void solid_drawing ( gscenum dm );
 
 	/*! Determines if vertices can be added to polygons or not */
-	void allow_adding_vertices ( bool b ) { _add_vertices=(gscbool)b; }
+	void allow_adding_vertices ( bool b ) { _addvertices=(gscbool)b; }
+
+	/*! Determines if vertices can be added to polygons or not */
+	void advanced_editing ( bool b ) { _adved=(gscbool)b; }
 
 	/*! Set type of the selection marker: the polygon, the convex hull, or the bounding box */
 	void selection_type ( SelType t );
@@ -127,7 +130,7 @@ class SnPolyEditor : public SnEditor
 	void* userdata () const { return _userdata; }
 
 	/*! If possible stop current/next operation as detected in user's callback */
-	void stop_operation () { _stop_operation=1; }
+	void stop_operation () { _stopop=1; }
 
 	/*! Send to user's callback evnts which were not processed */
 	void notify_events_not_used () { _genevnotused=1; }
