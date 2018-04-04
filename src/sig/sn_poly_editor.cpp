@@ -549,54 +549,62 @@ int SnPolyEditor::handle_keyboard ( const GsEvent& e )
 		_mode=ModeMove;
 	 	return 1;
 	}
-	else if ( e.key=='c' && _adved && _selpol>=0 ) // make it ccw
-	{	GsPolygon& p = _polygons->polygons()->get(_selpol);
-		if ( !p.ccw() ) p.reverse();
-	}
-	else if ( e.key=='s' && _adved && _selvtx>=0 ) // split
-	{	GsPolygon& pa = polygon(_selpol);
-		pa.open ( true );
-		int sa = pa.size();
-		if ( sa>2 && _selvtx>0 && _selvtx<sa ) // can split in valid polylines
-		{	GsPolygon& pb = _polygons->push();
-			pb.open ( true );
-			int sb = sa-_selvtx;
-			pb.size ( sb );
-			for ( int i=0; i<sb; i++ ) pb[i]=pa[i+_selvtx];
-			pa.size ( _selvtx+1 );
-			pa.top() += (pa[_selvtx-1]-pb[0])*0.25f;
-			pb[0] += (pb[1]-pb[0])*0.25f;
-			_selpol = _selvtx = -1; _selection->init(); 
-			if ( !pa.ccw() ) pa.reverse();
-			if ( !pb.ccw() ) pb.reverse();
-			return 1;
+	else if ( _adved )
+	{	if ( e.key=='c' && _selpol>=0 ) // make it ccw
+		{	GsPolygon& p = _polygons->polygons()->get(_selpol);
+			if ( !p.ccw() ) p.reverse();
 		}
-	}
-	else if ( e.key=='j' && _adved && _selvtx>=0 ) // join
-	{	GsPolygon& pa = polygon(_selpol);
-		int sa = pa.size();
-		if ( _selvtx==0 || _selvtx==sa-1 ) // can only join endpoints
-		{	GsPnt2& p = pa[_selvtx];
-			float d2, dmin2 = dist2(pa[0],pa.top());
-			int pid=-1, vid=-1;
-			for ( int i=0, s=polygons()->size(); i<s; i++ ) // get closest endpoint
-			{	if ( i==_selpol ) continue;
-				GsPolygon& pb = polygon(i);
-				d2 = dist2(pb[0],p);
-				if ( d2<dmin2 ) { pid=i; vid=0; dmin2=d2; }
-				d2 = dist2(pb.top(),p);
-				if ( d2<dmin2 ) { pid=i; vid=pb.size()-1; dmin2=d2; }
-			}
-			if ( pid>=0 ) // join 
-			{	GsPolygon& pb = _polygons->polygons()->get(pid);
-				if ( vid==0 ) pb.reverse();
-				if ( _selvtx>0 ) pa.reverse();
-				pb.push ( pa );
+		else if ( e.key=='s' && _selvtx>=0 ) // split
+		{	GsPolygon& pa = polygon(_selpol);
+			pa.open ( true );
+			int sa = pa.size();
+			if ( sa>2 && _selvtx>0 && _selvtx<sa ) // can split in valid polylines
+			{	GsPolygon& pb = _polygons->push();
 				pb.open ( true );
-				_polygons->polygons()->remove(_selpol);
+				int sb = sa-_selvtx;
+				pb.size ( sb );
+				for ( int i=0; i<sb; i++ ) pb[i]=pa[i+_selvtx];
+				pa.size ( _selvtx+1 );
+				pa.top() += (pa[_selvtx-1]-pb[0])*0.25f;
+				pb[0] += (pb[1]-pb[0])*0.25f;
 				_selpol = _selvtx = -1; _selection->init(); 
+				if ( !pa.ccw() ) pa.reverse();
 				if ( !pb.ccw() ) pb.reverse();
+				return 1;
 			}
+		}
+		else if ( e.key=='j' && _selvtx>=0 ) // join
+		{	GsPolygon& pa = polygon(_selpol);
+			int sa = pa.size();
+			if ( _selvtx==0 || _selvtx==sa-1 ) // can only join endpoints
+			{	GsPnt2& p = pa[_selvtx];
+				float d2, dmin2 = dist2(pa[0],pa.top());
+				int pid=-1, vid=-1;
+				for ( int i=0, s=polygons()->size(); i<s; i++ ) // get closest endpoint
+				{	if ( i==_selpol ) continue;
+					GsPolygon& pb = polygon(i);
+					d2 = dist2(pb[0],p);
+					if ( d2<dmin2 ) { pid=i; vid=0; dmin2=d2; }
+					d2 = dist2(pb.top(),p);
+					if ( d2<dmin2 ) { pid=i; vid=pb.size()-1; dmin2=d2; }
+				}
+				if ( pid>=0 ) // join 
+				{	GsPolygon& pb = _polygons->polygons()->get(pid);
+					if ( vid==0 ) pb.reverse();
+					if ( _selvtx>0 ) pa.reverse();
+					pb.push ( pa );
+					pb.open ( true );
+					_polygons->polygons()->remove(_selpol);
+					_selpol = _selvtx = -1; _selection->init(); 
+					if ( !pb.ccw() ) pb.reverse();
+				}
+				return 1;
+			}
+		}
+		else if ( (e.key=='n'||e.key=='p') && _selvtx>=0 ) // move to next vertex
+		{	if ( e.key=='n' ) _selvtx++; else _selvtx--;
+			_selvtx=polygon(_selpol).vid(_selvtx);
+			create_vertex_selection ( _selpol, _selvtx );
 			return 1;
 		}
 	}

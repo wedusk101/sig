@@ -54,7 +54,8 @@ const char* Msg =
 "\nAdvanced editing mode:\n"
 "c: make polygon ccw\n"
 "s: split at selected vertex\n"
-"j: join selected vertex with closest\n";
+"j: join selected vertex with closest\n"
+"n/p: select next/previous vertex\n";
 
 int PolyEdViewer::uievent ( int e )
 {
