@@ -22,6 +22,7 @@
     <ClInclude Include="..\include\sigkin\kn_ct_motion.h" />
     <ClInclude Include="..\include\sigkin\kn_ct_posture.h" />
     <ClInclude Include="..\include\sigkin\kn_ct_scheduler.h" />
+    <ClInclude Include="..\include\sigkin\kn_fbx_importer.h" />
     <ClInclude Include="..\include\sigkin\kn_ik.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
     </ClInclude>
@@ -56,6 +57,7 @@
     <ClCompile Include="..\src\sigkin\kn_ct_motion.cpp" />
     <ClCompile Include="..\src\sigkin\kn_ct_posture.cpp" />
     <ClCompile Include="..\src\sigkin\kn_ct_scheduler.cpp" />
+    <ClCompile Include="..\src\sigkin\kn_fbx_importer.cpp" />
     <ClCompile Include="..\src\sigkin\kn_ik_solver.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>

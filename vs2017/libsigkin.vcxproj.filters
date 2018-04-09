@@ -90,6 +90,9 @@
     <ClCompile Include="..\src\sigkin\kn_mconnection.cpp">
       <Filter>skeleton</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sigkin\kn_fbx_importer.cpp">
+      <Filter>skeleton</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\sigkin\kn_controller.h">
@@ -162,6 +165,9 @@
       <Filter>ik</Filter>
     </ClInclude>
     <ClInclude Include="..\include\sigkin\kn_mconnection.h">
+      <Filter>skeleton</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sigkin\kn_fbx_importer.h">
       <Filter>skeleton</Filter>
     </ClInclude>
   </ItemGroup>

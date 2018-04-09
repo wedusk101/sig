@@ -8,6 +8,7 @@
 
 # include <sigkin/kn_skeleton.h>
 # include <sigkin/kn_ik_manipulator.h>
+# include <sigkin/kn_motion.h>
 # include <sigkin/kn_scene.h>
 
 # include <sigogl/ui_panel.h>
@@ -19,7 +20,8 @@
 // Viewer for this example:
 class MySkelViewer : public WsViewer
 {  public :
-	enum MenuEv { EvInfo, EvView, EvExit, EvP1, EvP2, EvP3, EvR1, EvR2, EvR3, EvPosture=100, EvEff=200, EvJoint=300 };
+	enum MenuEv { EvInfo, EvView, EvExit, EvP1, EvP2, EvP3, EvR1, EvR2, EvR3, EvLoadMotion,
+				  EvPosture=200, EvEff=400, EvJoint=600, EvMotion=800 };
 	SnGroup* _mg;
 	KnSkeleton* _sk;
 	KnScene* _sksc;
@@ -30,6 +32,8 @@ class MySkelViewer : public WsViewer
 	UiPanel* _valuesp;
 	UiPanel* _posturesp;
 	UiPanel* _endeffs;
+	UiPanel* _motionsp;
+	GsArray<KnMotion*> _motions;
 	int _seljoint;
 
    public :
@@ -38,6 +42,7 @@ class MySkelViewer : public WsViewer
 	void iksolved ( KnIkManipulator* ikm );
 	void build_value_panel ( int jid );
 	void update_joint ( int si, int jid );
+	void apply_motion ( KnMotion* m, float t );
 	virtual int uievent ( int e ) override;
 };
 

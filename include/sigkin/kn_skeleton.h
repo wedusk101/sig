@@ -199,8 +199,8 @@ class KnSkeleton : public GsShareable
 
 	/*! loads a .s, .sd, or .bvh file from given filename.
 		Note1: if lookforsd is set to true, then if a .sd file exists in the same folder of the 
-		skeleton file, the .sd file is automatically also loaded and applied to the skeleton.
-		Note2: if lookforw is true, then if a .w file of same name exists, it is automatically loaded. */
+		skeleton file, the .sd file is automatically subsequently loaded and applied to the skeleton.
+		Note2: if lookforw is true, then if a .w file of same name exists, it is then automatically loaded. */
 	bool load ( const char* filename, const char* basedir=0, bool lookforsd=true, bool lookforw=true );
 
 	/*! Loads a skeleton hierarchy in .s or .bvh format (also merges .sd files).

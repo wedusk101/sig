@@ -7,8 +7,8 @@
 
 # include "skelviewer.h"
 
+# include <sigkin/kn_fbx_importer.h>
 # include <sigogl/ui_dialogs.h>
-
 # include <sigogl/ws_dialog.h>
 # include <sigogl/ws_run.h>
 
@@ -31,14 +31,21 @@ int main ( int argc, char **argv )
 	}
 
 	if ( choice<=0 ) // select file from disk
-		skfile = ui_select_file ( "Select skeleton file to load:", "../data/arms/", "*.s;*.bvh" );
+		skfile = ui_select_file ( "Select skeleton file to load:", "../data/arms/", "*.s;*.bvh;*.fbx" );
 	else
 		skfile = s[choice];
 
 	// load skeleton:
 	if ( !skfile ) return 1;
 	KnSkeleton* sk = new KnSkeleton;
-	if ( !sk->load(skfile) ) gsout.fatal("could not load %s",skfile);
+	if ( gs_compare(gs_extension(skfile),"fbx")==0 ) // import fbx
+	{	KnFbxImporter fbximp;
+		if ( !fbximp.load(skfile) ) gsout.fatal("could not load %s",skfile);
+		fbximp.get_skeleton(sk);
+	}
+	else
+	{	if ( !sk->load(skfile) ) gsout.fatal("could not load %s",skfile);
+	}
 
 	// Create and show viewer:
 	MySkelViewer* viewer = new MySkelViewer(sk,-1,-1,800,600,"SIG Skelviewer");

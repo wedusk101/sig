@@ -11,7 +11,6 @@
 //================================ KnSkin ===================================
 
 # include <sig/gs_array.h>
-# include <sig/sn_model.h>
 
 class SnLines;
 class GsModel;
@@ -20,12 +19,16 @@ class KnSkeleton;
 
 /*! Maintains a model and skinning weights.
 	This class is usually owned (via sharing) by a KnSkeleton. */
-class KnSkin : public SnModel
-{  public :
-	struct Weight { KnJoint* j; float w; GsVec v; GsQuat q; };
+class KnSkin : public GsShareable
+{  protected :
+	struct Weight
+	{	KnJoint* j; float w; GsVec v; GsQuat q;
+//		Weight () { j=0; }
+	};
 	struct SkinVtx { int n; Weight* w; };
 	GsArray<SkinVtx> SV;
-	KnSkeleton* skeleton;
+	GsModel* _model;
+	KnSkeleton* _skeleton;
 	bool _intn;
 
    public :
@@ -35,7 +38,10 @@ class KnSkin : public SnModel
 	/*! Destructor */
    ~KnSkin ();
 
-	/*! deletes all */
+	/*! Returns the referenced model, as an always valid pointer */
+	GsModel* model () { return _model; }
+
+	/*! Deletes weights and initializes the reference model*/
 	void init ();
 
 	/*! Init by loading a skin mesh file (.m or .obj) and a skinning weight file (.w).
@@ -48,7 +54,6 @@ class KnSkin : public SnModel
 		Will only update if the skin mesh is visible, otherwise nothing is done. */
 	void update ();
 };
-
 
 //================================ End of File =================================================
 

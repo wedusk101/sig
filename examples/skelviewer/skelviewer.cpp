@@ -94,6 +94,12 @@ MySkelViewer::MySkelViewer ( KnSkeleton* sk, int x, int y, int w, int h, const c
 	}
 
 	p->add ( new UiButton ( "info", EvInfo ) );
+
+	p->add ( new UiButton ( "motions", sp=new UiPanel(0,UiPanel::Vertical) ) );
+	{	UiPanel* p=_motionsp=sp;
+		p->add ( new UiButton ( "load", EvLoadMotion ) );
+	}
+
 	p->add ( new UiButton ( "exit", EvExit ) );
 }
 
@@ -196,14 +202,25 @@ void MySkelViewer::update_joint ( int si, int jid )
 	}
 }
 
+void MySkelViewer::apply_motion ( KnMotion* m, float t )
+{
+	m->apply ( t );
+	message().setf ( "%s:  t=%f", m->name(), t );
+	_sksc->update ();
+	render ();
+	ws_check ();
+}
+
 int MySkelViewer::uievent ( int e )
 {
+	const int DEV=200;
+
 	if ( e>=EvP1 && e<=EvR3 )
 	{	update_joint(e-EvP1,_seljoint);
 		_sksc->update();
 		render();
 	}
-	else if ( e>=EvPosture && e<EvPosture+100 )
+	else if ( e>=EvPosture && e<EvPosture+DEV )
 	{	KnPosture* p = _sk->postures()[e-EvPosture];
 		p->apply();
 		_sksc->update();
@@ -211,25 +228,51 @@ int MySkelViewer::uievent ( int e )
 		p->output ( o, false, true );
 		return 1;
 	}
-	else if ( e>=EvEff && e<EvEff+100 )
+	else if ( e>=EvEff && e<EvEff+DEV )
 	{	KnJoint* j = _effs[e-EvEff];
 		_mg->get<KnIkManipulator>(e-EvEff)->lines( j->ik()->lines()? false:true );
 		//_sksc->update();
 		render ();
 		return 1;
 	}
-	else if ( e>=EvJoint && e<EvJoint+100 )
+	else if ( e>=EvJoint && e<EvJoint+DEV )
 	{	_seljoint = e-EvJoint;
 		joint_info ( _seljoint );
 		build_value_panel ( _seljoint );
 		return 1;
 	}
+	else if ( e>=EvMotion && e<EvMotion+DEV )
+	{	KnMotion* m = _motions[e-EvMotion];
+		double d = (double)m->duration();
+		double t=0, t0=gs_time();
+		while ( t<d )
+		{	apply_motion ( m, (float)t );
+			t = gs_time()-t0;
+		}
+		apply_motion ( m, (float)d );
+		return 1;
+	}
 	else switch ( e )
-	{	//case EvInfo: info(); return 1;
+	{	case EvLoadMotion:
+		{	const char* mfile = ui_select_file ( "Selection motion file", 0, "*.sm;*.bvh" );
+			if ( !mfile ) return 1;
+			KnMotion* m = new KnMotion;
+			if ( !m->load ( mfile ) ) { delete m; return 1; }
+			_motions.push ( m );
+			m->connect ( _sk );
+			m->ref ();
+			_motionsp->add ( new UiButton ( m->name(), EvMotion+_motions.size()-1 ) );
+			_motionsp->build();
+			if ( _motions.size()==1 ) _motionsp->top()->separate();
+		} return 1;
 
 		case EvView:
-		_sksc->set_visibility ( _vbut[0]->value(), _vbut[1]->value(), _vbut[2]->value(), _vbut[3]->value() );
-		return 1;
+		{	_sksc->set_visibility ( _vbut[0]->value(), _vbut[1]->value(), _vbut[2]->value(), _vbut[3]->value() );
+		} return 1;
+
+		case EvInfo: 
+		{	message().setf ( "Skeleton:%s Joints:%d Motions:%d", _sk->name(), _sk->joints().size(), _motions.size() );
+		} return 1;
 
 		case EvExit: ws_exit(); return 1;
 	}

@@ -235,10 +235,10 @@ class GsInput
 		Returns true if all tokens could be successfully skipped */
 	bool skip ( int n=1 );
 
-	/*! Reads tokens using get() until a string is found equal to the given name. 
+	/*! Reads tokens using get() until given type is found with string equal to the given name. 
 		Case-insensitive comparison is used.
 		Returns false if End was reached before, otherwise returns true. */
-	bool skipto ( const char *name );
+	bool skipto ( const char *name, TokenType type=String );
 
 	/*! Operator to read an integer. */
 	friend GsInput& operator>> ( GsInput& in, int& i ) { i=in.geti(); return in; }

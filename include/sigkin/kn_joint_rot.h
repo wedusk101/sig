@@ -33,11 +33,11 @@ class KnJointRot
 	enum SyncRot { JT=1, FQ=2, LQ=4, ST=8, EU=16 };
 	KnJoint* _joint;   // to notify the joint that the current rotation has changed
 	PrePost* _prepost; // local frame adjustment rotations
-	GsQuat   _quat;	// the total rotation of the joint, after applying prerot/postrot
+	GsQuat   _quat;	   // the total rotation of the joint, after applying prerot/postrot
 	GsQuat   _lquat;   // the local rotation of the joint, before applying prerot/postrot; if fullmode or no pre/post, will be same as _quat
-	gsbyte   _sync;	// encodes SyncRot flags
+	gsbyte   _sync;	   // encodes SyncRot flags
 	gscbool  _frozen;  // if false KnJointRot will not allow setting new quat values
-	gscenum  _mode;	// stores the joint mode (default Full). Affects how the setvalue() and value() methods will set quaternion after pre/post
+	gscenum  _mode;	   // stores the joint mode (default Full). Affects how the setvalue() and value() methods will set quaternion after pre/post
 	mutable  KnJointST* _st;
 	mutable  KnJointEuler* _euler;
 	friend class KnJointST;
@@ -59,12 +59,12 @@ class KnJointRot
 	/*! Init with the same parameters as in the given jr object */
 	void init ( const KnJointRot& jr );
 
-	/*! Sets the internal mode (default is JT_FULL). If JT_FULL the value set and 
-		retrieved through value() is considered already affected by the pre/post 
-		rotation. If the JT_LOCAL is set value() sets and gets the quaternion 
-		before pre/post. Remember that is prepost is not present local and  
-		full values are the same. All the joint parameterizations (ST and EU) if
-		prepost is present are expressed in local values.*/
+	/*! Sets the internal mode (default is FullMode). If in FullMode the value set
+		and retrieved with value() methods is considered already affected by the 
+		pre/post rotations. If LocalMode is set value() sets and gets the quaternion 
+		without pre/post. If prepost is not defined, then local and full values are
+		the same. For all the joint parameterizations (for ex. ST and EU), if
+		prepost is present they are expressed in local values.*/
 	void setmode ( ValueMode mode ) { _mode=mode; }
 
 	/*! Returns the joint mode. */

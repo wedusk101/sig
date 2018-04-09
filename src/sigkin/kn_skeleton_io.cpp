@@ -472,41 +472,41 @@ KnJoint* KnSkeleton::_loadj ( GsInput& in, KnJoint* p, GsDirs& paths, int mode, 
  }
 
 bool KnSkeleton::load ( const char* filename, const char* basedir, bool lookforsd, bool lookforw )
- {
-   GS_TRACE3("Load from file...");
-   GsInput in;
+{
+	GS_TRACE3("Load from file...");
+	GsInput in;
 
-   // load skeleton .s/.bvh or joint .sd file
-   if ( !in.open(filename) ) return false;
-   if ( !load(in,basedir) ) return false;
+	// load skeleton .s/.bvh or joint .sd file
+	if ( !in.open(filename) ) return false;
+	if ( !load(in,basedir) ) return false;
 
-   // check if there is a .sd data file to load
-   GsString filest(filename);
-   remove_extension(filest);
-   filest.append(".sd");
-   if ( lookforsd && in.open(filest) ) // there is extra joint data to load
-	{ if ( !load( in, basedir ) )
-		{ gsout << "Error loading " << filest << gsnl;
+	// check if there is a .sd data file to load
+	GsString filest(filename);
+	remove_extension(filest);
+	filest.append(".sd");
+	if ( lookforsd && in.open(filest) ) // there is extra joint data to load
+	{	if ( !load( in, basedir ) )
+		{	gsout << "Error loading " << filest << gsnl;
 			return false;
 		}
 	}
 
-   // check if there is a .w data file to load
-   remove_extension(filest);
-   filest.append(".w");
-   if ( lookforw && gs_exists(filest) )
-	{ if ( _skin ) _skin->unref();
-	  _skin = new KnSkin;
-	  _skin->ref();
-	  if ( !_skin->init ( this, filest, basedir ) )
-	   { gsout<<"Error loading "<<filest<<gsnl;
-		 _skin->unref();
-		 _skin=0;
-		 return false;
-	   }
+	// check if there is a .w data file to load
+	remove_extension(filest);
+	filest.append(".w");
+	if ( lookforw && gs_exists(filest) )
+	{	if ( _skin ) _skin->unref();
+		_skin = new KnSkin;
+		_skin->ref();
+		if ( !_skin->init ( this, filest, basedir ) )
+		{	gsout<<"Error loading "<<filest<<gsnl;
+			_skin->unref();
+			_skin=0;
+			return false;
+		}
 	}
-   return true;
- }
+	return true;
+}
 
 bool KnSkeleton::load ( GsInput& in, const char* basedir )
 {
@@ -535,7 +535,7 @@ bool KnSkeleton::load ( GsInput& in, const char* basedir )
 	{	// ok, .s or .sd format
 	}
 	else if ( in.ltoken()=="HIERARCHY" ) // .bvh
-	{	in.unget();		 // .bvh format has no signature
+	{	in.unget();	// .bvh format has no signature
 		name ( "bvhskel" ); // .bvh has no name, use a default one
 	}
 	else // .sk?

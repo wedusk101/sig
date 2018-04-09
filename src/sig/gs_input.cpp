@@ -382,14 +382,14 @@ bool GsInput::skip ( int n )
    return true;
  }
 
-bool GsInput::skipto ( const char *name )
- {
-   while ( get()!=End )
-	{ if ( _data->ltype==(gsbyte)String )
-	   if ( _data->ltoken==name ) return true;
+bool GsInput::skipto ( const char *name, TokenType type )
+{
+	while ( get()!=End )
+	{	if ( _data->ltype==(gsbyte)type )
+		{	if ( _data->ltoken==name ) return true; }
 	}
-   return false;
- }
+	return false;
+}
 
 //============================= operators ==================================
 
