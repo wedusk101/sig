@@ -24,6 +24,7 @@
 //# define GS_USE_TRACE6 // Animation curves
 //# define GS_USE_TRACE7 // Joint connections
 //# define GS_USE_TRACE8 // Curve connections
+//# define GS_USE_TRACE9
 # include <sig/gs_trace.h>
 
 //======================================= KnFbxImporter ====================================
