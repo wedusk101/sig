@@ -13,6 +13,7 @@
 # include <sigkin/kn_scene.h>
 # include <sigkin/kn_skeleton.h>
 # include <sigkin/kn_joint.h>
+# include <sigkin/kn_skin_scene.h>
 
 //# define GS_USE_TRACE1  // connect
 # include <sig/gs_trace.h>
@@ -30,13 +31,16 @@
 //# define DEF_CYLRAD_OFFSETRATIO	1
 //============================= KnScene ============================
 
-KnScene::KnScene ()
+KnScene::KnScene ( KnSkeleton* s )
 {
 	_cradius = DEF_CYL_RADIUS;
 	_sfactor = DEF_SPH_FACTOR;
 	_axislen = DEF_AXIS_LEN;
 	_avgoffsetlen = 1.0f;
 	_skeleton = 0;
+	_skinsc = 0;
+	_skelgroup = 0;
+	if ( s ) connect ( s );
 }
 
 KnScene::~KnScene ()
@@ -47,6 +51,8 @@ KnScene::~KnScene ()
 void KnScene::init ()
 {
 	remove_all ();
+	_skinsc = 0;
+	_skelgroup = 0;
 	_jgroup.capacity ( 0 );
 	if ( _skeleton ) { _skeleton->unref(); _skeleton=0; }
 }
@@ -83,13 +89,19 @@ void KnScene::connect ( KnSkeleton* s )
 	SnLines* axis;
 	SnPrimitive* sphere;
 	SnModel* smodel;
+	bool vgeovis=true;
 
 	const GsArray<KnJoint*>& joints = s->joints ();
 	_jgroup.size ( joints.size() );
 
-	SnGroup* g = make_joint_group ( s->root(), s, _jgroup );
+	SnGroup* g = _skelgroup = make_joint_group ( s->root(), s, _jgroup );
 	g->separator ( true );
-	add ( g );
+	add ( g ); // group containing per-joint visualization
+
+	if ( _skeleton->skin() ) // skin group
+	{	add ( _skinsc=new KnSkinScene(_skeleton->skin()) );
+		vgeovis = false;
+	}
 
 	float lavg=0, lmin=-1.0, lmax=-1.0f, lf;
 	if (joints[0])
@@ -146,6 +158,7 @@ void KnScene::connect ( KnSkeleton* s )
 		_jgroup[i]->add ( g, GeoPos );
 
 		smodel = new SnModel(joints[i]->visgeo()); // ok if visgeo is null
+		smodel->visible ( vgeovis );
 		g->add ( smodel ); // at VisgeoPos
 
 		smodel = new SnModel(joints[i]->colgeo());
@@ -169,8 +182,13 @@ void KnScene::connect ( KnSkeleton* s )
 void KnScene::update ()
 {
 	if ( !_skeleton ) return;
-	const GsArray<KnJoint*>& joints = _skeleton->joints ();
-	for ( int i=0; i<joints.size(); i++ ) update ( i );
+
+	if ( _skinsc ) _skinsc->update();
+
+	if ( _skelgroup->visible() )
+	{	const GsArray<KnJoint*>& joints = _skeleton->joints ();
+		for ( int i=0, s=joints.size(); i<s; i++ ) update ( i );
+	}
 }
 
 void KnScene::update ( int j )
@@ -220,15 +238,23 @@ void KnScene::rebuild ( int j )
 	}
 }
 
-//===== virtual methods =====
+//===== visibility methods =====
 
-void KnScene::set_visibility ( int skel, int visgeo, int colgeo, int vaxis )
+void KnScene::set_visibility ( int skin, int skel, int visgeo, int colgeo, int vaxis )
 {
 	if ( !_skeleton ) return;
+
 	const GsArray<KnJoint*>& joints = _skeleton->joints();
 	for ( int i=0, s=joints.size(); i<s; i++ )
 	{	set_visibility ( joints[i], skel, visgeo, colgeo, vaxis );
 	}
+
+	if ( _skinsc && skin!=-1 )
+	{	_skinsc->visible ( skin==1 );
+	}
+
+	// check if per-joint info shuld be visible:
+	_skelgroup->visible ( !skel && !visgeo && !colgeo && !vaxis? false:true );
 }
 
 void KnScene::set_visibility ( KnJoint* joint, int skel, int visgeo, int colgeo, int vaxis )

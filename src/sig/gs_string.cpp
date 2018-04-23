@@ -473,38 +473,38 @@ int remove_filename ( GsString& path )
  }
 
 int remove_path ( GsString& fname )
- {
-   int i=-1;
-   for ( i=fname.len()-1; i>=0; i-- )
-	{ if ( fname[i]=='/' || fname[i]=='\\' )
-	   { fname.substring(i+1,-1);
-		 break;
-	   }
+{
+	int i=-1;
+	for ( i=fname.len()-1; i>=0; i-- )
+	{	if ( fname[i]=='/' || fname[i]=='\\' )
+		{	fname.substring(i+1,-1);
+			break;
+		}
 	}
-   return i;
- }
+	return i;
+}
 
 int remove_extension ( GsString& fname )
- {
-   int i=-1;
-   for ( i=fname.len()-1; i>=0; i-- )
-	{ if ( fname[i]=='.' ) { fname.len(i); return i; }
-	  if ( fname[i]=='/' || fname[i]=='\\' ) return -1; // no extension
+{
+	int i=-1;
+	for ( i=fname.len()-1; i>=0; i-- )
+	{	if ( fname[i]=='.' ) { fname.len(i); return i; }
+		if ( fname[i]=='/' || fname[i]=='\\' ) return -1; // no extension
 	}
-   return i;
- }
+	return i;
+}
 
 int get_filename ( const GsString& path, GsString& fname )
- {
-   fname = path;
-   return remove_path ( fname );
- }
+{
+	fname = path;
+	return remove_path ( fname );
+}
 
 int get_path ( const GsString& fname, GsString& path )
- {
-   path = fname;
-   return remove_filename ( path );
- }
+{
+	path = fname;
+	return remove_filename ( path );
+}
 
 int get_extension ( const GsString& fname, GsString& ext )
  {

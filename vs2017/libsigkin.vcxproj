@@ -46,6 +46,7 @@
     <ClInclude Include="..\include\sigkin\kn_posture.h" />
     <ClInclude Include="..\include\sigkin\kn_scene.h" />
     <ClInclude Include="..\include\sigkin\kn_skeleton.h" />
+    <ClInclude Include="..\include\sigkin\kn_skin_scene.h" />
     <ClInclude Include="..\include\sigkin\kn_skin.h" />
     <ClInclude Include="..\include\sigkin\kn_vec_limits.h" />
   </ItemGroup>
@@ -84,6 +85,7 @@
     <ClCompile Include="..\src\sigkin\kn_scene.cpp" />
     <ClCompile Include="..\src\sigkin\kn_skeleton.cpp" />
     <ClCompile Include="..\src\sigkin\kn_skeleton_io.cpp" />
+    <ClCompile Include="..\src\sigkin\kn_skin_scene.cpp" />
     <ClCompile Include="..\src\sigkin\kn_skin.cpp" />
     <ClCompile Include="..\src\sigkin\kn_vec_limits.cpp" />
   </ItemGroup>

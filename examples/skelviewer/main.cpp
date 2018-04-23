@@ -7,10 +7,13 @@
 
 # include "skelviewer.h"
 
+# include <sigkin/kn_skin.h>
 # include <sigkin/kn_fbx_importer.h>
 # include <sigogl/ui_dialogs.h>
 # include <sigogl/ws_dialog.h>
 # include <sigogl/ws_run.h>
+
+static SnGroup* get_skin_models ( KnFbxImporter& fbximp );
 
 int main ( int argc, char **argv )
 {
@@ -35,20 +38,25 @@ int main ( int argc, char **argv )
 	else
 		skfile = s[choice];
 
-	// load skeleton:
+	// Create viewer:
 	if ( !skfile ) return 1;
 	KnSkeleton* sk = new KnSkeleton;
+
+	// load skeleton:
+	SnGroup* g=0;
 	if ( gs_compare(gs_extension(skfile),"fbx")==0 ) // import fbx
 	{	KnFbxImporter fbximp;
 		if ( !fbximp.load(skfile) ) gsout.fatal("could not load %s",skfile);
 		fbximp.get_skeleton(sk);
+		// g = get_skin_models(fbximp); // use this to inspect skin models
 	}
 	else
 	{	if ( !sk->load(skfile) ) gsout.fatal("could not load %s",skfile);
 	}
 
-	// Create and show viewer:
+	// Create viewer:
 	MySkelViewer* viewer = new MySkelViewer(sk,-1,-1,800,600,"SIG Skelviewer");
+	if ( g ) viewer->rootg()->add ( g );
 	viewer->view_all ();
 	viewer->show();
 
@@ -56,4 +64,15 @@ int main ( int argc, char **argv )
 	ws_run();
 
 	return 1;
+}
+
+static SnGroup* get_skin_models ( KnFbxImporter& fbximp )
+{
+	const GsArrayRef<GsModel>& m = fbximp.models();
+	if ( m.empty() ) return 0;
+	SnGroup* g = new SnGroup;
+	for ( int i=0; i<m.size(); i++ )
+	{	g->add ( new SnModel ( m[i] ) );
+	}
+	return g;
 }

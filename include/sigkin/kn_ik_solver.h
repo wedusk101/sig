@@ -24,7 +24,7 @@ class KnIkSolver : public KnIk
 
    public:
 	KnIkSolver ();
-	void coldet ( KnColdet* cd ) { updref<KnColdet>(_coldet,cd); }
+	void coldet ( KnColdet* cd ) { updrefs(_coldet,cd); }
 	void fixed_orbit ( float oang ) { orbitsearch=false; osearch.init=oang; }
 	void search_orbit () { orbitsearch=true; }
 	virtual bool standardik () { return true; }

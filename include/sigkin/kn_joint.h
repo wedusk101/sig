@@ -83,12 +83,12 @@ class KnJoint
 	/*! Replaces the visualization geometry pointer with the new one.
 		The ref/unref methods are used during replacement and null can be
 		passed in order to only unref the visualization geometry */
-	void visgeo ( GsModel* m ) { updref<GsModel>(_visgeo,m); }
+	void visgeo ( GsModel* m ) { updrefs(_visgeo,m); }
 
 	/*! Replaces the collision geometry pointer with the new one.
 		The ref/unref methods are used during replacement and null can be
 		passed in order to only unref the collision geometry */
-	void colgeo ( GsModel* m ) { updref<GsModel>(_colgeo,m); }
+	void colgeo ( GsModel* m ) { updrefs(_colgeo,m); }
 
 	/*! Get a pointer to the skeleton owner of this joint */
 	KnSkeleton* skeleton () { return _skeleton; }
@@ -218,7 +218,7 @@ class KnJoint
 	bool ikinit ( KnIk::Type t );
 
 	/*! Defines or updates the ik solver currenlty being referenced */
-	void ik ( KnIkSolver* iks ) { updref<KnIkSolver>(_ik,iks); }
+	void ik ( KnIkSolver* iks ) { updrefs(_ik,iks); }
 
 	/*! Access the ik solver; will be null if none is associated */
 	KnIkSolver* ik () { return _ik; }

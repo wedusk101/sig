@@ -31,7 +31,6 @@ class GlContext : public GsShareable
 	const GsMat* _viewing;
 	const GsMat* _modelview;
 	const GsMat* _cameraview;
-
 	const GsMat* _localframe;
 	// Tracked state:
 	GsColor _clearcolor;
@@ -45,7 +44,7 @@ class GlContext : public GsShareable
 	GLenum _polygonmode;
 
    public :
-	GsLight light;
+	GsLight light; // LightDev: add multiple lights
 
    public :
 	GlContext ();
@@ -80,6 +79,12 @@ class GlContext : public GsShareable
 	void transparency ( bool b );
 	void cull_face ( bool b );
 	void depth_test ( bool b );
+
+	/*! Access to state values */
+	bool line_smoothing () const { return _linesmoothing; }
+	bool transparency () const { return _transparency; }
+	bool cull_face () const { return _cullface; }
+	bool depth_test () { return _depthtest; }
 
 	void polygon_mode_fill ();
 	void polygon_mode_line ();

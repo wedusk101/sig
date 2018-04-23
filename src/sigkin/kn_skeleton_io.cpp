@@ -498,12 +498,13 @@ bool KnSkeleton::load ( const char* filename, const char* basedir, bool lookfors
 	{	if ( _skin ) _skin->unref();
 		_skin = new KnSkin;
 		_skin->ref();
-		if ( !_skin->init ( this, filest, basedir ) )
-		{	gsout<<"Error loading "<<filest<<gsnl;
-			_skin->unref();
-			_skin=0;
-			return false;
-		}
+//SkinDev: add load/save skin functionality
+		//if ( !_skin->init ( this, filest, basedir ) )
+		//{	gsout<<"Error loading "<<filest<<gsnl;
+		//	_skin->unref();
+		//	_skin=0;
+		//	return false;
+		//}
 	}
 	return true;
 }

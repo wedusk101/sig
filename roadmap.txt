@@ -3,18 +3,20 @@
            Copyright (c) 2018 Marcelo Kallmann
 ===============================================================
 
-===== Todo ====
+===== Todo =====
 
-- Shader support for multiple lights
+- Support for additional maps: normals, specular, etc
 - Complete glfw integration
 - Review file loading by GsModel and KnSkeleton
 - Review title of example programs
 
 ===== Searchable Labels Tracking Work in Progress =====
 
+- SkinDev:  skeletal skinning
 - CamDev:   updates to camera control
 - UiDev:	user interface development
 - UiKeyDev: inclusion of key navigation in UI
+- LightDev: Shader support for multiple lights
 - SgDev:	scene graph development
 - ManipDev: development to include rotation in SnManipulator
 - TodoNote: functionality not yet implemented
@@ -23,6 +25,6 @@
 
 ===== State of Examples =====
 
-- uidemo: review/test alignment groups, add "about" cmd
-- shapes: flat shading seems not correct
-- skelviewer: add loading of motions, and skin
+- uidemo: reviewt alignment in panels including key cmds
+- skelviewer: complete motions and skin integration
+- modelviewer: complete

@@ -16,52 +16,56 @@
 bool KnSkeleton::ConvertBvhToQuat = true;
 
 KnSkeleton::KnSkeleton ()
- {
-   _name = "noname";
-   _filename = 0;
-   _root = 0;
-   _coldetid = -1;	   // index used in collision detection
-   _gmat_uptodate = false;
-   _enforce_rot_limits = false;
+{
+	_name = "noname";
+	_filename = 0;
+	_root = 0;
+	_coldetid = -1;	   // index used in collision detection
+	_gmat_uptodate = false;
+	_enforce_rot_limits = false;
 
-   _channels = new KnChannels;
-   _channels->ref();
+	_channels = new KnChannels;
+	_channels->ref();
 
-   _dfjoints = 0;
-   _skin = 0;
-   _userdata = new GsVars;
-   _userdata->ref();
+	_dfjoints = 0;
+	_skin = 0;
+	_userdata = new GsVars;
+	_userdata->ref();
 
-   udata = 0;
- }
+	udata = 0;
+}
 
 KnSkeleton::~KnSkeleton ()
- {
-   init ();
-   delete[] _filename;
-   if ( _dfjoints ) _dfjoints->unref();
-   if ( _skin ) _skin->unref();
-   _channels->unref();
-   _userdata->unref();
+{
+	init ();
+	delete[] _filename;
+	if ( _dfjoints ) _dfjoints->unref();
+	if ( _skin ) _skin->unref();
+	_channels->unref();
+	_userdata->unref();
    
- }
+}
 
 void KnSkeleton::init ()
- {
-   _colfreepairs.size(0);
-   _channels->init();
-   while ( _postures.size()>0 ) _postures.pop()->unref();
-   while ( _joints.size()>0 ) delete _joints.pop();
-   _jhash.init(0);
-   _root = 0;
-   _gmat_uptodate = false;
- }
+{
+	_colfreepairs.size(0);
+	_channels->init();
+	while ( _postures.size()>0 ) _postures.pop()->unref();
+	while ( _joints.size()>0 ) delete _joints.pop();
+	_jhash.init(0);
+	_root = 0;
+	_gmat_uptodate = false;
+}
+
+void KnSkeleton::skin ( KnSkin* skin )
+{
+	updrefs ( _skin, skin );
+}
 
 void KnSkeleton::init_values ()
- {
-   int i;
-   for ( i=0; i<_joints.size(); i++ ) _joints[i]->init_values();
- }
+{
+	for ( int i=0, s=_joints.size(); i<s; i++ ) _joints[i]->init_values();
+}
 
 KnJoint* KnSkeleton::add_joint ( KnJoint::RotType rtype, KnJoint* parent, const char* name )
  {

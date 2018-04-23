@@ -53,14 +53,14 @@ class GsModel : public GsShareable
 	struct Texture
 	{	int id;				//!< the texture index, or <0 if not yet loaded
 		GsCharPt fname;		//!< texture filename as read from model file
-		Texture () { id=-1; }
+		Texture ( const char* file=0 ) : fname(file) { id=-1; }
 	};
 
 	/*! The group structure keeps material and texture information for group of faces */
 	struct Group
 	{	int fi, fn;			//!< the initial face index and the number of faces in this group
 		GsCharPt mtlname;	//!< name of the material used by this group
-		Texture* dmap;		//!< diffuse color map, or null if there is no diffuse texture
+		Texture* dmap;		//!< diffuse color map, or null pointer if none
 		Group ( int i=0, int n=0 ) { fi=i; fn=n; dmap=0; }
 	   ~Group () { delete dmap; }
 		void copy ( const Group& g );
@@ -142,6 +142,9 @@ class GsModel : public GsShareable
 
 	/*! Sets to an empty model. Mode is updated and used memory is freed. */
 	void init ();
+
+	/*! Sends to the output summary information about the model. Char sep is used to separate the information. */
+	void statistics ( GsOutput& o, char sep=gsnl );
 
 	/*! Copy operator */
 	void operator = ( const GsModel& m );

@@ -130,10 +130,10 @@ void GlContext::depth_test ( bool b )
 	if (b)
 	{	glEnable(GL_DEPTH_TEST);
 	}
-   else
+	else
 	{	glDisable(GL_DEPTH_TEST);
 	}
- }
+}
 
 void GlContext::polygon_mode_fill ()
 {

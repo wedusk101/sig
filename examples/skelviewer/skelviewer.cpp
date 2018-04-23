@@ -13,6 +13,8 @@
 
 # include <sigogl/ws_run.h>
 
+# include <sigkin/kn_scene.h>
+
 void ManipPCB ( KnIkManipulator* ikm, void* udata )
 {
 	((MySkelViewer*)udata)->iksolved(ikm);
@@ -21,19 +23,22 @@ void ManipPCB ( KnIkManipulator* ikm, void* udata )
 MySkelViewer::MySkelViewer ( KnSkeleton* sk, int x, int y, int w, int h, const char* l ) : WsViewer(x,y,w,h,l)
 { 
 	// create my scene and viewer:
-	_sksc = new KnScene; // KnScene derives SnGroup
-	_sksc->connect ( sk ); // creates a scene for my skeleton
+	
+	rootg()->add ( _sksc=new KnScene(sk) );
 
 	// set visualization:
-	bool viewskel=false, viewvisg=true, viewcolg=false, viewaxis=false;
-	if ( sk->visgeos()==0 ) // if no geometries show the skeleton:
-	{	viewskel=true; viewvisg=false; }
-	_sksc->set_visibility ( viewskel/*skel*/, viewvisg/*visgeo*/, viewcolg/*colgeo*/, viewaxis/*axis*/ );
+	bool viewskin=false, viewskel=false, viewvisg=false, viewcolg=false, viewaxis=false;
+	if ( sk->skin() )
+	{	viewskin=true;
+	}
+	else if ( sk->visgeos()==0 ) // if no geometries show the skeleton:
+	{	viewskel=true; viewvisg=false;
+	}
+	else viewvisg=true;
+	_sksc->set_visibility ( viewskin, viewskel/*skel*/, viewvisg/*visgeo*/, viewcolg/*colgeo*/, viewaxis/*axis*/ );
 
 	// Extra settings:
 	//sk->enforce_rot_limits ( false );
-
-	rootg()->add ( _sksc );
 
 	_sk=sk;
 	_seljoint=0;
@@ -87,10 +92,11 @@ MySkelViewer::MySkelViewer ( KnSkeleton* sk, int x, int y, int w, int h, const c
 
 	p->add ( new UiButton ( "view", sp=new UiPanel(0,UiPanel::Vertical) ) );
 	{	UiPanel* p=_valuesp=sp;
-		_vbut[0] = (UiCheckButton*)p->add ( new UiCheckButton ( "skeleton", EvView, viewskel ) );
-		_vbut[1] = (UiCheckButton*)p->add ( new UiCheckButton ( "visgeo", EvView, viewvisg ) );
-		_vbut[2] = (UiCheckButton*)p->add ( new UiCheckButton ( "colgeo", EvView, viewcolg ) );
-		_vbut[3] = (UiCheckButton*)p->add ( new UiCheckButton ( "frames", EvView, viewaxis ) );
+		_vbut[0] = (UiCheckButton*)p->add ( new UiCheckButton ( "skin", EvView, viewskin ) );
+		_vbut[1] = (UiCheckButton*)p->add ( new UiCheckButton ( "skeleton", EvView, viewskel ) );
+		_vbut[2] = (UiCheckButton*)p->add ( new UiCheckButton ( "visgeo", EvView, viewvisg ) );
+		_vbut[3] = (UiCheckButton*)p->add ( new UiCheckButton ( "colgeo", EvView, viewcolg ) );
+		_vbut[4] = (UiCheckButton*)p->add ( new UiCheckButton ( "frames", EvView, viewaxis ) );
 	}
 
 	p->add ( new UiButton ( "info", EvInfo ) );
@@ -202,10 +208,10 @@ void MySkelViewer::update_joint ( int si, int jid )
 	}
 }
 
-void MySkelViewer::apply_motion ( KnMotion* m, float t )
+void MySkelViewer::apply_motion ( KnMotion* m, int n, float t )
 {
 	m->apply ( t );
-	message().setf ( "%s:  t=%f", m->name(), t );
+	message().setf ( "%s:  n=%d  t=%4.2f  fps=%4.2f", m->name(), n, t, (t>0?float(n)/t:0.0f) );
 	_sksc->update ();
 	render ();
 	ws_check ();
@@ -245,11 +251,12 @@ int MySkelViewer::uievent ( int e )
 	{	KnMotion* m = _motions[e-EvMotion];
 		double d = (double)m->duration();
 		double t=0, t0=gs_time();
+		int n=1;
 		while ( t<d )
-		{	apply_motion ( m, (float)t );
+		{	apply_motion ( m, n++, (float)t );
 			t = gs_time()-t0;
 		}
-		apply_motion ( m, (float)d );
+		apply_motion ( m, n, (float)d );
 		return 1;
 	}
 	else switch ( e )
@@ -267,11 +274,14 @@ int MySkelViewer::uievent ( int e )
 		} return 1;
 
 		case EvView:
-		{	_sksc->set_visibility ( _vbut[0]->value(), _vbut[1]->value(), _vbut[2]->value(), _vbut[3]->value() );
+		{	_sksc->set_visibility ( _vbut[0]->value(), _vbut[1]->value(), _vbut[2]->value(), _vbut[3]->value(), _vbut[4]->value() );
+			_sksc->update();
 		} return 1;
 
 		case EvInfo: 
-		{	message().setf ( "Skeleton:%s Joints:%d Motions:%d", _sk->name(), _sk->joints().size(), _motions.size() );
+		{	message().setf ( "Skeleton:%s  Joints:%d  Channels:%d  Channels in Motions:", 
+					_sk->name(), _sk->joints().size(), _sk->channels().size() );
+			for ( int i=0; i<_motions.size(); i++ ) message()<<" "<<_motions[i]->channels()->size();
 		} return 1;
 
 		case EvExit: ws_exit(); return 1;

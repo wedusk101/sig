@@ -74,11 +74,14 @@ class KnSkeleton : public GsShareable
 	/*! Access to the user data GsVars, which is always a valid pointer that can be shared */
 	GsVars* userdata () { return _userdata; }
 
-	/*! Access to the skin object, can be null if not loaded */
-	KnSkin* skin () { return _skin; }
-
 	/*! Deletes all data and set the skeleton to be an empty hierarchy */
 	void init ();
+
+	/*! Access to the skin object, will be null if non existing */
+	KnSkin* skin () { return _skin; }
+
+	/*! Associates by referencing a skin object for this skeleton, unreferencing the previous if any */
+	void skin ( KnSkin* skin );
 
 	/*! Set a file name to be associated with the skeleton.
 		This information is not saved in the skeleton file and is 

@@ -18,17 +18,20 @@ class SnLines;
 class GsModel;
 class KnJoint;
 class KnSkeleton;
+class KnSkinScene;
 
 /*! Maintains a scene graph containing geometries to display a given KnSkeleton */
 class KnScene : public SnGroup
- { protected :
+{  protected :
 	GsArray<SnGroup*> _jgroup;
 	float _cradius, _sfactor, _axislen, _avgoffsetlen;
 	KnSkeleton* _skeleton;
+	KnSkinScene* _skinsc;
+	SnGroup* _skelgroup;
 
    public :
-	/*! Constructor  */
-	KnScene ();
+	/*! Constructor. If s is given as non-null s will be connected. */
+	KnScene ( KnSkeleton* s=0 );
 
 	/*! Destructor unreferences the associated skeleton */
    ~KnScene ();
@@ -39,35 +42,40 @@ class KnScene : public SnGroup
    public : //=== virtual methods for functionality extension ===
 
 	/*! Creates a scene graph according to the given skeleton.
-		Only the visualization geometry is set as visible; method
-		set_visibility() can be used to visualize other objects.
+		If a skin exists, only the skin is visible at creation time; otherwise,
+		the visualization geometry will be set as visible. In all cases method
+		set_visibility() can be used to visualize other elements.
+		If only skin visualization is need, use lighter KnSkinScene class.
 		Null can be passed to clear the scene.
 		The skeleton ref()/unref() methods are respected. */
-	virtual void connect ( KnSkeleton* s );
+	void connect ( KnSkeleton* s );
 
 	/*! Update the transformations of the scene graph according
-		to the joints in the skeleton sent to init(). */
-	virtual void update ();
+		to the joints in the skeleton sent to init().
+		The skin and per-joint elements will only be updated if visible. */
+	void update ();
 
 	/*! Update the scene transformation relative to the given joint index j,
 		of the skeleton sent to init. */
-	virtual void update ( int j );
+	void update ( int j );
 
 	/*! Rebuild all joints of the current skeleton */
-	virtual void rebuild ();
+	void rebuild ();
 
 	/*! Rebuild all data relative to the given joint index j */
-	virtual void rebuild ( int j );
+	void rebuild ( int j );
 
    public : //=== end of virtual methods section ===
 
 	/*! Returns the connected skeleton, or null if not connected */
 	KnSkeleton* skeleton () { return _skeleton; }
 
-	/*! Set the visibility state of the skeleton, the visualization geometry,
+	/*! Set the visibility state of the skin, skeleton, the visualization geometry,
 		the collision geometry, and joint axis. The integers mean 1:show, 0:hide, and
-		-1:does not change the visibility state. */
-	void set_visibility ( int skel, int visgeo, int colgeo, int axis );
+		-1:does not change the visibility state. If the skin and/or all per-joint
+		elements are not visible the non-visible elements will not be updated on
+		a call to update() */
+	void set_visibility ( int skin, int skel, int visgeo, int colgeo, int axis );
 
 	/*! Same as the other set_visibility() method, but only affecting the given joint */
 	void set_visibility ( KnJoint* joint, int skel, int visgeo, int colgeo, int vaxis );

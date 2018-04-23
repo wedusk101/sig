@@ -391,9 +391,9 @@ bool gs_canopen ( const char* fname )
 {
 	FILE* fp = fopen ( fname, "r" );
 	if ( fp )
-	{ fclose(fp); return true; }
-   else
-	{ return false; }
+	{	fclose(fp); return true; }
+	else
+	{	return false; }
 }
 
 bool gs_absolute ( const char* path )

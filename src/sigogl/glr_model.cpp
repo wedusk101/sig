@@ -83,7 +83,7 @@ void GlrModel::render (  SnShape* s, GlContext* c )
 
 	const GlProgram* p=pGour;
 
-	c->cull_face ( m.culling? 1:0 ); // TodoNote: set rules for back-face culling context state change
+	c->cull_face ( m.culling==1 ); // every node has to set its desired back face culling state
 
 	// 1. Set programs based on rendering mode
 	gsRenderMode rm = s->render_mode();

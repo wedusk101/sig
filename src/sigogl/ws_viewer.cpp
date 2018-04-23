@@ -531,9 +531,9 @@ void WsViewer::view_all ( GsBox* boxpt )
 			float s = box.maxsize()/2.0f;
 			float d = s/tanf(c.fovy/2.0f);
 			c.center = box.center();
-			c.eye = c.center+GsVec(0,0,d+s); // s here should be box center dist to box front plane
+			c.eye = c.center+GsVec(0,0,d+s+0.2f);
 			c.up = GsVec::j;
-			c.znear = 0.01f;
+			c.znear = 0.1f;
 			c.zfar  = d+3.0f*s;
 		}
 	}

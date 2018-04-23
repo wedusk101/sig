@@ -244,11 +244,10 @@ bool GsModel::load_obj ( const char* file )
 	validate();
 	compress ();
 
-	GS_TRACE4("V size:"<<V.size()<<" N size:"<<N.size());
-	GS_TRACE4("F size:"<<F.size()<<" Fn size:"<<Fn.size());
-	GS_TRACE4("T size:"<<T.size()<<" Ft size:"<<Ft.size());
-	GS_TRACE4("M size:"<<M.size()<<" G size:"<<G.size());
-	GS_TRACE4("Modes: GM="<<_geomode<<" MM="<<_mtlmode);
+	#ifdef GS_USE_TRACE4
+	statistics ( gsout );
+	#endif
+
 	GS_TRACE4("Ok!");
 
 	return true;

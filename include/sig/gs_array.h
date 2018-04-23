@@ -162,7 +162,7 @@ class GsArray : protected GsArrayBase
 
 	/*! Constructor from a string with values to initialize the array. */
 	GsArray ( const char* values, int s=0, int c=0 ) : GsArrayBase ( sizeof(X), s, c )
-	 { GsInput inp; inp.init(values); inp>>*this; }
+	{	GsInput inp; inp.init(values); inp>>*this; }
 
 	/*! Destructor frees the array calling the base class free_data() method.
 		Attention: elements' destructors are not called ! */
@@ -437,6 +437,9 @@ class GsArrayPt : protected GsArray<X*>
 	/* Access to the base class function of same name. */
 	int size () const { return GsArray<X*>::size(); }
 
+	/* Will delete or allocate entries until array size matches ns. */
+	void size ( int ns ) { while(size()>ns) pop(); while(size()<ns) push(new X); }
+
 	/* Access to the base class function of same name. */
 	int capacity () const { return GsArray<X*>::capacity(); }
 
@@ -489,10 +492,10 @@ class GsArrayRef : protected GsArray<X*>
 	GsArrayRef () : GsArray<X*> () {}
 
 	/*! Destructor unrefs each element in the array */
-   ~GsArrayRef () { while(size()>0) pop(); }
+   ~GsArrayRef () { while(size()) pop(); }
 
 	/*! Unrefs each element in the array and set size to 0 */
-	void init () { while(size()>0) pop(); }
+	void init () { while(size()) pop(); }
 
 	/* Access to the base class function of same name. */
 	bool empty () const { return GsArray<X*>::empty(); }

@@ -41,15 +41,16 @@ class GsShareable
 	void unref();
 };
 
-/*! Unreferences obj1 (if not null) and references obj2 (if not null). */
+/*! Unreferences obj1 (if not null) and references obj2 (if not null).
+	Object obj2 is referenced first such that no destruction can happen if obj1 is equal to obj2. */
 void unrefref ( GsShareable* obj1, GsShareable* obj2 );
 
-/*! Unreferences curobj, references newobj, and makes curobj point to newobj.
+/*! References newobj, then unreferences curobj and makes curobj point to newobj.
 	Objects curobj and newobj are only unrefd/refd if not null. 
 	A call to updref(curobj,0) will make curobj return with 0 value. */
 template <class S>
-inline void updref ( S*& curobj, S* newobj )
-	{ ::unrefref((GsShareable*)curobj,(GsShareable*)newobj); curobj=(S*)newobj; }
+inline void updrefs ( S*& curobj, S* newobj )
+{	::unrefref((GsShareable*)curobj,(GsShareable*)newobj); curobj=newobj; }
 
 //============================== end of file ===============================
 

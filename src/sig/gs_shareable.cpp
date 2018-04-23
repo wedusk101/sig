@@ -24,8 +24,8 @@ void GsShareable::unref()
 
 void unrefref ( GsShareable* obj1, GsShareable* obj2 )
 {
+	if ( obj2 ) obj2->ref(); // calling this one first is needed
 	if ( obj1 ) obj1->unref();
-	if ( obj2 ) obj2->ref();
 }
 
 //============================== End of File ========================================

@@ -131,32 +131,42 @@ void GsModel::init ()
 	_mtlmode = NoMtl;
 }
 
+void GsModel::statistics ( GsOutput& o, char sep )
+{
+	o << "GsModel ["<<name<<"]: "<<sep;
+	o << "V size:"<<V.size()<<" N size:"<<N.size()<<sep;
+	o << "F size:"<<F.size()<<" Fn size:"<<Fn.size()<<sep;
+	o << "T size:"<<T.size()<<" Ft size:"<<Ft.size()<<sep;
+	o << "M size:"<<M.size()<<" G size:"<<G.size()<<sep;
+	o << "Modes: GM="<<_geomode<<" MM="<<_mtlmode<<sep;
+}
+
 void GsModel::operator = ( const GsModel& m )
- {
-   M = m.M;
-   V = m.V;
-   N = m.N;
-   T = m.T;
-   F = m.F;
-   Fn = m.Fn;
-   Ft = m.Fn;
+{
+	M = m.M;
+	V = m.V;
+	N = m.N;
+	T = m.T;
+	F = m.F;
+	Fn = m.Fn;
+	Ft = m.Fn;
 
-   name = m.name;
-   filename = m.filename;
+	name = m.name;
+	filename = m.filename;
 
-   clear_groups();
+	clear_groups();
    
 
-   culling = m.culling;
-   _geomode = m._geomode;
-   _mtlmode = m._mtlmode;
+	culling = m.culling;
+	_geomode = m._geomode;
+	_mtlmode = m._mtlmode;
 
-   if ( primitive ) { delete primitive; primitive=0; }
-   if ( m.primitive )
-	{ primitive = new GsPrimitive;
-	  *primitive = *m.primitive;
+	if ( primitive ) { delete primitive; primitive=0; }
+	if ( m.primitive )
+	{	primitive = new GsPrimitive;
+		*primitive = *m.primitive;
 	}
- }
+}
 
 void GsModel::compress ()
 {
@@ -719,6 +729,7 @@ GsArray<int>* GsModel::get_edges()
 	// this is faster than global tree sorting after about 700 vertices.
 	// Allocate array per vertex:
 	GsArray<int>* va = new GsArray<int>[V.size()];
+	// Revise to use: GsArrayPt<GsArray<int>> va passed as referenced argument
 
 	// Get slight improvements by reducing re-allocations per vertex:
 	int i, s;
@@ -738,7 +749,7 @@ GsArray<int>* GsModel::get_edges()
 	return va;
 }
 
-void GsModel::get_edges ( GsArray<int> &E )
+void GsModel::get_edges ( GsArray<int>& E )
 {
 	E.size(0);
 	if ( F.empty() ) return;
