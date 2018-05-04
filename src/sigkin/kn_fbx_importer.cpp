@@ -635,49 +635,56 @@ void KnFbxImporter::read_connections ( GsInput& fin )
 	finalize_models ();
 }
 
-void KnFbxImporter::finalize_model ( int gi, GsModel& m, const Material* mtl )
+void KnFbxImporter::finalize_model ( GsDirs& dirs, int gi, GsModel& m, const Material* mtl )
 {
-	Texture* t = mtl->difmap; // only processing here diffuse texture
+	Texture* dift = mtl->difmap; // only processing here diffuse texture
 
 	GS_TRACE8 ( "Geo "<<gi<< ": " << (t?t->relfname:"-") );
 
-	if ( t && t->fname.len()==0 && t->relfname.len()==0 ) t=0; // no texture file
+	if ( dift && dift->fname.len()==0 && dift->relfname.len()==0 ) dift=0; // no texture file
 
 	GsString fname;
-	if (t)
-	{	GsDirs d;
-		d.basedir_from_filename ( _fbxfname );
-		fname = t->relfname;
-		bool ok = d.checkfull ( fname );
-		if ( !ok ) { fname=t->relfname; }
+	//Could define desired mode, but currently using detect_mode() (called later)
+	//GsModel::GeoMode geom = GsModel::Faces;
+	//GsModel::MtlMode mtlm = GsModel::NoMtl;
+
+	if (dift)
+	{
+		fname = dift->relfname;
+		bool ok = dirs.checkfull ( fname );
+		if ( !ok ) { fname=dift->relfname; }
 
 		GsModel::Group* g = m.G.push();
 		g->fi = 0;
 		g->fn = m.F.size();
-		g->mtlname = t->name;
+		g->mtlname = dift->name;
 		g->dmap = new GsModel::Texture(fname);
 
 		m.M.size(1);
 		m.M[0]=mtl->mtl;
-		m.set_mode ( GsModel::Faces, GsModel::PerGroupMtl );
+		//m.set_mode ( GsModel::Faces, GsModel::PerGroupMtl );
 	
 		m.textured = true;
-
 	}
 
-	if ( !t )
+	if ( !dift )
 	{	m.set_one_material ( mtl->mtl );
 	}
+	m.detect_mode();
+	m.compress();
 	//m.statistics(gsout);
 }
 
 void KnFbxImporter::finalize_models ()
 {
+	GsDirs d;
+	d.basedir_from_filename ( _fbxfname );
+
 	if ( GSM.size()!=GEO.size() ) gsout.fatal("Geo-Mod mismatch!");
 	for ( int i=0; i<GEO.size(); i++ )
 	{	int mi = GEO[i]->g->gsm;
 		if ( mi>=0 )
-		{	finalize_model ( i, *GSM[mi], GEO[i]->mtl );
+		{	finalize_model ( d, i, *GSM[mi], GEO[i]->mtl );
 		}
 	}
 }

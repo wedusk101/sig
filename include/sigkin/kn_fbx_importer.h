@@ -109,7 +109,7 @@ class KnFbxImporter : public GsShareable
 	void read_deformer ( GsInput& fin, Deformer* d );
 	void read_connections ( GsInput& fin );
 	void add_children ( KnSkeleton* sk, Model* pm, KnJoint* pj );
-	void finalize_model ( int gi, GsModel& m, const Material* mtl );
+	void finalize_model ( GsDirs& d, int gi, GsModel& m, const Material* mtl );
 	void finalize_models ();
 	void set_influences ( KnSkin* skin, int mid, Deformer* d );
 };
