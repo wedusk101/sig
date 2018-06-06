@@ -54,10 +54,13 @@ class SnLines : public SnShape
 	void init ();
 
 	/*! Returns true if V and P arrays are empty; false otherwise. */
-	bool empty () const { return V.empty()&&P.empty(); }
+	bool empty () const { return V.empty() && P.empty(); }
 
 	/*! Compress internal arrays. */
 	void compress ();
+
+	/*! Returns the number of entries in V and P */
+	int size () const { return V.size()+P.size(); }
 
 	/*! Set the rendering width of the lines, default is 1. */
 	void line_width ( float w ) { _lwidth=w; }

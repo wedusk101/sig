@@ -64,7 +64,7 @@ class SnLines2 : public SnShape
 	/*! Compress internal arrays. */
 	void compress ();
 
-	/*! Returns the number of ebtries in V and P */
+	/*! Returns the number of entries in V and P */
 	int size () const { return V.size()+P.size(); }
 
 	/*! Set the rendering width of the lines, default is 1. */
