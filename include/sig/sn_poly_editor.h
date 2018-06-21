@@ -119,7 +119,7 @@ class SnPolyEditor : public SnEditor
 	/*! Set the edition mode */
 	void mode ( SnPolyEditor::Mode m );
 
-	/*! Returns selected polygon */
+	/*! Returns selected polygon, or -1 if none selected */
 	int selected_polygon () const { return _selpol; }
 
 	/*! Set a user callback that is called each time an event is processed. The 3rd parameter
@@ -135,6 +135,9 @@ class SnPolyEditor : public SnEditor
 	/*! Send to user's callback evnts which were not processed */
 	void notify_events_not_used () { _genevnotused=1; }
 
+	/*! Remove polygon currently selected */
+	void remove_selected_polygon ();
+
    protected :
 	bool pick_polygon_vertex ( const GsVec2& p );
 	bool pick_polygon ( const GsVec2& p );
@@ -146,7 +149,6 @@ class SnPolyEditor : public SnEditor
 	void add_centroid_selection ( int i );
 	void translate_polygon ( int i, const GsVec2& lp, const GsVec2& p );
 	void rotate_polygon ( int i, const GsVec2& lp, const GsVec2& p );
-	void remove_selected_polygon ();
 
 	virtual int handle_only_move_event ( const GsEvent& e, const GsVec2& p, const GsVec2& lp );
 	virtual int handle_keyboard ( const GsEvent& e );
