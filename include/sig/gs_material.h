@@ -70,7 +70,7 @@ class GsMaterial
 	/*! Outputs in format: "amb r g b a  dif r g b a  spe r g b a  emi r g b a  shi s" */
 	friend GsOutput& operator<< ( GsOutput& o, const GsMaterial& m );
 
-	/*! Inputs from the output format, the keywords can be omitted but all parameters must be defined */
+	/*! Inputs from the output format, the keywords may be omitted but all parameters must be defined */
 	friend GsInput& operator>> ( GsInput& in, GsMaterial& m );
 };
 

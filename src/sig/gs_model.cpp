@@ -25,7 +25,7 @@
 
 //========================== GsModel::Group ======================================
 
-void GsModel::Group::copy ( const Group& g )
+void GsModel::Group::copyfrom ( const Group& g )
 {
 	fi = g.fi;
 	fn = g.fn;
@@ -245,88 +245,89 @@ void GsModel::validate ()
 }
 
 void GsModel::add_model ( const GsModel& m )
- {
-   if ( _mtlmode!=NoMtl && _mtlmode!=PerGroupMtl && m.mtlmode()!=NoMtl && m.mtlmode()!=PerGroupMtl )
-	 gsout.fatal("incompatible modes add_model()!");
+{
+	if ( _mtlmode!=NoMtl && _mtlmode!=PerGroupMtl && m.mtlmode()!=NoMtl && m.mtlmode()!=PerGroupMtl )
+		gsout.fatal("incompatible modes add_model()!");
 
-   // data: M, V, N, T, F, Fn, Ft, G
-   int origm = M.size();
-   int origv = V.size();
-   int orign = N.size();
-   int origt = T.size();
-   int origf = F.size();
-   //int origfn = Fn.size(); // not used
-   int origft = Ft.size();
-   int origg = G.size();
+	// data: M, V, N, T, F, Fn, Ft, G
+	int origm = M.size();
+	int origv = V.size();
+	int orign = N.size();
+	int origt = T.size();
+	int origf = F.size();
+	//int origfn = Fn.size(); // not used
+	int origft = Ft.size();
+	int origg = G.size();
 
-   int i;
-   int mfsize = m.F.size();
-   int mvsize = m.V.size();
-   GS_TRACE4 ( "add_model: init" );
+	int i;
+	int mfsize = m.F.size();
+	int mvsize = m.V.size();
+	GS_TRACE4 ( "add_model: init" );
 
-   if ( mvsize==0 || mfsize==0 ) return;
-   if ( origv==0 || origf==0 ) { init(); *this=m; return; }
+	if ( mvsize==0 || mfsize==0 ) return;
+	if ( origv==0 || origf==0 ) { init(); *this=m; return; }
 
-   // add vertices and faces:
-   GS_TRACE4 ( "add_model: geometry" );
-   V.size ( origv+mvsize );
-   for ( i=0; i<mvsize; i++ ) V[origv+i] = m.V.get(i);
-   F.size ( origf+mfsize );
-   for ( i=0; i<mfsize; i++ )
-	{ const Face& f = m.F.get(i);
-	  F[origf+i].set ( f.a+origv, f.b+origv, f.c+origv );
+	// add vertices and faces:
+	GS_TRACE4 ( "add_model: geometry" );
+	V.size ( origv+mvsize );
+	for ( i=0; i<mvsize; i++ ) V[origv+i] = m.V.get(i);
+	F.size ( origf+mfsize );
+	for ( i=0; i<mfsize; i++ )
+	{	const Face& f = m.F.get(i);
+		F[origf+i].set ( f.a+origv, f.b+origv, f.c+origv );
 	}
 
-   // add the normals:
-   GS_TRACE4 ( "add_model: normals" );
-   if ( m.Fn.size()>0 )
-	{ if ( orign==0 ){ orign=origv; N.size(orign); Fn.size(orign); Fn.setall(Face(0,0,0)); N.setall(GsVec::i); }
+	// add the normals:
+	GS_TRACE4 ( "add_model: normals" );
+	if ( m.Fn.size()>0 )
+	{	if ( orign==0 ){ orign=origv; N.size(orign); Fn.size(orign); Fn.setall(Face(0,0,0)); N.setall(GsVec::i); }
 
-	  N.size ( orign+m.N.size() );
-	  for ( i=0; i<m.N.size(); i++ ) N[orign+i] = m.N.get(i);
+		N.size ( orign+m.N.size() );
+		for ( i=0; i<m.N.size(); i++ ) N[orign+i] = m.N.get(i);
 
-	  Fn.size ( origf+mfsize );
-	  for ( i=0; i<mfsize; i++ )
-	   { const Face& f = m.Fn.get(i);
-		 Fn[origf+i].set ( f.a+orign, f.b+orign, f.c+orign );
-	   }
+		Fn.size ( origf+mfsize );
+		for ( i=0; i<mfsize; i++ )
+		{	const Face& f = m.Fn.get(i);
+			Fn[origf+i].set ( f.a+orign, f.b+orign, f.c+orign );
+		}
 	}
 
-   // add the materials:
-   GS_TRACE4 ( "add_model: materials" );
-   if ( m.M.size()>0 )
-	{ M.size ( origm+m.M.size() );
-	  for ( i=0; i<m.M.size(); i++ ) M[origm+i] = m.M(i);
+	// add the materials:
+	GS_TRACE4 ( "add_model: materials" );
+	if ( m.M.size()>0 )
+	{	M.size ( origm+m.M.size() );
+		for ( i=0; i<m.M.size(); i++ ) M[origm+i] = m.M(i);
 	}
 
 	// add the groups:
+	GS_TRACE4 ( "add_model: groups" );
 	if ( m.G.size()>0 )
-	{	M.size ( origg+m.G.size() );
+	{	G.size ( origg+m.G.size() );
 		for ( i=0; i<m.G.size(); i++ )
-		{	G[origg+i]->copy ( *m.G[i] );
+		{	G[origg+i]->copyfrom ( *m.G[i] );
 			G[origg+i]->fi+=origf;
 		}
 	}
 
-   // add text coords:
-   GS_TRACE4 ( "add_model: text coords" );
-   if ( m.Ft.size()>0 )
-	{ Ft.size ( origft+m.Ft.size() );
-	  for ( i=0; i<m.Ft.size(); i++ ) Ft[origft+i] = m.Ft(i);
+	// add text coords:
+	GS_TRACE4 ( "add_model: text coords" );
+	if ( m.Ft.size()>0 )
+	{	Ft.size ( origft+m.Ft.size() );
+		for ( i=0; i<m.Ft.size(); i++ ) Ft[origft+i] = m.Ft(i);
 	}
 
-   // add texture coordinates
-   if ( m.T.size()>0 )
-	{ T.size ( origt+m.T.size() );
-	  for ( i=0; i<m.T.size(); i++ ) V[origt+i] = m.T(i);
+	// add texture coordinates
+	if ( m.T.size()>0 )
+	{	T.size ( origt+m.T.size() );
+		for ( i=0; i<m.T.size(); i++ ) V[origt+i] = m.T(i);
 	}
 
-   // the model will for sure not be a primitive anymore
-   if ( primitive )
-	{ delete primitive; primitive=0; }
+	// the model will for sure not be a primitive anymore
+	if ( primitive )
+	{	delete primitive; primitive=0; }
 
-   GS_TRACE4 ( "add_model: ok." );
- }
+	GS_TRACE4 ( "add_model: ok." );
+}
 
 void GsModel::set_one_material ( const GsMaterial& m, const char* name, bool comp )
 {

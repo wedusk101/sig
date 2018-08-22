@@ -42,7 +42,8 @@ class SnMaterial : public SnNode
 
 	/*! Sets the material to be used for the shape */
 	void material ( const GsMaterial& m ) { _material=m; }
-	const GsMaterial& material () const { return _material; }
+	GsMaterial& material () { return _material; }
+	const GsMaterial& cmaterial () const { return _material; }
 
    protected :
 

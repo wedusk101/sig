@@ -63,7 +63,7 @@ class GsModel : public GsShareable
 		Texture* dmap;		//!< diffuse color map, or null pointer if none
 		Group ( int i=0, int n=0 ) { fi=i; fn=n; dmap=0; }
 	   ~Group () { delete dmap; }
-		void copy ( const Group& g );
+		void copyfrom ( const Group& g );
 	};
 
 	// Arrays containing the model data:

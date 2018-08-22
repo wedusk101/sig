@@ -68,21 +68,21 @@ void KnSkeleton::init_values ()
 }
 
 KnJoint* KnSkeleton::add_joint ( KnJoint::RotType rtype, KnJoint* parent, const char* name )
- {
-   if ( !parent ) init(); else _jhash.init(0);
+{
+	if ( !parent ) init(); else _jhash.init(0);
 
-   KnJoint* j = new KnJoint ( this, parent, rtype, _joints.size() );
-   _joints.push() = j;
+	KnJoint* j = new KnJoint ( this, parent, rtype, _joints.size() );
+	_joints.push() = j;
 
-   if ( parent ) 
-	parent->_children.push() = j;
-   else
-	_root=j;
+	if ( parent ) 
+		parent->_children.push() = j;
+	else
+		_root=j;
 
-   if ( name ) j->name ( KnJointName(name) );
+	if ( name ) j->name ( KnJointName(name) );
 
-   return j;
- }
+	return j;
+}
 
 KnJoint* KnSkeleton::lsearch_joint ( const char* n ) const
  {

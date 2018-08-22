@@ -201,19 +201,24 @@ class KnSkeleton : public GsShareable
 	int vistriangles ( int jid=-1 ) const;
 
 	/*! loads a .s, .sd, or .bvh file from given filename.
-		Note1: if lookforsd is set to true, then if a .sd file exists in the same folder of the 
+		Note 1: if lookforsd is set to true, then if a .sd file exists in the same folder of the 
 		skeleton file, the .sd file is automatically subsequently loaded and applied to the skeleton.
-		Note2: if lookforw is true, then if a .w file of same name exists, it is then automatically loaded. */
+		Note 2: if lookforw is true, then if a .w file of same name exists, it is then automatically loaded. */
 	bool load ( const char* filename, const char* basedir=0, bool lookforsd=true, bool lookforw=true );
 
-	/*! Loads a skeleton hierarchy in .s or .bvh format (also merges .sd files).
+	/*! Loads a skeleton hierarchy from the given GsInput in .s or .bvh format (also merges .sd files).
 		Returns false if some error is encountered, otherwise true is returned.
 		Parameter basedir can specify the base directory used for searching for geometry
 		(.m files), which are searched in the paths declared in the .s file, in basedir,
 		and in the current directory. Also, relative paths in .s become relative to basedir.
-		If basedir is not given (null), it is extracted from in.filename() if available.
+		If basedir is not given (i.e. given as null), it will be extracted from in.filename(), if available.
 		Method compress() is called after the file is loaded.
+xxx
+		If parameter resetgeo is set to true, existing geometries will be deleted in case new ones
+xxx
+		are declared in the file being read (this is mostly applicable when loading .sd files).
 		The skeleton channels will be computed at first load (not from .sd if called for .s) */
+//	bool load ( GsInput& in, const char* basedir=0, bool resetgeo=false );
 	bool load ( GsInput& in, const char* basedir=0 );
 
 	/*! Save in .s format the current skeleton.

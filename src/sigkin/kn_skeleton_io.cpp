@@ -21,50 +21,52 @@
 
 enum KeyWord { ROOT, OFFSET, CENTER, CHANNELS, CHANNEL, JOINT, END, 
 			   VISGEO, COLGEO, MODELMAT, MODELROT, PREROT, POSTROT,
-			   ALIGN, TYPE, EULER, IK, NOKEYWORD }; 
+			   ALIGN, TYPE, EULER, IK, NOKEYWORD, RESETGEO }; 
 
 static KeyWord read_keyword ( GsInput& in )
- {
-   KeyWord kw = NOKEYWORD;
+{
+	KeyWord kw = NOKEYWORD;
    
-   if ( in.get()!=GsInput::String ) return kw;
+	if ( in.get()!=GsInput::String ) return kw;
 
-   const GsString& s = in.ltoken();
+	const GsString& s = in.ltoken();
 
-   if ( s=="root" ) kw=ROOT; // root declaration
+	if ( s=="root" ) kw=ROOT; // root declaration
 	else 
-   if ( s=="offset" ) kw=OFFSET; // offset to position joints
+	if ( s=="offset" ) kw=OFFSET; // offset to position joints
 	else
-   if ( s=="center" ) kw=CENTER; // same as offset, more natural for global coords (not supported now)
+	if ( s=="center" ) kw=CENTER; // same as offset, more natural for global coords (not supported now)
 	else
-   if ( s=="channels" ) kw=CHANNELS; // bvh channels definition
+	if ( s=="channels" ) kw=CHANNELS; // bvh channels definition
 	else
-   if ( s=="channel" ) kw=CHANNEL; // bvh channels definition
+	if ( s=="channel" ) kw=CHANNEL; // bvh channels definition
 	else
-   if ( s=="joint" ) kw=JOINT; // joint declaration
+	if ( s=="joint" ) kw=JOINT; // joint declaration
 	else
-   if ( s=="modelmat" ) kw=MODELMAT; // matrix to adjust geometries
+	if ( s=="modelmat" ) kw=MODELMAT; // matrix to adjust geometries
 	else
-   if ( s=="modelrot" ) kw=MODELROT; // rotation to adjust geometries
+	if ( s=="modelrot" ) kw=MODELROT; // rotation to adjust geometries
 	else
-   if ( s=="prerot" || s=="framerot" ) kw=PREROT; // to pre-multiply joint rotations
+	if ( s=="prerot" || s=="framerot" ) kw=PREROT; // to pre-multiply joint rotations
 	else
-   if ( s=="postrot" ) kw=POSTROT; // to post-multiply joint rotations
+	if ( s=="postrot" ) kw=POSTROT; // to post-multiply joint rotations
 	else
-   if ( s=="align" ) kw=ALIGN; // adjusts pre/post to have 1st child with given offset
+	if ( s=="align" ) kw=ALIGN; // adjusts pre/post to have 1st child with given offset
 	else
-   if ( s=="visgeo" ) kw=VISGEO; // visualization geometry
+	if ( s=="visgeo" ) kw=VISGEO; // visualization geometry
 	else
-   if ( s=="colgeo" ) kw=COLGEO; // collision geometry
+	if ( s=="colgeo" ) kw=COLGEO; // collision geometry
 	else
-   if ( s=="euler" ) kw=EULER; // euler order/type specification
+	if ( s=="euler" ) kw=EULER; // euler order/type specification
 	else
-   if ( s=="ik" ) kw=IK; // initialize joint IK
+	if ( s=="ik" ) kw=IK; // initialize joint IK
 	else
-   if ( s=="end" ) kw=END; // default string comparison is case-insensitive
+	if ( s=="end" ) kw=END; // default string comparison is case-insensitive
+	else
+	if ( s=="resetgeo" ) kw=RESETGEO; // default string comparison is case-insensitive
 
-   return kw;
- }
+	return kw;
+}
 
 // used in bvh format
 static bool sReadChannels ( GsInput& in, KnJoint* j, GsArray<KnChannel::Type>& channels )
@@ -226,250 +228,254 @@ static bool sReadChannel ( GsInput& in, KnJoint* j )
  }
 
 static GsModel* sReadModel ( GsInput& in, GsDirs& paths, GsMat* mat, GsModel* theother, GsInput* igeo )
- {
-   if ( in.get()!=GsInput::String ) return 0;
-   GsString fname = in.ltoken();
+{
+	if ( in.get()!=GsInput::String ) return 0;
+	GsString fname = in.ltoken();
+	GS_TRACE2 ( "sReadModel:"<<fname );
 
-   if ( fname=="primitive" ) // create a primitive without loading from a file
-	{ GsPrimitive prim;
-	  in >> prim;
-	  GsModel* m = new GsModel;
-	  m->make_primitive ( prim );
-	  if ( mat ) m->transform ( *mat );
-	  m->ref();
-	  return m;
+	if ( fname=="primitive" ) // create a primitive without loading from a file
+	{	GsPrimitive prim;
+		in >> prim;
+		GsModel* m = new GsModel;
+		m->make_primitive ( prim );
+		if ( mat ) m->transform ( *mat );
+		m->ref();
+		return m;
 	}
-   else if ( fname=="shared" ) // explicit command to share the other geometry
-	{ if ( !theother ) return 0;
-	  theother->ref();
-	  return theother;
+	else if ( fname=="shared" ) // explicit command to share the other geometry
+	{	if ( !theother ) return 0;
+		theother->ref();
+		return theother;
 	}
 
-   // if we are reading a same model again in the same joint, share it:
-   if ( theother )
+	// if we are reading a same model again in the same joint, share it:
+	if ( theother )
 	if ( gs_comparecs(fname,theother->filename)==0 )
-	 { theother->ref();
-	   return theother;
-	 }
-
-   //int i=0;
-
-   if ( igeo )
-	{ igeo->get(); // newgeo keyword
-	  igeo->get();
-	  if ( igeo->ltoken()!=fname ) gsout<<"sReadModel Error in "<<fname<<gsnl;
-	}
-   else
-	{ if ( !paths.checkfull(fname) )
-	  { GS_TRACE2 ( "Could not read model." );
-		 return 0; // file not found
-	  }
+	{	theother->ref();
+		return theother;
 	}
 
-   GsModel* m = new GsModel;
-
-   GS_TRACE2 ( "Loading geometry [" << fname << "]..." );
-   bool ok;
-   if ( igeo )
-	{ ok = m->load ( *igeo ); }
-   else
-	{ ok = m->load ( fname ); }
-
-   if ( ok )
-	{ GS_TRACE2 ( "Loaded model with "<<m->F.size()<<" triangles" );
-	  if ( mat ) m->transform ( *mat );
-	  m->ref();
+	if ( igeo )
+	{	igeo->get(); // newgeo keyword
+		igeo->get();
+		if ( igeo->ltoken()!=fname ) gsout<<"sReadModel Error in "<<fname<<gsnl;
 	}
-   else
-	{ GS_TRACE2 ( "Loading Error!" );
-	  delete m;
-	  m=0;
+	else
+	{	if ( !paths.checkfull(fname) )
+		{	GS_TRACE2 ( "Could not read model." );
+			return 0; // file not found
+		}
 	}
 
-   return m;
- }
+	GsModel* m = new GsModel;
+
+	GS_TRACE2 ( "Loading geometry [" << fname << "]..." );
+	bool ok;
+	if ( igeo )
+	{	ok = m->load ( *igeo ); }
+	else
+	{	ok = m->load ( fname ); }
+
+	if ( ok )
+	{	GS_TRACE2 ( "Loaded model with "<<m->F.size()<<" triangles" );
+		if ( mat ) m->transform ( *mat );
+		m->ref();
+	}
+	else
+	{	GS_TRACE2 ( "Loading Error!" );
+		delete m;
+		m=0;
+	}
+
+	return m;
+}
 
 static void sSetModel ( GsModel*& curm, GsModel* newm )
- {
-   if ( !newm ) return;
-   if ( curm )
-	{ curm->add_model ( *newm );
-	  delete newm;
+{
+	if ( !newm ) return;
+	if ( curm )
+	{
+		curm->add_model ( *newm );
+		newm->unref();
 	}
-   else
-	{ curm = newm;
-	  curm->ref();
+	else
+	{	curm = newm;
+		curm->ref();
 	}
- }
+}
 
 // Load joint data and returns -1 if } or error is reached, or kw JOINT, END or NOKEYWORD
 int KnSkeleton::_loadjdata ( GsInput& in, KnJoint* j, GsDirs& paths, GsInput* igeo )
- {
-   KeyWord kw;
-   bool hasmat=false;
-   GsMat curmat;
-   GsArray<KnChannel::Type> channels;
+{
+	KeyWord kw;
+	bool hasmat=false;
+	GsMat curmat;
+	GsArray<KnChannel::Type> channels;
 
-   while (true) // get next items
+	while (true) // get next items
 	{ 
-	  kw = read_keyword(in);
-	  GS_TRACE1 ( in.ltoken() );
+		kw = read_keyword(in);
+		GS_TRACE1 ( in.ltoken() );
 
-	  if ( kw==OFFSET || kw==CENTER )
-	   {
-		 in >> j->_offset;
-	   }
-	  else if ( kw==CHANNELS ) // only in bvh format
-	   {
-		 if ( !sReadChannels(in,j,channels) ) return -1;
-	   }
-	  else if ( kw==EULER )
-	   { 
-		 j->rot_type ( KnJoint::TypeEuler );
-		 in.get();
-		 if ( in.ltoken()=="XYZ" )
-		  j->euler()->type ( KnJointEuler::TypeXYZ );
-		 else if ( in.ltoken()=="YXZ" )
-		  j->euler()->type ( KnJointEuler::TypeYXZ );
-		 else if ( in.ltoken()=="ZY" )
-		  j->euler()->type ( KnJointEuler::TypeZY );
-		 else if ( in.ltoken()=="YZX" )
-		  j->euler()->type ( KnJointEuler::TypeYZX );
-	   }
-	  else if ( kw==CHANNEL ) // only in kn format
-	   {
-		 if ( !sReadChannel(in,j) ) return -1;
-	   }
-	  else if ( kw==MODELMAT )
-	   {
-		 in >> curmat;
-		 hasmat = true;
-		 if ( j->_visgeo ) j->_visgeo->transform ( curmat );
-		 if ( j->_colgeo ) j->_colgeo->transform ( curmat );
-	   }
-	  else if ( kw==MODELROT )
-	   {
-		 GsQuat q;
-		 in >> q;
-		 quat2mat ( q, curmat );
-		 hasmat = true;
-		 if ( j->_visgeo ) j->_visgeo->rotate ( q );
-		 if ( j->_colgeo ) j->_colgeo->rotate ( q );
-	   }
-	  else if ( kw==PREROT )
-	   {
-		 GsQuat q;
-		 in >> q;
-		 j->quat()->prerot ( j->quat()->prerot()*q );
-	   }
-	  else if ( kw==POSTROT )
-	   {
-		 GsQuat q;
-		 in >> q;
-		 j->quat()->postrot ( j->quat()->postrot()*q );
-	   }
-	  else if ( kw==ALIGN )
-	   {
-		 GsVec v;
-		 GsString type;
-		 in >> type >> v;
-		 j->quat()->align ( type=="pre"? KnJointRot::AlignPre :
-							type=="post"? KnJointRot::AlignPost :
-							type=="prepost"? KnJointRot::AlignPrePost :
-							type=="preinv"? KnJointRot::AlignPreInv :
-											KnJointRot::AlignPostInv, v );
-	   }
-	  else if ( kw==VISGEO ) // keyword only in hm format
-	   {
-		 sSetModel ( j->_visgeo, sReadModel(in,paths,hasmat?&curmat:0,j->_colgeo,igeo) );
-	   }
-	  else if ( kw==COLGEO ) // keyword only in hm format
-	   {
-		 sSetModel ( j->_colgeo, sReadModel(in,paths,hasmat?&curmat:0,j->_visgeo,igeo) );
-	   }
-	  else if ( kw==JOINT )
-	   {
-		 return kw;
-	   }
-	  else if ( kw==END )
-	   { if ( in.gets()=="Site" ) // bvh "end site" joint
-		  { in.unget("EndSite");
-			return JOINT;
-		  }
-		 else { in.unget(); return kw; }
-	   }
-	  else if ( in.ltoken()[0]=='}' ) return -1;
+		if ( kw==OFFSET || kw==CENTER )
+		{
+			in >> j->_offset;
+		}
+		else if ( kw==CHANNELS ) // only in bvh format
+		{
+			if ( !sReadChannels(in,j,channels) ) return -1;
+		}
+		else if ( kw==EULER )
+		{ 
+			j->rot_type ( KnJoint::TypeEuler );
+			in.get();
+			if ( in.ltoken()=="XYZ" )
+				j->euler()->type ( KnJointEuler::TypeXYZ );
+			else if ( in.ltoken()=="YXZ" )
+				j->euler()->type ( KnJointEuler::TypeYXZ );
+			else if ( in.ltoken()=="ZY" )
+				j->euler()->type ( KnJointEuler::TypeZY );
+			else if ( in.ltoken()=="YZX" )
+				j->euler()->type ( KnJointEuler::TypeYZX );
+		}
+		else if ( kw==CHANNEL ) // only in kn format
+		{
+			if ( !sReadChannel(in,j) ) return -1;
+		}
+		else if ( kw==MODELMAT )
+		{
+			in >> curmat;
+			hasmat = true;
+			if ( j->_visgeo ) j->_visgeo->transform ( curmat );
+			if ( j->_colgeo ) j->_colgeo->transform ( curmat );
+		}
+		else if ( kw==MODELROT )
+		{
+			GsQuat q;
+			in >> q;
+			quat2mat ( q, curmat );
+			hasmat = true;
+			if ( j->_visgeo ) j->_visgeo->rotate ( q );
+			if ( j->_colgeo ) j->_colgeo->rotate ( q );
+		}
+		else if ( kw==PREROT )
+		{
+			GsQuat q;
+			in >> q;
+			j->quat()->prerot ( j->quat()->prerot()*q );
+		}
+		else if ( kw==POSTROT )
+		{
+			GsQuat q;
+			in >> q;
+			j->quat()->postrot ( j->quat()->postrot()*q );
+		}
+		else if ( kw==ALIGN )
+		{
+			GsVec v;
+			GsString type;
+			in >> type >> v;
+			j->quat()->align ( type=="pre"? KnJointRot::AlignPre :
+							   type=="post"? KnJointRot::AlignPost :
+							   type=="prepost"? KnJointRot::AlignPrePost :
+							   type=="preinv"? KnJointRot::AlignPreInv :
+											   KnJointRot::AlignPostInv, v );
+		}
+		else if ( kw==VISGEO ) // keyword only in hm format
+		{
+			sSetModel ( j->_visgeo, sReadModel(in,paths,hasmat?&curmat:0,j->_colgeo,igeo) );
+		}
+		else if ( kw==COLGEO ) // keyword only in hm format
+		{
+			sSetModel ( j->_colgeo, sReadModel(in,paths,hasmat?&curmat:0,j->_visgeo,igeo) );
+		}
+		else if ( kw==JOINT )
+		{
+			return kw;
+		}
+		else if ( kw==RESETGEO )
+		{	if ( j->_visgeo ) { j->_visgeo->unref(); j->_visgeo=0; }
+			if ( j->_colgeo ) { j->_colgeo->unref(); j->_colgeo=0; }
+		}
+		else if ( kw==END )
+		{	if ( in.gets()=="Site" ) // bvh "end site" joint
+			{	in.unget("EndSite");
+				return JOINT;
+			}
+			else { in.unget(); return kw; }
+		}
+		else if ( in.ltoken()[0]=='}' ) return -1;
 	}
- }
+}
 
 static char getname ( GsString& name, GsInput& in )
- {
-   name = "";
-   while ( true ) // we try to cope with names containing spaces
-	{ in.get();
-	  if ( in.end() ) return 0; // unexpected EOF
-	  if ( in.ltoken()[0]=='{' ) return '{';
-	  if ( in.ltoken()[0]==':' ) return ':'; // new feature: define explicitly the parent!
-	  if ( in.ltoken()[0]=='}' ) return 0; // should never enter here
-	  if ( name.len()>0 ) name << '_';
-	  name << in.ltoken();
+{
+	name = "";
+	while ( true ) // we try to cope with names containing spaces
+	{	in.get();
+		if ( in.end() ) return 0; // unexpected EOF
+		if ( in.ltoken()[0]=='{' ) return '{';
+		if ( in.ltoken()[0]==':' ) return ':'; // new feature: define explicitly the parent!
+		if ( in.ltoken()[0]=='}' ) return 0; // should never enter here
+		if ( name.len()>0 ) name << '_';
+		name << in.ltoken();
 	}
-   return 0; // should never enter here
- }
+	return 0; // should never enter here
+}
 
 // recursivelly load joint definitions
 enum KnLoadMode { SkeletonMode, JointDataMode };
 KnJoint* KnSkeleton::_loadj ( GsInput& in, KnJoint* p, GsDirs& paths, int mode, GsInput* igeo )
- {
-   KnJoint* j=0;
+{
+	KnJoint* j=0;
 
-   // get joint name
-   GsString name;
-   char lchar = getname(name,in);
-   if ( !lchar ) return 0;
+	// get joint name
+	GsString name;
+	char lchar = getname(name,in);
+	if ( !lchar ) return 0;
 
-   // check if root is set
-   if ( mode==JointDataMode )
-	{ if ( !_root ) // add root, so this is a new joint definition
-	   { add_joint ( KnJoint::TypeQuat, 0, name );
-		 if ( lchar==':' ) in.get(); // some protection
-	   }
-	  else if ( lchar==':' ) // parent provided, so this is a new joint definition
-	   { GsString pname;
-		 char lchar = getname(pname,in);
-		 if ( !lchar ) return 0;
-		 p = joint ( pname );
-		 if ( !p ) return 0;
-		 j = add_joint ( KnJoint::TypeQuat, p, name );
-	   }
+	// check if root is set
+	if ( mode==JointDataMode )
+	{	if ( !_root ) // add root, so this is a new joint definition
+		{	add_joint ( KnJoint::TypeQuat, 0, name );
+			if ( lchar==':' ) in.get(); // some protection
+		}
+		else if ( lchar==':' ) // parent provided, so this is a new joint definition
+		{	GsString pname;
+			char lchar = getname(pname,in);
+			if ( !lchar ) return 0;
+			p = joint ( pname );
+			if ( !p ) return 0;
+			j = add_joint ( KnJoint::TypeQuat, p, name );
+		}
 
-	  if ( !j ) j = joint ( name );
+		if ( !j ) j = joint ( name );
 
-	  if ( !j ) // name not found, skip this joint definitions
-	   { do { in.get(); } while ( !in.end() && in.ltoken()[0]!='}' );
-	   }
-	  else
-	   { j->set_lmat_changed ();
-		 _loadjdata ( in, j, paths, igeo );
-	   }
-	  return j;
+		if ( !j ) // name not found, skip this joint definitions
+		{	do { in.get(); } while ( !in.end() && in.ltoken()[0]!='}' );
+		}
+		else
+		{	j->set_lmat_changed ();
+			_loadjdata ( in, j, paths, igeo );
+		}
+		return j;
 	}
 
-   // at this point, a hierarchy is to be loaded:
-   j = add_joint ( KnJoint::TypeQuat, p, name );
+	// at this point, a hierarchy is to be loaded:
+	j = add_joint ( KnJoint::TypeQuat, p, name );
 
-   int kw=0;
-   while ( kw>=0 )
-	{ kw = _loadjdata ( in, j, paths, igeo );
+	int kw=0;
+	while ( kw>=0 )
+	{	kw = _loadjdata ( in, j, paths, igeo );
 
-	  if ( kw==JOINT ) // recurse
-	   {
-		 _loadj ( in, j, paths, SkeletonMode, igeo );
-	   }
+		if ( kw==JOINT ) // recurse
+		{
+			_loadj ( in, j, paths, SkeletonMode, igeo );
+		}
 	}
 
-   return j;
- }
+	return j;
+}
 
 bool KnSkeleton::load ( const char* filename, const char* basedir, bool lookforsd, bool lookforw )
 {
@@ -485,7 +491,7 @@ bool KnSkeleton::load ( const char* filename, const char* basedir, bool lookfors
 	remove_extension(filest);
 	filest.append(".sd");
 	if ( lookforsd && in.open(filest) ) // there is extra joint data to load
-	{	if ( !load( in, basedir ) )
+	{	if ( !load(in,basedir) )
 		{	gsout << "Error loading " << filest << gsnl;
 			return false;
 		}
