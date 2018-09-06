@@ -51,9 +51,10 @@ class GsModel : public GsShareable
 
 	/*! Texture information */
 	struct Texture
-	{	int id;				//!< the texture index, or <0 if not yet loaded
+	{	int id;				//!< the texture index in GlResources, or <0 if not yet loaded
+		unsigned int oglid; //!< if >0 then this OpenGL id will be used, otherwise image will come from GlResources
 		GsCharPt fname;		//!< texture filename as read from model file
-		Texture ( const char* file=0 ) : fname(file) { id=-1; }
+		Texture ( const char* file=0 ) : fname(file) { id=-1; oglid=0; }
 	};
 
 	/*! The group structure keeps material and texture information for group of faces */

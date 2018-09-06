@@ -250,10 +250,13 @@ void GlrModel::render (  SnShape* s, GlContext* c )
 			{	GsModel::Group& G=*m.G[g];
 				GsMaterial& M=m.M[g];
 				if ( G.dmap ) // has diffuse texture
-				{	if ( G.dmap->id<0 ) _add_texture(G,m); // need to declare texture
-					const GlTexture* t = GlResources::get_texture ( G.dmap->id );
+				{	if ( !G.dmap->oglid )
+					{	if ( G.dmap->id<0 ) _add_texture(G,m); // need to declare texture
+						const GlTexture* t = GlResources::get_texture ( G.dmap->id );
+						G.dmap->oglid = t->id;
+					}
 					glActiveTexture ( GL_TEXTURE0 + 0 );	// Only using texture unit 0
-					glBindTexture ( GL_TEXTURE_2D, t->id ); // Bind image
+					glBindTexture ( GL_TEXTURE_2D, G.dmap->oglid ); // Bind image
 					DEFINE_MATERIAL(M);
 					DRAW_GROUP(G,_normalspervertex);
 				}

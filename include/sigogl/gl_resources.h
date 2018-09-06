@@ -19,6 +19,7 @@ class GsDirs;
 class GlProgram;
 class GlShader;
 class GlTexture;
+class GsImage;
 class GsFontStyle;
 class GsFont;
 class GlFont;
@@ -70,6 +71,9 @@ class GlResources
 
 	/*! Declares the name and location of a texture file to be later used */
 	static int declare_texture ( const char* texname, const char* filename );
+
+	/*! Declares the name and data of a texture file to be later used. Pointer img will be shared using ref()/unref() methods. */
+	static int declare_texture ( const char* texname, GsImage* img );
 
 	/*! Get the resources id of the texture, or -1 if it has not been declared. */
 	static int get_texture_id ( const char* txname );

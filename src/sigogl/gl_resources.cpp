@@ -84,6 +84,8 @@ class GlTextureDecl
 	GsCharPt name; GsCharPt filename; GsImage* image;
 	GlTextureDecl ( const char* n, const char* fn )
 	{ name=n; filename=fn; image=0; }
+	GlTextureDecl ( const char* n, GsImage* i )
+	{ name=n; image=i; image->ref(); }
 };
 
 class GlFontDecl
@@ -258,6 +260,22 @@ int GlResources::declare_texture ( const char* txname, const char* filename )
 	return TextureTable.lastid();
 }
 
+int GlResources::declare_texture ( const char* txname, GsImage* img )
+{
+	if ( TextureTable.hashsize()==0 ) TextureTable.init(TextureTableSize);
+	GlTexture* t = TextureTable.insert(txname);
+	if ( t )
+	{	t->_decl = new GlTextureDecl(txname,img); }
+	else
+	{	int lid = TextureTable.lastid();
+		if ( lid<0 )
+			Error("invalid texture name",txname); // null string or some other error
+		else
+			Error("texture name conflict",txname);
+	}
+	return TextureTable.lastid();
+}
+
 int GlResources::get_texture_id ( const char* txname )
 {
 	GS_TRACE1 ( "get_texture_id ["<<txname<<"]" );
@@ -268,19 +286,29 @@ const GlTexture* GlResources::get_texture ( int txid )
 {
 	GS_TRACE1 ( "get_texture ["<<txid<<"]" );
 	GlTexture* t = TextureTable.data(txid);
-	if ( !t ) Error("get_texture()","texture name not found");
+	if ( !t ) Error("get_texture()","texture index not found");
 	if ( !t->valid() )
 	{	GlTextureDecl* td = t->_decl;
 		if ( !td ) Error("texture declarion null",TextureTable.key(txid));
-		GsString fname(td->filename);
-		if ( !Dirs.checkfull(fname) ) Error("texture file not found",td->filename);
-		GsImage* img = new GsImage;
-		if ( !img->load(fname) ) Error("error loading texture file",fname);
-		img->vertical_mirror(); // needed because OpenGL loads pixel data upside-down
+		GsString fname;
+		GsImage* img;
+		if ( td->image )
+		{	img = td->image;
+			img->ref();
+			fname = "(imagedata)";
+		}
+		else
+		{	img = new GsImage;
+			img->ref();
+			fname = td->filename;
+			if ( !Dirs.checkfull(fname) ) Error("texture file not found",td->filename);
+			if ( !img->load(fname) ) Error("error loading texture file",fname);
+			img->vertical_mirror(); // needed because OpenGL loads pixel data upside-down
+		}
 		GS_TRACE1 ( "texture ["<<fname<<"] size:"<<img->w()<<'x'<<img->h() );
 		if ( !gl_loaded() ) Error("get_texture called before OpenGL loaded",fname);
 		t->data ( img, GlTexture::Filtered );
-		delete img;
+		img->unref();
 		if ( FreeDeclInfo ) { delete td; t->_decl=0; }
 	}
 	return t;
