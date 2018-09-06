@@ -477,7 +477,9 @@ void KnFbxImporter::read_material ( GsInput& fin, Material* m )
 		{	_read_color ( fin, m->mtl.specular );
 		}
 		else if ( s=="Shininess" )
-		{	_read_color ( fin, GsColor(), &m->mtl.shininess );
+		{	
+			GsColor c;
+			_read_color ( fin, c, &m->mtl.shininess );
 		}
 		else if ( s[0]=='{' )
 		{	level++;
