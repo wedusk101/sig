@@ -64,33 +64,33 @@ void KnChannels::init()
  }
 
 void KnChannels::_add ( KnJoint* j, KnChannel::Type t )
- {
-   _channels.push();
+{
+	_channels.push();
 
-   if ( j==0 )
-	{ _channels.top().init ( t ); 
+	if ( j==0 )
+	{	_channels.top().init ( t ); 
 	}
-   else
-	{ _channels.top().type ( t );
-	  _channels.top().connect ( j );
+	else
+	{	_channels.top().type ( t );
+		_channels.top().connect ( j );
 	}
 
-   _floats += KnChannel::size(t);
-   if ( _htable ) { delete _htable; _htable=0; }
- }
+	_floats += KnChannel::size(t);
+	if ( _htable ) { delete _htable; _htable=0; }
+}
 
 bool KnChannels::insert ( int pos, KnChannel::Type type )
- {
-   if ( pos<0 || pos>_channels.size() ) return false;
+{
+	if ( pos<0 || pos>_channels.size() ) return false;
 
-   // add channel:
-   _channels.insert ( pos );
-   _channels[pos].init ( type );
-   _floats += KnChannel::size ( type );
-   if ( _htable ) { delete _htable; _htable=0; }
+	// add channel:
+	_channels.insert ( pos );
+	_channels[pos].init ( type );
+	_floats += KnChannel::size ( type );
+	if ( _htable ) { delete _htable; _htable=0; }
 
-   return true;
- }
+	return true;
+}
 
 KnSkeleton* KnChannels::skeleton () const
  {
@@ -389,26 +389,27 @@ void KnChannels::merge ( const KnChannels& ca )
  }
 
 bool KnChannels::only_quat_channel () const
- {
-   for ( int c=0; c<_channels.size(); c++ )
-	{ if ( _channels[c].type()!=KnChannel::Quat ) return false;
+{
+	int c, s=_channels.size();
+	for ( c=0; c<s; c++ )
+	{	if ( _channels[c].type()!=KnChannel::Quat ) return false;
 	}
-   return true;
- }
+	return true;
+}
 
 int KnChannels::force_quat_channels ()
- {
-   int c, n=0;
-   for ( c=0; c<_channels.size(); c++ )
-	{ if ( _channels[c].type()!=KnChannel::Quat )
-	   { _channels[c].type ( KnChannel::Quat );
-		 n++;
-	   }
-	  if ( _channels[c].status()>KnChannel::JointConnection )
-	   _channels[c].disconnect();
+{
+	int c, s=_channels.size(), n=0;
+	for ( c=0; c<s; c++ )
+	{	if ( _channels[c].type()!=KnChannel::Quat )
+		{	_channels[c].type ( KnChannel::Quat );
+			n++;
+		}
+		if ( _channels[c].status()>KnChannel::JointConnection )
+			_channels[c].disconnect();
 	}
-   return n;
- }
+	return n;
+}
 
 void KnChannels::copyfrom ( const KnChannels& c )
  {
