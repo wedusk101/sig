@@ -150,42 +150,42 @@ GsVec GsQuat::apply ( const GsVec &v ) const
 //=================================== Friend Functions ===================================
 
 GsQuat operator * ( const GsQuat &q1, const GsQuat &q2 )
- {
-   GsQuat q;
+{
+	GsQuat q;
 
-   // the following is the same as:
-   // ( w1*w2-dot(v1,v2), w1*v1 + w2*v2 + cross (v1,v2) )
-   q.w = (q1.w*q2.w) - (q1.x*q2.x + q1.y*q2.y + q1.z*q2.z); // w1*w2-dot(v1,v2)
-   q.x = q1.y*q2.z - q1.z*q2.y; // cross (q1.v,q2.v)
-   q.y = q1.z*q2.x - q1.x*q2.z;
-   q.z = q1.x*q2.y - q1.y*q2.x;
-   q.x += (q1.x*q2.w) + (q2.x*q1.w); // += w1*v1 + w2*v2 
-   q.y += (q1.y*q2.w) + (q2.y*q1.w);
-   q.z += (q1.z*q2.w) + (q2.z*q1.w);
+	// the following is the same as:
+	// ( w1*w2-dot(v1,v2), w1*v1 + w2*v2 + cross (v1,v2) )
+	q.w = (q1.w*q2.w) - (q1.x*q2.x + q1.y*q2.y + q1.z*q2.z); // w1*w2-dot(v1,v2)
+	q.x = q1.y*q2.z - q1.z*q2.y; // cross (q1.v,q2.v)
+	q.y = q1.z*q2.x - q1.x*q2.z;
+	q.z = q1.x*q2.y - q1.y*q2.x;
+	q.x += (q1.x*q2.w) + (q2.x*q1.w); // += w1*v1 + w2*v2 
+	q.y += (q1.y*q2.w) + (q2.y*q1.w);
+	q.z += (q1.z*q2.w) + (q2.z*q1.w);
 
-   return q;
- }
+	return q;
+}
 
 bool operator == ( const GsQuat &q1, const GsQuat &q2 )
- { 
-   return q1.w==q2.w && q1.x==q2.x && q1.y==q2.y && q1.z==q2.z ; 
- }
+{
+	return q1.w==q2.w && q1.x==q2.x && q1.y==q2.y && q1.z==q2.z ; 
+}
 
 bool operator != ( const GsQuat &q1, const GsQuat &q2 )
- { 
-   return q1.w==q2.w && q1.x==q2.x && q1.y==q2.y && q1.z==q2.z ? false:true; 
- }
+{
+	return q1.w==q2.w && q1.x==q2.x && q1.y==q2.y && q1.z==q2.z ? false:true; 
+}
 
 //=================================== Global Functions ===================================
 
 void swap ( GsQuat &q1, GsQuat &q2 )
- {
-   float tmp;
-   GS_SWAP(q1.w,q2.w);
-   GS_SWAP(q1.x,q2.x);
-   GS_SWAP(q1.y,q2.y);
-   GS_SWAP(q1.z,q2.z);
- }
+{
+	float tmp;
+	GS_SWAP(q1.w,q2.w);
+	GS_SWAP(q1.x,q2.x);
+	GS_SWAP(q1.y,q2.y);
+	GS_SWAP(q1.z,q2.z);
+}
 
 void gslerp ( const float* q1const, const float* q2, float t, float* q )
  { 
@@ -257,7 +257,7 @@ GsInput& operator>> ( GsInput& in, GsQuat& q )
 
 	  case XZY: { GsMat m;
 				  in>>vec; // get euler angles here
-				  gs_rot_xzy ( m, GS_TORAD(vec.x), GS_TORAD(vec.y), GS_TORAD(vec.z), 'C' ); // build rot mat
+				  gs_rot_xzy ( m, GS_TORAD(vec.x), GS_TORAD(vec.y), GS_TORAD(vec.z), 'L' ); // build rot mat
 				  // for a generic order, use instead:
 				  // enum gsEulerOrder { gsXYZ=123, gsXZY=132, gsYXZ=213, gsYZX=231, gsZXY=312, gsZYX=321 };
 				  // void gs_rot ( gsEulerOrder order, GsMat& m, float rx, float ry, float rz, char fmt );

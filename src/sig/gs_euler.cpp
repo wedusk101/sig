@@ -27,17 +27,17 @@
 //============================ Get Angles ================================
 
 void gs_angles ( gsEulerOrder order, const GsMat& m, float& rx, float& ry, float& rz, char fmt )
- {
-   switch ( order )
-	{ case 123: gs_angles_xyz(m,rx,ry,rz,fmt); break;
-	  case 132: gs_angles_xzy(m,rx,ry,rz,fmt); break;
-	  case 213: gs_angles_yxz(m,rx,ry,rz,fmt); break;
-	  case 231: gs_angles_yzx(m,rx,ry,rz,fmt); break;
-	  case 312: gs_angles_zxy(m,rx,ry,rz,fmt); break;
-	  case 321: gs_angles_zyx(m,rx,ry,rz,fmt); break;
-	  default: rx=ry=rz=0;
+{
+	switch ( order )
+	{	case 123: gs_angles_xyz(m,rx,ry,rz,fmt); break;
+		case 132: gs_angles_xzy(m,rx,ry,rz,fmt); break;
+		case 213: gs_angles_yxz(m,rx,ry,rz,fmt); break;
+		case 231: gs_angles_yzx(m,rx,ry,rz,fmt); break;
+		case 312: gs_angles_zxy(m,rx,ry,rz,fmt); break;
+		case 321: gs_angles_zyx(m,rx,ry,rz,fmt); break;
+		default: rx=ry=rz=0;
 	}
- }
+}
 
 void gs_angles_xyz ( const GsMat& m, float& rx, float& ry, float& rz, char fmt )
  {
@@ -144,17 +144,17 @@ void gs_angles_zyx ( const GsMat& m, float& rx, float& ry, float& rz, char fmt )
 //============================ Get Mat ================================
 
 void gs_rot ( gsEulerOrder order, GsMat& m, float rx, float ry, float rz, char fmt )
- {
-   switch ( order )
-	{ case 123: gs_rot_xyz(m,rx,ry,rz,fmt); break;
-	  case 132: gs_rot_xzy(m,rx,ry,rz,fmt); break;
-	  case 213: gs_rot_yxz(m,rx,ry,rz,fmt); break;
-	  case 231: gs_rot_yzx(m,rx,ry,rz,fmt); break;
-	  case 312: gs_rot_zxy(m,rx,ry,rz,fmt); break;
-	  case 321: gs_rot_zyx(m,rx,ry,rz,fmt); break;
-	  default: m.identity();
+{
+	switch ( order )
+	{	case 123: gs_rot_xyz(m,rx,ry,rz,fmt); break;
+		case 132: gs_rot_xzy(m,rx,ry,rz,fmt); break;
+		case 213: gs_rot_yxz(m,rx,ry,rz,fmt); break;
+		case 231: gs_rot_yzx(m,rx,ry,rz,fmt); break;
+		case 312: gs_rot_zxy(m,rx,ry,rz,fmt); break;
+		case 321: gs_rot_zyx(m,rx,ry,rz,fmt); break;
+		default: m.identity();
 	}
- }
+}
 
 void gs_rot_xyz ( GsMat& m, float rx, float ry, float rz, char fmt )
  {
