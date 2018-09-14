@@ -203,7 +203,7 @@ int PrimViewer::timer ( int e )
 	redraw ();
 	return 1;
 }
-
+ 
 int main ( int argc, char** argv )
 {
 	UiStyle::Current().set_dark_style();

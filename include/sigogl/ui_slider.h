@@ -37,6 +37,8 @@ class UiSlider : public UiElement
 	void value ( float v ); // between min, max
 	void tvalue ( float t ); // between 0,1
 	void range ( float min, float max );
+	float range_min () const { return _min; }
+	float range_max () const { return _max; }
 	void format ( int n, int d ) { _fmt[1]='0'+n; _fmt[3]='0'+d; } // if n==0 number does not show
 	void increment ( float inc ) { _inc=inc; }
 	void configure ( float min, float max, float inc, int n, int d ) { range(min,max); increment(inc); format(n,d); }
