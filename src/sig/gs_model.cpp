@@ -255,13 +255,14 @@ void GsModel::add_model ( const GsModel& m )
 	int orign = N.size();
 	int origt = T.size();
 	int origf = F.size();
-	//int origfn = Fn.size(); // not used
+	int origfn = Fn.size(); // not used
 	int origft = Ft.size();
 	int origg = G.size();
 
 	int i;
 	int mfsize = m.F.size();
 	int mvsize = m.V.size();
+	int mnsize = m.N.size();
 	GS_TRACE4 ( "add_model: init" );
 
 	if ( mvsize==0 || mfsize==0 ) return;
@@ -279,16 +280,23 @@ void GsModel::add_model ( const GsModel& m )
 
 	// add the normals:
 	GS_TRACE4 ( "add_model: normals" );
-	if ( m.Fn.size()>0 )
-	{	if ( orign==0 ){ orign=origv; N.size(orign); Fn.size(orign); Fn.setall(Face(0,0,0)); N.setall(GsVec::i); }
+	if ( mnsize>0 )
+	{	int mfnsize = m.Fn.size();
+		if ( orign==0 && origfn==0 ) // normals will follow format of m
+		{	if ( mfnsize>0 )
+			{	smooth(); orign=N.size(); origfn=Fn.size(); }
+			else
+			{	smooth(-1.0f); orign=N.size(); }
+		}
+		N.size ( orign+mnsize );
+		for ( i=0; i<mnsize; i++ ) N[orign+i] = m.N.get(i);
 
-		N.size ( orign+m.N.size() );
-		for ( i=0; i<m.N.size(); i++ ) N[orign+i] = m.N.get(i);
-
-		Fn.size ( origf+mfsize );
-		for ( i=0; i<mfsize; i++ )
-		{	const Face& f = m.Fn.get(i);
-			Fn[origf+i].set ( f.a+orign, f.b+orign, f.c+orign );
+		if ( mfnsize>0 )
+		{	Fn.size ( origfn+mfnsize );
+			for ( i=0; i<mfnsize; i++ )
+			{	const Face& f = m.Fn.get(i);
+				Fn[origfn+i].set ( f.a+origfn, f.b+origfn, f.c+origfn );
+			}
 		}
 	}
 

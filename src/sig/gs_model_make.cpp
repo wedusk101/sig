@@ -220,16 +220,16 @@ void GsModel::make_sphere ( const GsPnt& c, float r, int nfaces, bool smooth )
 	F.push().set ( 0, 3, 4 );
 
 	int i;
-	for ( i=0; i<8; i++ )
-		subtriface ( this, i, r, depth );
+	for ( i=0; i<8; i++ ) subtriface ( this, i, r, depth );
 
 	if ( smooth )
-	{	N.sizecap(V.size(),V.size());
-		for ( i=0; i<V.size(); i++ ) { N[i]=V[i]; N[i].normalize(); }
+	{	int vs=V.size();
+		N.sizecap(vs,vs);
+		for ( i=0; i<vs; i++ ) { N[i]=V[i]; N[i].normalize(); }
+		_geomode=Smooth;
 	}
 
 	if ( c!=GsPnt::null ) translate(c);
-	_geomode=Smooth;
 	compress();
 }
 
