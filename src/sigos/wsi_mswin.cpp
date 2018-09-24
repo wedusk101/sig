@@ -489,8 +489,11 @@ static LRESULT CALLBACK WndProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 
 		case WM_KEYUP  :
 		case WM_SYSKEYUP:
+			GS_TRACE5("WM_KEYUP...");
 			setstate ( e ); // update state in event
-			return DefWindowProc ( hWnd, uMsg, wParam, lParam ); // not currently in use
+			setkeycode ( e, wParam );
+			if (e.key == 0) return DefWindowProc ( hWnd, uMsg, wParam, lParam );
+			e.type = GsEvent::KeyRelease;
 			break;
 
 		// we call setstate below to have correct events in all cases with multiple windows

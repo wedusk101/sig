@@ -213,12 +213,7 @@ class KnSkeleton : public GsShareable
 		and in the current directory. Also, relative paths in .s become relative to basedir.
 		If basedir is not given (i.e. given as null), it will be extracted from in.filename(), if available.
 		Method compress() is called after the file is loaded.
-xxx
-		If parameter resetgeo is set to true, existing geometries will be deleted in case new ones
-xxx
-		are declared in the file being read (this is mostly applicable when loading .sd files).
 		The skeleton channels will be computed at first load (not from .sd if called for .s) */
-//	bool load ( GsInput& in, const char* basedir=0, bool resetgeo=false );
 	bool load ( GsInput& in, const char* basedir=0 );
 
 	/*! Save in .s format the current skeleton.

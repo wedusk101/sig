@@ -35,7 +35,7 @@ void GsEvent::init ()
 
 const char *GsEvent::type_name () const
 {
-	static const char *types[] = { "None", "Push", "Release", "Drag", "Move", "Wheel", "Keyboard" };
+	static const char *types[] = { "None", "Push", "Release", "Drag", "Move", "Wheel", "KeyPress", "KeyRelease" };
 	return types [ int(type) ];
 }
 
@@ -48,7 +48,7 @@ GsOutput& operator<< ( GsOutput& out, const GsEvent& e )
 {
 	out << e.type_name();
 
-	if ( e.type==GsEvent::Keyboard ) 
+	if ( e.type==GsEvent::Keyboard || e.type==GsEvent::KeyRelease ) 
 	{	if ( e.key>=1 && e.key<=12 ) out << " [F" << (int)e.key << ']';
 		else if ( e.key>12 && e.key<255 ) out << " [" << char(e.key) << ':' << (int)e.key << ']';
 		else out << " [" << (int)e.key << ']';

@@ -264,12 +264,16 @@ class WsViewer : public WsWindow
 	/*! Applies an event action to the scene */
 	virtual int handle_scene_event ( const GsEvent& e );
 
-   /*! All keyboard events are passed to this method. The WsViewer
+   /*! All key press events are passed to this method. The WsViewer
 	   implementation checks if crtl+shift+m is pressed to display
 	   the mouse menu, crtl+shift+x to exit the application, 
 	   crtl+shift+e to call the eps export action;
 	   otherwise it passes the event to the scene graph. */
 	virtual int handle_keyboard ( const GsEvent& e );
+
+	/*! All key release events are passed to this method.
+		Currently the WsViewer implementation is empty and always returns 0. */
+	virtual int handle_key_release ( const GsEvent& e );
 
 	/*! Will be called each time a spin animation accured. The WsViewer
 		implementation of this virtual method does nothing. */
