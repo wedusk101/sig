@@ -80,25 +80,24 @@ void GsModel::make_tube ( const GsPnt& a, const GsPnt& b, float ra, float rb, in
 	GsQuat rot ( va, dang );
 	GsPnt a1 = a+vra;
 	GsPnt b1 = b+vrb;
-	GsPnt a2 = rot.apply(a1);
-	GsPnt b2 = rot.apply(b1);
+	GsPnt a2 = a+rot.apply(vra);
+	GsPnt b2 = b+rot.apply(vrb);
 
 	// compute points around body:
 	int i=1;
 	do
 	{	if ( smooth )
 		{	if ( ra==rb )
-			{	N.push()=(a1-a)/ra; } //normalized normal
+			{	N.push()=(a1-a)/ra; } // normalized normal
 			else // adjust normal for our cylinder with a "cone body"
 			{	GsVec v = b1-a1;
-				N.push() = cross ( v, cross(v,GsVec::j) );
-				N.top().normalize();
+				N.push() = ::normalize ( cross ( v, cross(v,GsVec::j) ) );
 			}
 		}
 		V.push()=a1; V.push()=b1;
 		if ( i==nfaces ) break;
-		a1=a2; a2=rot.apply(a1);
-		b1=b2; b2=rot.apply(b1);
+		a1=a2; a2=a+rot.apply(a1-a);
+		b1=b2; b2=b+rot.apply(b1-b);
 		i++;
 	} while ( true );
 
@@ -110,10 +109,8 @@ void GsModel::make_tube ( const GsPnt& a, const GsPnt& b, float ra, float rb, in
 	{	i1 = V.vidpos ( i+1 );
 		i2 = V.vidpos ( i+2 );
 		i3 = V.vidpos ( i+3 );
-
 		F.push().set ( i, i2, i1 );
 		F.push().set ( i1, i2, i3 );
-
 		if ( smooth )
 		{	n1 = N.vid ( n+1 );
 			Fn.push().set ( n, n1, n );
