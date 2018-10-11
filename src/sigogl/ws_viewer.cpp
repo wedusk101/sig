@@ -534,7 +534,7 @@ void WsViewer::view_all ( GsBox* boxpt )
 			c.eye = c.center+GsVec(0,0,d+s+0.2f);
 			c.up = GsVec::j;
 			c.znear = 0.1f;
-			c.zfar  = d+3.0f*s;
+			c.zfar  = d+(4.0f*s);
 		}
 	}
 

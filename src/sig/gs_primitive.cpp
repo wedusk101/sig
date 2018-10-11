@@ -101,7 +101,7 @@ GsInput& operator>> ( GsInput& in, GsPrimitive& p )
 	p.smooth = true;
 
 	while ( in.get()==GsInput::String )
-	{ 
+	{
 		if ( in.ltoken()=="center" )
 		{	in >> p.center; }
 		else if ( in.ltoken()=="orientation" )
