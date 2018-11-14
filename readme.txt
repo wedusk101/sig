@@ -3,6 +3,16 @@
            Copyright (c) 2018 Marcelo Kallmann
 ===============================================================
 
+SIG is a C++ class toolkit for the development of applications displaying
+interactive graphics. SIG is designed to be small, flexible, fast, portable,
+and standalone. SIG includes a simple and extendible scene graph, a flexible
+skeleton structure supporting a variety of joint definitions, classes for 
+loading and manipulating bvh motion files and obj geometry files, several 
+utilities for developing motion planners, and an analytical Inverse Kinematics
+solver. It also includes functionality to manage resources such as textures
+and fonts. Being standalone the entire functionality is exposed making SIG
+a great tool to learn OpenGL and to develop research in computer graphics.
+
 ==== TERMS OF DISTRIBUTION ====
 
 This software is distributed under the Apache License, Version 2.0.
@@ -13,6 +23,7 @@ at the base folder of the distribution.
 
 Windows: use the visual studio solution(s) in the vs20NN folder
 Linux:   call make from the make/ folder (in development)
+Other:   a port to glfw is also under development
 
 ==== DIRECTORIES ====
 
