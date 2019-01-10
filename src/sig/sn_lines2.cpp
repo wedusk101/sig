@@ -73,7 +73,7 @@ void SnLines2::end_polyline ()
 	_polyline = 0;
 }
 
-void SnLines2::append_to_last_polyline ( const GsVec2& p )
+void SnLines2::append_to_last_polyline ( GsVec2 p )
 { 
 	if ( _polyline ) return;
 	if ( I.empty() ) return;
@@ -96,19 +96,7 @@ void SnLines2::push ( float x, float y )
 	}
 }
 
-void SnLines2::push_horizontal ( float x, float y, float w )
-{
-	push ( x, y );
-	push ( x+w, y );
-}
-
-void SnLines2::push_vertical ( float x, float y, float h )
-{
-	push ( x, y );
-	push ( x, y+h );
-}
-
-void SnLines2::push ( const GsColor& c )
+void SnLines2::push ( GsColor c )
 {
 	if ( !_colorspervertex )
 	{	while ( Vc.size()<V.size() ) Vc.push()=_material.diffuse;
@@ -116,6 +104,15 @@ void SnLines2::push ( const GsColor& c )
 		_colorspervertex = 1;
 	}
 	_material.diffuse = c;
+}
+
+void SnLines2::push_arrow ( GsPnt2 p1, GsPnt2 p2, float l, float w )
+{
+	GsVec2 v=p1-p2;	v.len(l);
+	GsVec2 o=v.ortho(); o.len(w);
+	push ( p1, p2 ); v+=p2;
+	push ( p2, v+o );
+	push ( p2, v-o );
 }
 
 void SnLines2::push_cross ( GsPnt2 c, float r )
@@ -165,7 +162,7 @@ void SnLines2::push_lines ( const float* pt, int nl )
 	for ( ; nl>0; nl--, pt+=4 ) push ( pt[0], pt[1], pt[2], pt[3] );
 }
 
-void SnLines2::push_circle_approximation ( const GsPnt2& center, float radius, int nvertices )
+void SnLines2::push_circle_approximation ( GsPnt2 center, float radius, int nvertices )
 {
 	GsVec2 p;
 	int i0 = V.size();

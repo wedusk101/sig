@@ -135,16 +135,16 @@ class GsOutput
 		For other devices, nothing is done. The filename is set to null. */
 	void close ();
  
-	/*! Set the desired "printf format" for integers, "%d" is the default */
+	/*! Set the desired "printf format" for integers, "%d" is the default. A null s sets the default. */
 	void fmtint ( const char* s );
 
-	/*! Set the desired "printf format" for floats, "%g" is the default.
+	/*! Set the desired "printf format" for floats, "%g" is the default.  A null s sets the default.
 		There are two special formats GsOutput understands: 
 		"f" prints with %f but zeros are printed without decimals;
 		and "g" prints with %g but zeros are printed as "0.0" */
 	void fmtfloat ( const char* s );
 
-	/*! Set the desired "printf format" for doubles, "%g" is the default.
+	/*! Set the desired "printf format" for doubles, "%g" is the default. A null s sets the default.
 		The same special formats described in method fmtfloat are vlso valid here. */
 	void fmtdouble ( const char* s );
 

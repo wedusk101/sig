@@ -51,7 +51,7 @@ void GsArrayBase::size ( unsigned sizeofx, int ns )
 	_size = ns;
 	if ( _size>_capacity )
 	{	_capacity = _size;
-		_data = realloc ( _data, sizeofx*_capacity ); // if _data==0, realloc reacts as malloc. If size is zero _data is freed and null is returned
+		_data = realloc ( _data, sizeofx*_capacity );
 	}
 }
 
@@ -63,7 +63,7 @@ void GsArrayBase::capacity ( unsigned sizeofx, int nc )
 	_capacity = nc;
 	if ( _size>_capacity ) _size=_capacity;
 
-	_data = realloc ( _data, sizeofx*_capacity ); // realloc notes: if _data==0, realloc reacts as malloc. If size==0, _data is freed
+	_data = realloc ( _data, sizeofx*_capacity );
 }
 
 void GsArrayBase::compress ( unsigned sizeofx )
@@ -71,9 +71,9 @@ void GsArrayBase::compress ( unsigned sizeofx )
 	if ( _size==_capacity ) return;
 
 	if ( !_size )
-	 { free ( _data ); _data=0; }
+	{	free ( _data ); _data=0; }
 	else
-	 { _data = realloc ( _data, sizeofx*_size ); }
+	{	_data = realloc ( _data, sizeofx*_size ); }
 
 	_capacity = _size;
 }
@@ -176,7 +176,10 @@ void GsArrayBase::copyfrom ( unsigned sizeofx, const GsArrayBase& a )
 	if ( _data==a._data ) return;
 	if ( _capacity<a._size  )
 	{	_capacity = a._size;
-		_data = realloc ( _data, sizeofx*_capacity );
+		if ( !_capacity )
+		{	if ( _data ) free ( _data ); _data=0; }
+		else
+		{	_data = realloc ( _data, sizeofx*_capacity ); }
 	}
 	_size = a._size;
 	if ( _size>0 ) memcpy ( _data, a._data, sizeofx*_size );

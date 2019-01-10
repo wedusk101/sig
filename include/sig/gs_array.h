@@ -30,7 +30,7 @@ class GsArrayBase
 	int   _size;	 //!< Number of elements being used in array
 	int   _capacity; //!< Number of allocated elements (>=size)
 
-	protected :
+   protected :
 
 	/*! Init with the sizeof of each element, size, and capacity. If the given
 		capacity is smaller than the size, capacity is set to be equal to size */
@@ -145,7 +145,7 @@ class GsArrayBase
 	because a[x] references a memory position that can be reallocated by push() */
 template <typename X>
 class GsArray : protected GsArrayBase
- { public:
+{  public:
 
 	/*! Constructs with the given size and capacity. If the given capacity 
 		is smaller than the size, capacity is set to be equal to size. */
@@ -421,7 +421,7 @@ class GsArray : protected GsArrayBase
 	GsArrayPt can thus be used for non-primitive classes. */
 template <typename X>
 class GsArrayPt : protected GsArray<X*>
- { public:
+{  public:
 	/*! Only the default constructor is provided here */
 	GsArrayPt () : GsArray<X*> () {}
 
@@ -487,7 +487,7 @@ class GsArrayPt : protected GsArray<X*>
 	from GsShareable, automatically managing ref/unref calls as needed. */
 template <typename X>
 class GsArrayRef : protected GsArray<X*>
- { public:
+{  public:
 	/*! Only the default constructor is provided here */
 	GsArrayRef () : GsArray<X*> () {}
 

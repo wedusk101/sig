@@ -83,14 +83,6 @@ class SnLines2 : public SnShape
 	void push ( const GsVec &p1, const GsVec &p2 ) { push(p1.x,p1.y,p2.x,p2.y); }
 	void push ( const GsVec2 &p1, const GsVec2 &p2 ) { push(p1.x,p1.y,p2.x,p2.y); }
 
-	/*! Push in V a horizontal line (x,y), (x+w,y). */
-	void push_horizontal ( float x, float y, float w );
-	void push_horizontal ( GsColor c, float x, float y, float w ) { push(c); push_horizontal(x,y,w); }
-
-	/*! Push in V a vertical line (x,y), (x,y+h). */
-	void push_vertical ( float x, float y, float h );
-	void push_vertical ( GsColor c, float x, float y, float h ) { push(c); push_vertical(x,y,h); }
-
 	/*! Starts a definition of a polyline by pushing in 'I' the index V.size() */
 	void begin_polyline ();
 
@@ -98,10 +90,13 @@ class SnLines2 : public SnShape
 	void end_polyline ();
 
 	/*! Append a new point to the previous polyline */
-	void append_to_last_polyline ( const GsVec2& p );
+	void append_to_last_polyline ( GsVec2 p );
 
 	/*! Stores in SnShape::material the new color to be pushed to Vc or Pc for the next vertices. */
-	void push ( const GsColor& c );
+	void push ( GsColor c );
+
+	/*! Add an arrow from p1 to p2, with tip length l and width w */
+	void push_arrow ( GsPnt2 p1, GsPnt2 p2, float l, float w );
 
 	/*! Add a 2 dimensional cross of radius r and center c */
 	void push_cross ( GsPnt2 c, float r );
@@ -130,7 +125,7 @@ class SnLines2 : public SnShape
 
 	/*! Approximates circle (center,radius) with a polyline, where
 		nvertices gives the number of vertices in the polyline */
-	void push_circle_approximation ( const GsPnt2& center, float radius, int nvertices );
+	void push_circle_approximation ( GsPnt2 center, float radius, int nvertices );
 
 	/*! Returns the bounding box of all vertices used.
 		The returned box can be empty. */

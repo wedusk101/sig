@@ -131,17 +131,17 @@ static void set_fmt ( char*& fmt, const char* def, const char* newfmt )
 
 void GsOutput::fmtint ( const char* s )
 {
-	set_fmt ( _intfmt, DefaultIntFmt, s );
+	set_fmt ( _intfmt, DefaultIntFmt, s?s:DefaultIntFmt );
 }
 
 void GsOutput::fmtfloat ( const char* s )
 {
-	set_fmt ( _floatfmt, DefaultFloatFmt, s );
+	set_fmt ( _floatfmt, DefaultFloatFmt, s?s:DefaultFloatFmt );
 }
 
 void GsOutput::fmtdouble ( const char* s )
 {
-	set_fmt ( _doublefmt, DefaultDoubleFmt, s );
+	set_fmt ( _doublefmt, DefaultDoubleFmt, s?s:DefaultDoubleFmt );
 }
 
 void GsOutput::outm ()
