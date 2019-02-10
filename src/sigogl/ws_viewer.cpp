@@ -815,17 +815,18 @@ int WsViewer::handle ( const GsEvent &e )
 	int result=1;
 
 	if ( e.mouse_event() )
-	{	bool camevent = (e.ctrl||e.shift) || e.type==GsEvent::Wheel;
-		if ( !camevent )
-		{	result = handle_scene_event(e);
-			if ( !result && e.alt ) camevent=true;
-		}
-		if ( camevent )
-		{	if ( _data->viewmode==ModeExaminer )
-				result = handle_examiner_manipulation(e);
-			else if ( _data->viewmode==ModePlanar )
-				result = handle_planar_manipulation(e);
-		}
+	{	result = handle_mouse(e);
+	//bool camevent = (e.ctrl||e.shift) || e.type==GsEvent::Wheel;
+	//	if ( !camevent )
+	//	{	result = handle_scene_event(e);
+	//		if ( !result && e.alt ) camevent=true;
+	//	}
+	//	if ( camevent )
+	//	{	if ( _data->viewmode==ModeExaminer )
+	//			result = handle_examiner_manipulation(e);
+	//		else if ( _data->viewmode==ModePlanar )
+	//			result = handle_planar_manipulation(e);
+	//	}
 	}
 	else if ( e.type==GsEvent::Keyboard )
 	{	result = handle_keyboard(e);
@@ -845,18 +846,21 @@ int WsViewer::uievent ( int e )
 
 //================== WSVIEWER VIRTUAL METHODS ==============================
 
-void WsViewer::set_light ()
+int WsViewer::handle_mouse ( const GsEvent& e )
 {
-	// GsLight& l = _data->light;
-
-	// SgDev: revise and complete light implementation:
-	// -change attenuation depending on distance: l.constant_attenuation = 1.0f/_data->camera.scale;
-	// -set or not directional light
-	// -multiple light sources
-	if ( _data->lightneedsupdate ) // set all light parameters
-	{	_data->lightneedsupdate = false;
-		// state updates should come here, if needs update flag stil needed
+	int result = 1;
+	bool camevent = (e.ctrl||e.shift) || e.type==GsEvent::Wheel;
+	if ( !camevent )
+	{	result = handle_scene_event(e);
+		if ( !result && e.alt ) camevent=true;
 	}
+	if ( camevent )
+	{	if ( _data->viewmode==ModeExaminer )
+			result = handle_examiner_manipulation(e);
+		else if ( _data->viewmode==ModePlanar )
+			result = handle_planar_manipulation(e);
+	}
+	return result;
 }
 
 //== Examiner ==============================================================
@@ -1072,6 +1076,22 @@ int WsViewer::handle_key_release ( const GsEvent& e )
 
 void WsViewer::spin_animation_occured ()
 {
+}
+
+//== Light Setup ========================================================
+
+void WsViewer::set_light ()
+{
+	// GsLight& l = _data->light;
+
+	// SgDev: revise and complete light implementation:
+	// -change attenuation depending on distance: l.constant_attenuation = 1.0f/_data->camera.scale;
+	// -set or not directional light
+	// -multiple light sources
+	if ( _data->lightneedsupdate ) // set all light parameters
+	{	_data->lightneedsupdate = false;
+		// state updates should come here, if needs update flag stil needed
+	}
 }
 
 //================================ End of File =================================================

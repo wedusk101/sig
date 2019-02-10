@@ -234,7 +234,7 @@ class WsViewer : public WsWindow
 		To draw the window contents, use render() instead. */
 	virtual void draw ( GlRenderer* wr ) override;
 
-	/*! Method handle() will respond to scene-related mouse events and will then call the
+	/*! Method handle() processes all basic events and will then call the
 		specialized handle methods below according to the generated event. 
 		This is the handle event entry point overriding WsWindow::handle(e). */
 	virtual int handle ( const GsEvent& e ) override;
@@ -245,11 +245,9 @@ class WsViewer : public WsWindow
 
    public : //----> virtual methods allowing the user to override WsViewer functionality
 
-	/*! Called when it is time to set the OpenGL light.
-		The viewer uses one GsLight object and this method automatically sets the light
-		attenuation to be the inverse of the (Camview) scene scale and makes sure the
-		light is not directional. Only called when using OpenGL 1.1 API. */
-	virtual void set_light ();
+   /*! This method is called to route mouse events to the different camera
+		manipulation handlers or to the scence. */
+	virtual int handle_mouse ( const GsEvent& e );
 
 	/*! Takes mouse events to rotate, scale and translate the scene. 
 		If the event is not used, it is passed to the scene by calling
@@ -278,6 +276,12 @@ class WsViewer : public WsWindow
 	/*! Will be called each time a spin animation accured. The WsViewer
 		implementation of this virtual method does nothing. */
 	virtual void spin_animation_occured ();
+
+	/*! Called when it is time to set the OpenGL light.
+		The viewer uses one GsLight object and this method automatically sets the light
+		attenuation to be the inverse of the (Camview) scene scale and makes sure the
+		light is not directional. Only called when using OpenGL 1.1 API. */
+	virtual void set_light ();
 };
 
 //================================ End of File =================================================

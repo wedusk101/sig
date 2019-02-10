@@ -58,7 +58,7 @@ class GsManager : public GsManagerBase
 	virtual void input ( GsInput& i, void* obj ) { i>>*((X*)obj); }
 
 	virtual int compare ( const void* obj1, const void* obj2 )
-	 { return X::compare ( (const X*)obj1, (const X*)obj2 ); }
+	{	return X::compare ( (const X*)obj1, (const X*)obj2 ); }
 };
 
 //============================== end of file ===============================

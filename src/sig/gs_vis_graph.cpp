@@ -186,7 +186,7 @@ bool GsVisGraph::shortest_path ( const GsPnt2& pi, const GsPnt2& pg, GsPolygon& 
 	// search path:
 	GS_TRACE2 ( "Searching..." );
 	float gcost;
-	bool found = _graph.shortest_path ( _vi, _vg, _path, gcost );
+	bool found = _graph.shortest_path ( _vi, _vg, _path, 0, &gcost );
 	path.open ( true );
 	path.size ( _path.size() );
 	for ( int i=_path.size()-1; i>=0; i-- ) path[i]=_path[i]->p;

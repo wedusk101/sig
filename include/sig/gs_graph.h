@@ -27,12 +27,12 @@ class GsGraphLink
 {  private :
 	GsGraphNode* _node;	// node this link is pointing to
 	gsuint _index;		// index for traversing
-	float _cost;		// cost for minimum paths
+	float _cost;		// cost for minimum-cost paths
 	int _blocked;		// used as boolean or as a ref counter
 	friend class GsGraphNode;
 	friend class GsGraphBase;
    protected :
-	GsGraphLink () { _index=0; _cost=0; _node=0; _blocked=0; }
+	GsGraphLink () { _node=0; _index=0; _cost=0; _blocked=0; }
    ~GsGraphLink () {}
    public :
 	void cost ( float c ) { _cost=c; }
@@ -148,8 +148,8 @@ class GsGraphPathTree;
 
 /*! GsGraphBase maintains a directed graph with nodes and links. Links around
 	a node do not have any order meaning.
-	Note also that the user should avoid redundant links, as no tests are done
-	(for speed purposes) in several methods.
+	The user should avoid redundant links, as no tests to detect redunduncy are included
+	(for efficiency) in several methods.
 	GsGraphBase is the base class, the user should use GsGraph template instead. */
 class GsGraphBase
 {  private :
@@ -238,13 +238,13 @@ class GsGraphBase
 
 	/*! Get all directed edges of the graph. Note that if n1 is linked
 		to n2 and n2 is linked to n1, both edges (n1,n2) and (n2,n1) will
-		appear in the edges array. Every two consecutive nodes in the
-		returned array represents one edge. */
-	void get_directed_edges ( GsArray<GsGraphNode*>& edges );
+		appear in the edges array. Every two consecutive nodes in the returned
+		array represents one edge. Array links, if given, returns the links. */
+	void get_directed_edges ( GsArray<GsGraphNode*>& edges, GsArray<GsGraphLink*>* links=0 );
 
 	/*! Get all edges of the graph without duplications from the directional
-		point of view. */
-	void get_undirected_edges ( GsArray<GsGraphNode*>& edges );
+		point of view. Array links, if valid pointer is given, returns the links. */
+	void get_undirected_edges ( GsArray<GsGraphNode*>& edges, GsArray<GsGraphLink*>* links=0 );
 
 	/*! Get all nodes which are in the same connected component of source */
 	void get_connected_nodes ( GsGraphNode* source, GsArray<GsGraphNode*>& nodes );
@@ -253,24 +253,29 @@ class GsGraphBase
 		pairs of start and end positions in array nodes, for each component. */
 	void get_disconnected_components ( GsArray<int>& components, GsArray<GsGraphNode*>& nodes );
 
-	/*! The returned path contains pointers to existing nodes in the graph.
+	/*! Computes and returns in array path the shortest path between n1 and n2.
 		In the case the two nodes are in two different disconnected components
 		an empty path is returned. If n1==n2 a path with the single node n1
-		is returned. In all cases, returns the distance (cost) of the path.
-		In case no path is found, the optional parameters distfunc and udata
-		can be used to return the path to the closest processed node to the goal. */
-	//TodoNote: use distfunc to implement A*
-	bool shortest_path ( GsGraphNode* n1, GsGraphNode* n2, GsArray<GsGraphNode*>& path, float& cost,
-						float (*distfunc) ( const GsGraphNode*, const GsGraphNode*, void* udata )=0,
+		is returned. In all cases, if cost is null-non it will receive the path cost.
+		If links is non-null, it will contain the links between the path nodes.
+		If hdistf is provided, this method performs A*; otherwise Dijkstra.
+		In case no path is found and the optional parameter gdistf is given,
+		the path to the closest processed node to the goal is returned.
+		Parameters hdistf and gdistf may be the same. */
+	bool shortest_path ( GsGraphNode* n1, GsGraphNode* n2, GsArray<GsGraphNode*>& path,
+						GsArray<GsGraphLink*>* links=0, float* cost=0,
+						float (*hdistf) ( const GsGraphNode*, const GsGraphNode*, void* udata )=0,
+						float (*gdistf) ( const GsGraphNode*, const GsGraphNode*, void* udata )=0,
 						void* udata=0 );
 
-	/*! Performs an A* search from startn, until finding endn. The search 
-		stops if either maxnodes or maxdist is reached. If these parameters
-		are <0 they are not taken into account. True is returned if endn could
-		be reached, and parameters depth and dist will contain the final
-		higher depth and distance (along the shortest path) reached. */
-	bool local_search ( GsGraphNode* startn, GsGraphNode* endn,
-						int maxnodes, float maxdepth, int& depth, float& dist );
+	/*! Performs a breadth-first search from n1 until finding n2.
+		Parameter cost, if non-null, will point to the path cost.
+		The search stops if either maxdepth or maxcost is reached, but only
+		if these parameters are given with positive values.
+		True is returned if a path is returned. */
+		// method not yet tested
+	bool bfs ( GsGraphNode* startn, GsGraphNode* endn, GsArray<GsGraphNode*>& path,
+			   GsArray<GsGraphLink*>* links=0, float* cost=0, int maxdepth=-1, float maxcost=-1 );
 
 	/*! When set to true, graph search will consider a link blocked if any of its
 		directions is blocked, i.e., blocking only one direction of a link will
@@ -325,16 +330,24 @@ class GsGraph : public GsGraphBase
 	N* extract ( N* n )  { return (N*) GsGraphBase::extract((GsGraphNode*)n); }
 	N* first_node () const { return (N*) GsGraphBase::first_node(); }
 
-	void get_undirected_edges ( GsArray<N*>& edges )
-	{	GsGraphBase::get_undirected_edges( (GsArray<GsGraphNode*>&)edges ); }
+	void get_directed_edges ( GsArray<N*>& edges, GsArray<L*>* links=0 )
+	{	GsGraphBase::get_directed_edges( (GsArray<GsGraphNode*>&)edges, (GsArray<GsGraphLink*>*)links ); }
+
+	void get_undirected_edges ( GsArray<N*>& edges, GsArray<L*>* links=0 )
+	{	GsGraphBase::get_undirected_edges( (GsArray<GsGraphNode*>&)edges, (GsArray<GsGraphLink*>*)links ); }
 
 	void get_disconnected_components ( GsArray<int>& components, GsArray<N*>& nodes )
 	{	GsGraphBase::get_disconnected_components( components, (GsArray<GsGraphNode*>&)nodes ); }
 
-	bool shortest_path ( N* n1, N* n2, GsArray<N*>& path, float& cost,
-						float (*distfunc) ( const GsGraphNode*, const GsGraphNode*, void* udata )=0,
+	bool shortest_path ( N* n1, N* n2, GsArray<N*>& path, GsArray<L*>* links, float* cost=0,
+						float (*hdistf) ( const GsGraphNode*, const GsGraphNode*, void* udata )=0,
+						float (*gdistf) ( const GsGraphNode*, const GsGraphNode*, void* udata )=0,
 						void* udata=0  )
-	{	return GsGraphBase::shortest_path((GsGraphNode*)n1,(GsGraphNode*)n2,(GsArray<GsGraphNode*>&)path,cost,distfunc,udata); }
+	{	return GsGraphBase::shortest_path (
+				(GsGraphNode*)n1, (GsGraphNode*)n2,
+				(GsArray<GsGraphNode*>&)path, (GsArray<GsGraphLink*>*)links,
+				cost, hdistf, gdistf, udata );
+	}
 
 	GsArray<N*>& buffer () { return (GsArray<N*>&) GsGraphBase::buffer(); }
 

@@ -92,13 +92,6 @@ class GsVisGraph : public GsShareable
    protected :
 	void _connect_to_visible ( GsVisGraphNode* n, int pk=-1, int vk=-1, const GsPnt2* sm=0, const GsPnt2* sp=0 );
 	void _add_if_free ( GsVisGraphNode* n1, GsVisGraphNode* n2, int p1=-1, int v1=-1, int p2=-1, int v2=-1 );
-
-
-	/*! Returns a reference to polygon index i, which must be a valid index */
-//	GsPolygon& get ( int i ) { return *_data[i]; }
-
-	/*! Returns a const reference to polygon index i, which must be a valid index */
-//	const GsPolygon& cget ( int i ) const { return *_data[i]; }
 };
 
 //================================ End of File =================================================

@@ -9,9 +9,10 @@
 # include <sig/gs_graph.h>
 # include <sig/gs_string.h>
 # include <sig/gs_heap.h>
+# include <sig/gs_queue.h>
 
 //# define GS_USE_TRACE1 // Node operations
-//# define GS_USE_TRACE2 // Search
+//# define GS_USE_TRACE2 // Shortest path search
 # include <sig/gs_trace.h>
 
 //============================== GsGraphNode =====================================
@@ -110,16 +111,17 @@ void GsGraphNode::output ( GsOutput& o ) const
 
 class GsGraphPathTree
 {  public :
-//	struct Node { int parent; float cost; GsGraphNode* node; };
-	struct Node { int parent; GsGraphNode* node; };
-	struct Leaf { int l; int d; }; // the leaf index in nodes array, and its depth
+	struct Node { int parent; GsGraphNode* node; GsGraphLink* pnlink; };
+	struct Leaf { int l; int d; float hcost; }; // the leaf index in N, its depth, and dist to goal
 	GsArray<Node> N;
 	GsHeap<Leaf,float> Q;
+	GsQueue<Leaf> B;
 	GsGraphBase* graph;
 	GsGraphNode* closest;
 	int iclosest;
 	float cdist;
-	float (*distfunc) ( const GsGraphNode*, const GsGraphNode*, void* udata );
+	float (*hdfunc) ( const GsGraphNode*, const GsGraphNode*, void* udata );
+	float (*gdfunc) ( const GsGraphNode*, const GsGraphNode*, void* udata );
 	void *udata;
 	bool bidirectional_block;
 
@@ -128,69 +130,131 @@ class GsGraphPathTree
 	{	bidirectional_block = false;
 	}
 
-	void init ( GsGraphBase* g, GsGraphNode* n )
+	void init ( GsGraphBase* g, GsGraphNode* s, GsGraphNode* t )
 	{	N.size(1);
 		N[0].parent = -1;
-		N[0].node = n;
-		n->fparam = 0; // cost to come
-		g->mark ( n );
+		N[0].pnlink = 0;
+		N[0].node = s;
+		cost(s) = 0; // cost to come
+		g->mark ( s );
 		Leaf l;
 		l.l = l.d = 0;
+		l.hcost=hdfunc? hdfunc(s,t,udata):0;
 		Q.init ();
 		Q.insert ( l, 0 );
 		graph = g;
-		distfunc = 0;
+		hdfunc = 0;
 		udata = 0;
 		closest = 0;
 		iclosest = 0;
 		cdist = 0;
 	}
 
-	bool has_leaf () const { return Q.size()>=0; }
-
-	float& ncost ( int i ) { return N[i].node->fparam; }
+	float& cost ( int i ) { return N[i].node->fparam; }
+	float& cost ( GsGraphNode* n ) { return n->fparam; }
 
 	bool expand_lowest_cost_leaf ( GsGraphNode* goalnode )
-	{	int n = Q.top().l;
+	{	int ui = Q.top().l;
 		int nextd = Q.top().d+1;
-		Q.remove ();
-		GsGraphNode* node = N[n].node;
-		if ( node==goalnode ) { N.size(n+1); return true; }
+		GsGraphNode* u = N[ui].node;
+		
+		if ( cost(u)+Q.top().hcost<Q.lowest_cost() ) // skip reduced nodes
+		{	GS_TRACE2 ( "reduced node: "<<cost(u)<<"<"<<(Q.lowest_cost()-Q.top().hcost)<<"..." );
+			Q.remove ();
+			return false;
+		}
+		else
+		{	GS_TRACE2 ( "expanding node with cost "<<cost(u)<<"..." );
+			Q.remove ();
+		}
+		
+		if ( u==goalnode ) { N.size(ui+1); return true; }
 		Leaf leaf;
-		const GsArray<GsGraphLink*>& a = node->links();
-		for ( int i=0,s=a.size(); i<s; i++ )
+		float dg, newcost;
+		const GsArray<GsGraphLink*>& ul = u->links();
+		for ( int i=0,s=ul.size(); i<s; i++ )
 		{	//gsout<<a.size()<<gsnl;
-			GsGraphLink* li = a[i];
-			GsGraphNode* lin = li->node();
-			if ( li->blocked() || lin->blocked() ) continue;
-			if ( bidirectional_block && lin->link(node)->blocked() ) continue;
-			float newcost = node->fparam + li->cost();
-			if ( graph->marked(lin) && newcost>=lin->fparam ) continue;
-			lin->fparam = newcost;
-			graph->mark ( lin );
+			GsGraphLink* l = ul[i];
+			GsGraphNode* v = l->node();
+			if ( l->blocked() || v->blocked() ) continue;
+			if ( bidirectional_block ) { GsGraphLink* vul=v->link(u); if(vul&&vul->blocked()) continue; }
+			newcost = cost(u) + l->cost();
+			if ( graph->marked(v) && newcost>=cost(v) ) continue; // reached v with worse cost
+			graph->mark ( v );
+			cost(v) = newcost;
 			N.push();
-			N.top().parent = n;
-			N.top().node = lin;
+			N.top().parent = ui;
+			N.top().pnlink = l;
+			N.top().node = v;
 			leaf.l = N.size()-1;
 			leaf.d = nextd;
-			Q.insert ( leaf, lin->fparam );
-			if ( distfunc )
-			{	float d = distfunc ( lin, goalnode, udata );
-				if ( !closest || d<cdist )
-				{	closest=N.top().node; iclosest=N.size()-1; cdist=d; }
+			if ( gdfunc )
+			{	dg = gdfunc ( v, goalnode, udata );
+				if ( !closest || dg<cdist )	{ closest=v; iclosest=N.size()-1; cdist=dg; }
+			}
+			if ( hdfunc )
+			{	if ( hdfunc!=gdfunc ) dg = hdfunc ( v, goalnode, udata );
+				leaf.hcost = dg;
+				Q.insert ( leaf, cost(v)+dg );
+			}
+			else
+			{	leaf.hcost = 0;
+				Q.insert ( leaf, cost(v) );
 			}
 		}
 		return false;
 	 }
 
-	float make_path ( int i, GsArray<GsGraphNode*>& path )
-	{	float cost = N[i].node->fparam;   
+	void bfs_init ( GsGraphBase* g, GsGraphNode* s, GsGraphNode* t )
+	{	N.size(1);
+		N[0].parent = -1;
+		N[0].node = s;
+		cost(s) = 0; // cost to come
+		g->mark ( s );
+		Leaf l;
+		l.l = l.d = 0;
+		B.init ();
+		B.insert ()=l;
+		graph = g;
+	}
+
+	bool bfs_expand ( GsGraphNode* goalnode )
+	{	int ui = B.first().l;
+		int nextd = B.first().d+1;
+		GsGraphNode* u = N[ui].node;
+		B.remove ();
+		Leaf leaf;
+		const GsArray<GsGraphLink*>& ul = u->links();
+		for ( int i=0,s=ul.size(); i<s; i++ )
+		{	//gsout<<a.size()<<gsnl;
+			GsGraphLink* l = ul[i];
+			GsGraphNode* v = l->node();
+			if ( v==goalnode ) { N.size(ui+1); return true; }
+			if ( graph->marked(v) || l->blocked() || v->blocked() ) continue;
+			if ( bidirectional_block ) { GsGraphLink* vul=v->link(u); if(vul&&vul->blocked()) continue; }
+			cost(v) = cost(u) + l->cost();
+			graph->mark ( v );
+			N.push();
+			N.top().parent = ui;
+			N.top().node = v;
+			leaf.l = N.size()-1;
+			leaf.d = nextd;
+			B.insert ()=leaf;
+		}
+		return false;
+	 }
+
+	void make_path ( float* cost, int i, GsArray<GsGraphNode*>& path, GsArray<GsGraphLink*>* links )
+	{	if ( cost ) *cost = N[i].node->fparam;   
 		path.size(0);
+		if ( links ) links->size(0);
 		while ( i>=0 )
 		{	path.push() = N[i].node;
+			if ( links ) links->push() = N[i].pnlink;
 			i = N[i].parent;
 		}
-		return cost;
+		path.reverse();
+		if ( links ) { links->pop(); links->reverse(); }
 	}
 };
 
@@ -395,10 +459,10 @@ void GsGraphBase::link ( GsGraphNode* n1, GsGraphNode* n2, float c )
 
 //----------------------------------- get edges ----------------------------------
 
-void GsGraphBase::get_directed_edges ( GsArray<GsGraphNode*>& edges )
+void GsGraphBase::get_directed_edges ( GsArray<GsGraphNode*>& edges, GsArray<GsGraphLink*>* links )
 {
-	edges.size ( num_nodes() );
-	edges.size ( 0 );
+	edges.sizeres ( 0, num_nodes() );
+	if ( links ) links->sizeres ( 0, num_nodes() );
 
 	int i;
 	GsGraphNode* n;
@@ -409,14 +473,15 @@ void GsGraphBase::get_directed_edges ( GsArray<GsGraphNode*>& edges )
 		for ( i=0; i<n->num_links(); i++ )
 		{	edges.push() = n;
 			edges.push() = n->link(i)->node();
+			if ( links ) links->push() = n->link(i);
 		}
 	}
 }
 
-void GsGraphBase::get_undirected_edges ( GsArray<GsGraphNode*>& edges )
+void GsGraphBase::get_undirected_edges ( GsArray<GsGraphNode*>& edges, GsArray<GsGraphLink*>* links )
 {
-	edges.size ( num_nodes() );
-	edges.size ( 0 );
+	edges.sizeres ( 0, num_nodes() );
+	if ( links ) links->sizeres ( 0, num_nodes() );
 
 	int i, li;
 	GsGraphNode* n;
@@ -431,6 +496,7 @@ void GsGraphBase::get_undirected_edges ( GsArray<GsGraphNode*>& edges )
 			{	edges.push() = n;
 				edges.push() = n->link(i)->node();
 				mark ( n->link(i) );
+				if ( links ) links->push() = n->link(i);
 				li = edges.top()->search_link(n);
 				if ( li>=0 ) mark ( edges.top()->link(li) );
 			}
@@ -504,8 +570,10 @@ void GsGraphBase::get_disconnected_components ( GsArray<int>& components, GsArra
 //----------------------------------- shortest path ----------------------------------
 
 bool GsGraphBase::shortest_path
-				 ( GsGraphNode* n1, GsGraphNode* n2, GsArray<GsGraphNode*>& path, float& cost,
-				   float (*distfunc) ( const GsGraphNode*, const GsGraphNode*, void* udata ),
+				 ( GsGraphNode* n1, GsGraphNode* n2, GsArray<GsGraphNode*>& path,
+				   GsArray<GsGraphLink*>* links, float* cost,
+				   float (*hdistf) ( const GsGraphNode*, const GsGraphNode*, void* udata ),
+				   float (*gdistf) ( const GsGraphNode*, const GsGraphNode*, void* udata ),
 				   void* udata )
 {
 	GS_TRACE2 ( "search_shortest_path starting..." );
@@ -521,22 +589,22 @@ bool GsGraphBase::shortest_path
 
 	GS_TRACE2 ( "initializing..." );
 	begin_marking ();
-	_pt->init ( this, n2 );
-	if ( distfunc ) { _pt->distfunc=distfunc; _pt->udata=udata; }
+	_pt->hdfunc=hdistf; _pt->gdfunc=hdistf; _pt->udata=udata;
+	_pt->init ( this, n1, n2 );
 	GS_TRACE2 ( "searching..." );
-	while ( _pt->has_leaf() )
-	{	if ( _pt->expand_lowest_cost_leaf(n1) ) break;
+	while ( _pt->Q.size() )
+	{	if ( _pt->expand_lowest_cost_leaf(n2) ) break;
 	}
 	end_marking ();
 
-	if ( _pt->N.top().node==n1 ) // found
-	{	cost = _pt->make_path ( _pt->N.size()-1, path );
+	if ( _pt->N.top().node==n2 ) // found
+	{	_pt->make_path ( cost, _pt->N.size()-1, path, links );
 		GS_TRACE2 ( "Found! size:"<<path.size()<<" cost:"<<cost );
 		return true;
 	}
-	else if ( distfunc) // not found but closest goal available
+	else if ( gdistf ) // not found but closest goal available
 	{	GS_TRACE2 ( "Closest returned." );
-		cost = _pt->make_path ( _pt->iclosest, path );
+		_pt->make_path ( cost, _pt->iclosest, path, links );
 		return false;
 	}
 	else // not found
@@ -546,38 +614,33 @@ bool GsGraphBase::shortest_path
 	}
 }
 
-bool GsGraphBase::local_search ( GsGraphNode* startn, GsGraphNode* endn,
-								int maxdepth, float maxdist, int& depth, float& dist )
+bool GsGraphBase::bfs ( GsGraphNode* n1, GsGraphNode* n2, GsArray<GsGraphNode*>& path, 
+					    GsArray<GsGraphLink*>* links, float* cost, int maxdepth, float maxcost )
 {
-	depth=0;
-	dist=0;
-
-	if ( startn==endn ) return true;
+	if ( n1==n2 ) return true;
 
 	begin_marking ();
 
 	if ( !_pt ) _pt = new GsGraphPathTree;
-	_pt->init ( this, startn );
+	_pt->init ( this, n1, n2 );
 
-	bool not_found = false;
+	bool found = true;
 	bool end = false;
 
 	while ( !end )
-	{	if ( !_pt->has_leaf() ) { not_found=true; break; } // not found!
-
-		dist = _pt->ncost ( _pt->Q.top().l );
-		depth = _pt->Q.top().d;
-
-		if ( maxdepth>0 && depth>maxdepth ) { break; } // max depth reached
-		if ( maxdist>0 && dist>maxdist ) { break; }	// max dist reached
-
-		end = _pt->expand_lowest_cost_leaf ( endn );
+	{	if ( _pt->B.empty() ) { found=false; break; } // not found!
+		int d = _pt->B.first().d;
+		float c = _pt->cost ( _pt->B.first().l );
+		if ( maxdepth>0 && d>maxdepth ) break; // max depth reached
+		if ( maxcost>0 && c>maxcost ) break; // max dist reached
+		end = _pt->bfs_expand ( n2 );
 	}
 
 	end_marking ();
 
-	if ( not_found ) return false; // not found!
-	return true;
+	if ( found ) _pt->make_path ( cost, _pt->N.size()-1, path, links );
+
+	return found;
 }
 
 void GsGraphBase::bidirectional_block_test ( bool b )
@@ -700,4 +763,3 @@ void GsGraphBase::_normalize_mark() const
 }
 
 //============================== end of file ===============================
-

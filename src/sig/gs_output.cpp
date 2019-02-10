@@ -52,6 +52,13 @@ GsOutput::GsOutput ( void(*f)(const char*,void*), void* udata )
 	_device.func = f;
 }
 
+GsOutput::GsOutput ( const char* filename, const char* mode )
+{
+	_construct ();
+	_type = TypeFile;
+	_device.file = fopen ( filename, mode );
+}
+
 GsOutput::~GsOutput ()
 {
 	fmtdefaults (); // will free pointers only if needed

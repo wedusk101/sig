@@ -60,6 +60,17 @@ GsInput::GsInput ( FILE *file, char com )
 	}
 }
 
+GsInput::GsInput ( const char* filename, const char* mode, char com )
+{ 
+	GS_TRACE2 ("File Constructor");
+	_init ( com );
+	FILE* file = fopen(filename,mode);
+	if ( file )
+	{	_cur.f = file;
+		_type = (gsbyte) TypeFile;
+	}
+}
+
 GsInput::~GsInput ()
 {
 	close (); // close frees _filename

@@ -69,6 +69,12 @@ class GsInput
 		character for this input and is 0 by default. */
 	GsInput ( FILE *file, char com=0 );
 
+	/*! Construct an input of type GsInput::File as a C-style file stream which is open
+		with fopen(filename,mode). Method valid() can be used to verify if the file was
+		successfully open. Parameter com is the comment	character for this input and is
+		0 by default, in which case it means no comment char is considered. */
+	GsInput ( const char* filename, const char* mode, char com=0 );
+
 	/*! The destructor closes the associated file if it is a TypeFile input. If the 
 		associated input file has to be left open, call abandon() before. */
    ~GsInput ();

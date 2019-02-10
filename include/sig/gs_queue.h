@@ -42,7 +42,7 @@ class GsQueue
 	int size () const { return _in.size()+_out.size(); }
 
 	/*! Make the queue empty. Attention: elements are not visited or maintained for deallocation. */
-	void init () const { _in.size(0); _out.size(0); }
+	void init () { _in.size(0); _out.size(0); }
 
 	/*! Compress both input and output arrays. */
 	void compress () { _in.compress(); _out.compress(); }

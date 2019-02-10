@@ -103,7 +103,7 @@ void GsArrayBase::push ( unsigned sizeofx )
 { 
 	_size++;
 	if ( _size>_capacity ) 
-	{	_capacity = _size*2; 
+	{	_capacity = _size<4? 4:(_size-1)*2; // 2^n sizes in incremental calls
 		_data = realloc ( _data, sizeofx*_capacity );
 	}
 }

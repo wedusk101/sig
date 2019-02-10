@@ -61,6 +61,10 @@ class GsOutput
 		the string to output and a void pointer to use as user data. */
 	GsOutput ( void(*f)(const char*,void*), void* udata );
 
+	/*! Constructor that sets the output to a file open with fopen(filename,mode). 
+		Method valid() can be used to verify if the file was successfully open. */
+	GsOutput ( const char* filename, const char* mode );
+
 	/*! The destructor will close the associated output device with close(). */
    ~GsOutput ();
 
