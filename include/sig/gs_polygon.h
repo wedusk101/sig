@@ -31,9 +31,12 @@ class GsPolygon : public GsArray<GsPnt2>
 	GsPolygon ( int s=0, int c=0, bool o=false );
 
 	/*! Constructor from a given buffer */
-	GsPolygon ( GsPnt2* pt, int s, int c, bool o=false );
+	GsPolygon ( float* pt, int s, int c, bool o=false );
 
-	/*! Constructor from values in a string */
+	/*! Constructor from a given buffer */
+	GsPolygon ( GsPnt2* pt, int s, int c, bool o=false ) : GsPolygon(pt->e,s,c,o) {}
+
+	/*! Constructor from values written in a string */
 	GsPolygon ( const char* values, int s=0, int c=0, bool o=false );
 
 	/*! Copy constructor */

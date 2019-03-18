@@ -22,7 +22,7 @@ GsPolygon::GsPolygon ( int s, int c, bool o ) : GsArray<GsVec2> ( s, c ), _open(
 {
 }
 
-GsPolygon::GsPolygon ( GsPnt2* pt, int s, int c, bool o ) : GsArray<GsVec2> ( pt, s, c ), _open(o)
+GsPolygon::GsPolygon ( float* pt, int s, int c, bool o ) : GsArray<GsVec2> ( pt, s, c ), _open(o)
 {
 }
 
