@@ -1,6 +1,6 @@
 ===============================================================
        Standalone Interactive Graphics (SIG) Toolkit
-           Copyright (c) 2018 Marcelo Kallmann
+          Copyright (c) 2018-2019 Marcelo Kallmann
 ===============================================================
 
 SIG is a C++ class toolkit for the development of applications displaying
@@ -18,6 +18,8 @@ a great tool to learn OpenGL and to develop research in computer graphics.
 This software is distributed under the Apache License, Version 2.0.
 All copies must contain the full copyright notice licence.txt located
 at the base folder of the distribution.
+
+Sig is available from: https://bitbucket.org/mkallmann/sig
 
 ==== INSTALLATION GUIDELINES ====
 
