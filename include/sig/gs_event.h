@@ -49,7 +49,7 @@ class GsEvent
 	int  width;  //!< The width of the window when the event occured
 	int  height; //!< The height of the window when the event occured
 	int  wheelclicks; //!< Number of clicks the wheel rotated, sign indicates direction, 0 if not event occurred
-	char button;	  //!< The button number 1, 2 or 3 if event type was mouse related, 0 otherwise
+	char button;	  //!< The button number 1, 2 or 3 for: left, midlle, right, if event type was mouse related, 0 otherwise
 	gsbyte character; //!< Character code taking into account the shift state; 0 if not a keyboard event or not a character
 
    public : //--- states at event time :

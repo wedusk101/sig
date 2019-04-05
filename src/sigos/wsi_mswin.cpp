@@ -9,7 +9,7 @@
 
 # include <sig/gs.h>
 
-# ifdef GS_WINDOWS
+# if defined (GS_WINDOWS) && !defined (GS_GLFW)
 
 # include <sig/gs_array.h>
 # include <sig/gs_buffer.h>

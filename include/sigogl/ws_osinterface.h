@@ -59,7 +59,7 @@ int wsi_num_windows ();
 void wsi_activate_ogl_context ( void* win );
 
 // system-dependent function to load an OpenGL function by name
-extern void* wsi_get_ogl_procedure ( const char *name );
+void* wsi_get_ogl_procedure ( const char *name );
 
 //========== Events ===========
 

@@ -46,6 +46,7 @@
 # include <sigogl/ui_output.h>
 # include <sigogl/ws_run.h>
 
+//# define GS_USE_TRACE2  // init / resize / draw
 //# define GS_USE_TRACE3  // events
 //# define GS_USE_TRACE5  // timer
 //# define GS_USE_TRACE6  // get ray
@@ -697,40 +698,36 @@ void WsViewer::snapshots ( bool onoff, const char* file, int n )
 
 void WsViewer::init ( GlContext* c, int w, int h )
 {
+	GS_TRACE2 ( "init "<<w<<gspc<<h );
 	WsWindow::init(c,w,h);
-
-	glEnable ( GL_DEPTH_TEST );
-	glDepthFunc ( GL_LEQUAL );
-
-	glCullFace ( GL_BACK );
-	glFrontFace ( GL_CCW );
-
-	glEnable ( GL_BLEND ); // for transparency and antialiasing smoothing
-	glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
-
-	glEnable ( GL_LINE_SMOOTH );
-	glHint ( GL_LINE_SMOOTH_HINT, GL_NICEST );
-	glPointSize ( 2.0 );
-
+	c->depth_test ( true );
+	c->cull_face ( true );
+	c->transparency ( true );
+	c->line_smoothing ( true );
+	c->point_size ( 2.0f );
 	_data->camera.aspect = float(w)/float(h);
 }
 
 void WsViewer::resize ( GlContext* c, int w, int h )
 {
+	GS_TRACE2 ( "resize "<<w<<gspc<<h );
 	WsWindow::resize ( c, w, h );
 	_data->camera.aspect = float(w)/float(h);
 }
 
 void WsViewer::draw ( GlRenderer* wr ) 
 {
+	GS_TRACE2 ( "draw "<<w()<<gspc<<h() );
+
 	//----- Clear Background --------------------------------------------
 	GlContext* glc = wr->glcontext();
 	glc->clear_color ( _data->bcolor );
 	glc->clear ();
 
 	//----- Set Transformations ----------------------------------------------
+	GlRenderer* r = _data->vr;
 	_data->camera.getmat ( _data->matp, _data->matc );
-	_data->vr->init ( &_data->matp, &_data->matc );
+	r->init ( &_data->matp, &_data->matc );
 
 	//----- Set Light ---------------------------------------------------
 	if ( _data->lightneedsupdate )
@@ -743,11 +740,11 @@ void WsViewer::draw ( GlRenderer* wr )
 	//----- Render user scene -------------------------------------------
 	if ( _data->fcounter )
 	{	_data->fcounter->start();
-		_data->vr->apply ( _data->vroot );
+		r->apply ( _data->vroot );
 		_data->fcounter->stop();
 	}
 	else
-	{	_data->vr->apply ( _data->vroot );
+	{	r->apply ( _data->vroot );
 	}
 
 	//----- Update statistics -------------------------------------------

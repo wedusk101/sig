@@ -23,3 +23,6 @@ obj/
 
 # Doc local files
 *.tps
+
+# Local tests
+vs2017glfw/

@@ -12,8 +12,8 @@
 
 # define CHECK(state,newval) if ( state==newval ) return; state=newval
 
-//# define GS_USE_TRACE1 // use program
-//# define GS_USE_TRACE2 // 
+//# define GS_USE_TRACE1 // init trace
+//# define GS_USE_TRACE2 // use_program()
 # include <sig/gs_trace.h>
 
 //=================================== GlContext ====================================
@@ -35,16 +35,17 @@ GlContext::GlContext ()
 	_linesmoothing = 0;	// default OpenGL value
 	_curprogram = 0;	// zero refers to an invalid program (v4.5 man pages)
 	_cullface = 0;		// default OpenGL value 
-	_depthtest = true;	// by default depth test will be on
+	_depthtest = 0;		// by default depth test will be on by the OpenGL default is false
 	_polygonmode = GL_FILL; // default OpenGL value 
 }
 
 void GlContext::init ()
 {
-	point_size(2.0);
-	clear_color(UiStyle::Current().color.background);
-	transparency(true);
-	line_smoothing(true);
+	GS_TRACE1 ( "GlContext::init" );
+	point_size ( 2.0 );
+	clear_color ( UiStyle::Current().color.background );
+	transparency ( true );
+	line_smoothing ( true );
 	_projection = &GsMat::id;
 	_localframe = &GsMat::id;
 	// Note: glLineWidth(w) with w>1 is deprecated
@@ -52,19 +53,21 @@ void GlContext::init ()
 
 void GlContext::viewport ( int w, int h )
 {
-	//gsout<<w<<"x"<<h<<gsnl;
-	glViewport(0, 0, w, h);
+	GS_TRACE1 ( "GlContext::viewport "<<w<<"x"<<h );
+	glViewport ( 0, 0, w, h );
 	_vpw = w;
 	_vph = h;
 }
 
 void GlContext::clear ()
 {
+	GS_TRACE1 ( "GlContext::clear" );
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void GlContext::clear_color ( const GsColor& c )
 {
+	GS_TRACE1 ( "GlContext::clear_color" );
 	CHECK(_clearcolor,c);
 	glClearColor ( float(c.r)/255.0f, float(c.g)/255.0f, float(c.b)/255.0f, float(c.a)/255.0f );
 	// glClearColor (v4.5) specifies rgba values used when color buffers are cleared
@@ -118,6 +121,7 @@ void GlContext::cull_face ( bool b )
 	if (b)
 	{	glEnable(GL_CULL_FACE);
 		glCullFace(GL_BACK); // v4.5
+		glFrontFace(GL_CCW);
 	}
 	else
 	{	glDisable(GL_CULL_FACE);
@@ -128,7 +132,7 @@ void GlContext::depth_test ( bool b )
 {
 	CHECK(_depthtest,b);
 	if (b)
-	{	glEnable(GL_DEPTH_TEST);
+	{	glEnable(GL_DEPTH_TEST); // by default GL_LESS is used, otherwise call for ex.: glDepthFunc ( GL_LEQUAL );
 	}
 	else
 	{	glDisable(GL_DEPTH_TEST);
@@ -156,7 +160,7 @@ void GlContext::polygon_mode_point ()
 void GlContext::use_program ( GLuint pid ) 
 { 
 	CHECK(_curprogram,pid);
-	GS_TRACE1 ( "Program id changed to: "<<pid );
+	GS_TRACE2 ( "Program id changed to: "<<pid );
 	glUseProgram ( pid );
 }
 

@@ -580,7 +580,7 @@ void UiPanel::draw ( UiPanel* p )
 	if ( _color.bg.a>0 ) _pobs->push_rect ( _rect, _color.bg );
 	if ( _color.ln.a>0 ) _pobs->push_lines ( _rect, th, _color.ln );
 
-	if (_rect.w <= 2 * xspacing() && _rect.h <= 2 * yspacing()) return; // nothing else to show
+	if ( _rect.w<=2*xspacing() && _rect.h<=2*yspacing() ) return; // nothing else to show
 
     // Do a first pass to draw separator lines in order to reduce group type fragmentation in _pobs:
 	for ( int i=0; i<elements(); i++ )
@@ -599,7 +599,7 @@ void UiPanel::draw ( UiPanel* p )
 	// If enabled draw panel close button:
 	if ( _xclose>0 )
 	{	XButLabel.pos ( vertical()?_xclose+2*xspacing():xspacing(),_label.y() );
-		XButLabel.draw (_pobs,_rect.x,_rect.y,_inxclose?UiStyle::Current().color.close_button:_color.lb);
+		XButLabel.draw ( _pobs, _rect.x, _rect.y, _inxclose?UiStyle::Current().color.close_button:_color.lb );
 	}
 
 	// Draw label:

@@ -5,42 +5,32 @@
    at the base folder of the distribution. 
   =======================================================================*/
 
-//================================= x11 port via glfw ==========================================
+//================================= SIG-GLFW integration  ==========================================
+//================================= and x11 port via glfw ==========================================
 
 # include <sig/gs.h> // needed here to define macro below
 
-# ifdef GS_LINUX
-
-# include <sigogl/ws_osinterface.h>
-
-# define GS_USE_TRACE1 // trace main functions
-//# define GS_USE_TRACE2 // trace more functions
-//# define GS_USE_TRACE5 // events
-//# define GS_USE_TRACE6 // more events
-# include <sig/gs_trace.h>
-
-//================================= SIG-GLFW integration ==========================================
+# if defined (GS_LINUX) || defined (GS_GLFW)
 
 # include <stdio.h>
 # include <string.h>
 # include <stdlib.h>
 
-# include <sig/gs.h>
-
 # include <sig/gs_array.h>
 # include <sig/gs_buffer.h>
 # include <sig/gs_output.h>
+# include <sig/gs_string.h>
 # include <sigogl/ws_window.h>
 # include <sigogl/ws_osinterface.h>
-
 # include <sigogl/gl_loader.h>
 # include <sigogl/gl_resources.h>
 
-# include <sig/gs_string.h>
-
 //# define GS_USE_TRACE_COUNTER
-# define GS_USE_TRACE1 // trace main functions
+//# define GS_USE_TRACE1 // trace main functions
 //# define GS_USE_TRACE2 // trace more functions
+//# define GS_USE_TRACE3 // trace more info
+//# define GS_USE_TRACE4 // get ogl procedure
+
 //# define GS_USE_TRACE5 // events
 //# define GS_USE_TRACE6 // more events
 //# define GS_USE_TRACE7 // mouse move event
@@ -93,10 +83,11 @@ struct SwSysWin
 SwSysWin::~SwSysWin()
 {
 	GS_TRACE1 ( "SwSysWin Destructor ["<<label<<']' );
+	if ( gwin ) { wsi_win_hide(this); glfwDestroyWindow(gwin); gwin=0; } // no further callbacks will be called for this window
 	delete swin; // destructor will call wsi_del_win()
 	free ( label );
 	if ( isdialog ) DialogRunning--;
-	for ( int i=0; i<AppWindows.size(); i++ )
+	for ( int i=0, s=AppWindows.size(); i<s; i++ )
 	{	if ( AppWindows[i]==this ) { AppWindows.remove(i); break; } }
 }
 
@@ -107,54 +98,41 @@ void wsi_del_win ( void *win ) // this function is called by the WsWindow destru
 	GS_TRACE1 ( "wsi_del_win ["<<((SwSysWin*)win)->label<<"]..." );
 	SwSysWin* sw = (SwSysWin*)win;
 	if ( sw->isdialog ) { DialogRunning--; sw->isdialog=0; } // important to allow other windows to receive events
-	wsi_win_hide ( sw );
 
 	if ( sw->gwin ) // the user called this function
-	{	sw->swin=0; // if user deletes sw, this is being called before SwSysWin destructor, stop a 2nd delete
-		//PostMessage ( sw->gwin, WM_DESTROY, 0, 0 ); // sw will then be deleted from WndProc
-		glfwDestroyWindow ( sw->gwin );
+	{	sw->swin=0; // if user deletes sw, this is being called before SwSysWin destructor to stop a 2nd delete
+		delete sw;
 	}
-	else // this call came from SwSysWin desctructor triggered by a DESTROY event
+	else // this call came from SwSysWin desctructor triggered by a glfw event
 	{	// nothing more to do
 	}
 }
 
-//HAVE TO CALL SOMEWHERE:	glfwTerminate();
-
-static void _init_callbacks ( GLFWwindow* win );
+static void _init_callbacks ( GLFWwindow* win ); // will set all glfw callbacks, defined later
 
 static void error_callback(int error, const char* description)
 {
-    fprintf(stderr, "GLFW Error: %s\n", description);
+	fprintf(stderr, "GLFW Error: %s\n", description);
 }
 
 void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swin, int mode )
 {
-printf("HERE 1!\n");
-
 	GS_TRACE1 ( "wsi_new_win ["<<label<<"]..." );
 
 	static bool notinit=true;
-	if ( notinit )
-	{	
-		//gl_load_and_initialize (); // only overall 1st call will actually load ogl
-		//const char* s=(const char*)glGetString(GL_VERSION); printf("%s\n",s);
-		glfwSetErrorCallback(error_callback);
+	if ( notinit ) // glfw initializations before creating first window
+	{	glfwSetErrorCallback(error_callback);
 		if ( !glfwInit() ) gsout.fatal("wsi_new_win: Could not init GLFW!");
-		notinit=false;
 	}
 
-printf("HERE 2!\n");
 	GlResources::load_configuration_file (); // only overall 1st call will actually load config file
-printf("HERE 3!\n");
 
 	SwSysWin* sw = new SwSysWin;
-
-# ifdef GS_WINDOWS
+	# ifdef GS_WINDOWS
 	sw->label = _strdup ( label );
-# else
+	# else
 	sw->label = strdup ( label );
-# endif
+	# endif
 	sw->swin = swin;
 	sw->justresized = 1;
 	sw->needsinit = 1;
@@ -174,25 +152,28 @@ printf("HERE 3!\n");
 
 	// dialog boxes are simulated with mode>0 (DialogBox() function does not return until callback function terminates)
 	GS_TRACE1 ( "Creating window..." );
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR,3);
-        glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR,3);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+	glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR, 3 );
+	glfwWindowHint ( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 	glfwWindowHint ( GLFW_DOUBLEBUFFER, 1 );
 	glfwWindowHint ( GLFW_RESIZABLE, 1 );
 	glfwWindowHint ( GLFW_FOCUSED, mode>0? 1:0 );
 	GLFWwindow* sharedwin = AppWindows.size()? AppWindows[0]->gwin:NULL;
-	sw->gwin = glfwCreateWindow ( w, h, label, NULL, sharedwin ); // GLFWmonitor* monitor, GLFWwindow* share);
+	sw->gwin = glfwCreateWindow ( w, h, label, NULL, NULL );//sharedwin ); // GLFWmonitor* monitor, GLFWwindow* share);
 	glfwSetWindowUserPointer ( sw->gwin, sw );
+
+	if ( notinit ) // glfw initializations after creating first window
+	{	glfwMakeContextCurrent ( sw->gwin );
+		gl_load_and_initialize (); // only overall 1st call will actually load ogl
+		notinit=false;
+	}
 
 	int scw, sch;
 	wsi_screen_resolution ( scw, sch );
 	if ( x<0 ) x = (scw-w)/2;
 	if ( y<0 ) y = (sch-h)/2;
 	glfwSetWindowPos ( sw->gwin, x, y );
-
-	//GLFWAPI void glfwSetWindowSizeLimits(GLFWwindow* window, int minwidth, int minheight, int maxwidth, int maxheight);
-	//GLFWAPI void glfwSetWindowUserPointer(GLFWwindow* window, void* pointer);
-	//GLFWAPI void* glfwGetWindowUserPointer(GLFWwindow* window);
+	glfwSetWindowSizeLimits ( sw->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE);
 
 	if ( sw->gwin==NULL)
 	{	gsout.fatal ( "Window Creation Failed !" );
@@ -217,11 +198,11 @@ void wsi_win_label ( void* win, const char* label )
 	GS_TRACE2 ( "wsi_win_label ["<<((SwSysWin*)win)->label<<"] to "<<label<<"..." );
 	SwSysWin* sw = (SwSysWin*)win;
 	free ( sw->label );
-# ifdef GS_WINDOWS
+	# ifdef GS_WINDOWS
 	sw->label = _strdup ( label );
-# else
+	# else
 	sw->label = strdup ( label );
-# endif
+	# endif
 	glfwSetWindowTitle ( sw->gwin, sw->label );
 }
 
@@ -262,6 +243,7 @@ void wsi_win_size ( void* win, int& w, int& h )
 	GS_TRACE2 ( "wsi_win_size..." );
 	SwSysWin* sw = (SwSysWin*)win;
 	glfwGetWindowSize ( sw->gwin, &w, &h );
+	GS_TRACE3 ( "got size "<<w<<"x"<<h );
 }
 
 bool wsi_win_visible ( void* win )
@@ -290,10 +272,9 @@ int wsi_num_windows ()
 
 void* wsi_get_ogl_procedure ( const char *name )
 {
-	GS_TRACE2 ( "wsi_get_ogl_procedure..." );
-	return (void *)glfwGetProcAddress(name);
-	//return (void *)glXGetProcAddress((const GLubyte*)name);
-//here
+	GS_TRACE4 ( "wsi_get_ogl_procedure..." );
+	void* pt = (void *)glfwGetProcAddress(name);
+	return pt;
 }
 
 int wsi_check ()
@@ -317,83 +298,136 @@ inline void sysinit ( WsWindow* win, int w, int h ) { win->init(win->_glcontext,
 inline void sysresize ( WsWindow* win, int w, int h ) { win->resize(win->_glcontext,w,h); }
 inline void sysevent ( WsWindow* win, GsEvent& e ) { win->handle(e); }
 
+static void draw_cb ( GLFWwindow* gwin )
+{
+	GS_TRACE2 ( "draw_cb..." );
+	glfwMakeContextCurrent ( gwin );
+	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
+	if (sw->needsinit)
+	{	int w, h;
+		glfwGetWindowSize ( sw->gwin, &w, &h );
+		sysinit ( sw->swin, w, h );
+		sw->needsinit=0;
+	}
+	sysdraw ( sw->swin ); // this will call the user's window draw method
+	glfwSwapBuffers ( gwin );
+	sw->redrawcalled=0;
+}
+
 void wsi_win_redraw ( void* win )
 {
 	GS_TRACE2 ( "wsi_win_redraw..." );
 	SwSysWin* sw = (SwSysWin*)win;
-	//glfwFocusWindow(sw->gwin);
-	//sysdraw(sw->swin);
-}
-
-static void key_cb ( GLFWwindow* win, int key, int scancode, int action, int mods )
-{
-    //if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-    //    glfwSetWindowShouldClose(window, GLFW_TRUE);
-}
-
-static void draw_cb ( GLFWwindow* gwin )
-{
-	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
-	WsWindow* swin = sw->swin;
-
-	glfwMakeContextCurrent ( gwin );
-
-	if (sw->needsinit)
-	{	gl_load_and_initialize (); // only overall 1st call will actually load ogl
-		int w, h;
-		wsi_win_size ( sw, w, h );
-		sysinit ( swin, w, h );
-		sw->needsinit=0;
-	}
-
-	sysdraw ( swin ); // this will call user's draw function
-	glfwSwapBuffers ( gwin );
-	sw->redrawcalled=0;
+	draw_cb(sw->gwin);
 }
 
 void resize_cb ( GLFWwindow* gwin, int w, int h )
 {
 	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
 	WsWindow* swin = sw->swin;
-
 	glfwMakeContextCurrent ( gwin );
 	sysresize ( swin, w, h );
 }
 
-//see http://www.glfw.org/docs/latest/glfw3_8h.html
-void mouse_cb ( GLFWwindow* gwin, int but, int action, int modifs )
+//==== Event Callbacks ==============================================================================
+
+static void setmodifs ( GsEvent& e, int modifs )
 {
-	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
-	WsWindow* swin = sw->swin;
-
-	GsEvent e;
-	if ( action==GLFW_PRESS )
-	{	e.type = GsEvent::Push;
-	}
-	else 
-	{	e.type = GsEvent::Release;
-	}
-gsout<<but;
-	e.button = but+1;
-	e.shift = modifs&GLFW_MOD_SHIFT;
-
-	double x, y;
-	glfwGetCursorPos ( gwin, &x, &y );
-	e.mousex=(gsint16)x;
-	e.mousey=(gsint16)y;
-
-	sysevent ( swin, e );
+	e.alt = modifs&GLFW_MOD_ALT? 1:0;
+	e.ctrl = modifs&GLFW_MOD_CONTROL? 1:0;
+	e.shift = modifs&GLFW_MOD_SHIFT? 1:0;
 }
 
-void mousepos_cb ( GLFWwindow* gwin, double x, double y )
+static void setkeycode ( GsEvent& e, int key, int modifs )
+{
+	const gsbyte NS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(' };
+
+	setmodifs ( e, modifs );
+	if ( key<=162 ) e.key=key;
+
+	if ( key>='A' && key<='Z') { e.character=(gsbyte)(e.shift?key:key-'A'+'a'); return; }
+
+	e.character = 0;
+
+	# define RET(x) e.key=GsEvent::x; return
+	# define RET1(x) e.key=x; e.character=(gsbyte)x; return
+	# define RET2(x,y) e.key=x; e.character=(gsbyte)(e.shift?y:x); return
+	switch (key)
+	{	case GLFW_KEY_LEFT	: RET(KeyLeft); case GLFW_KEY_RIGHT	: RET(KeyRight);
+		case GLFW_KEY_UP	: RET(KeyUp);	case GLFW_KEY_DOWN	: RET(KeyDown);
+		case GLFW_KEY_ESCAPE: RET(KeyEsc);	case GLFW_KEY_BACKSPACE	: RET(KeyBack);
+		case GLFW_KEY_HOME	: RET(KeyHome); case GLFW_KEY_END	: RET(KeyEnd);
+		case GLFW_KEY_TAB	: RET1('\t');	case GLFW_KEY_ENTER	: RET(KeyEnter);
+		case GLFW_KEY_INSERT: RET(KeyIns);	case GLFW_KEY_DELETE: RET(KeyDel);
+		case GLFW_KEY_PAGE_UP: RET(KeyPgUp); case GLFW_KEY_PAGE_DOWN: RET(KeyPgDn);
+
+		case GLFW_KEY_KP_DIVIDE	: RET1('/'); case GLFW_KEY_KP_MULTIPLY: RET1('*');
+		case GLFW_KEY_KP_ADD	: RET1('+'); case GLFW_KEY_KP_SUBTRACT: RET1('-');
+		case 192: RET2('`','~'); case 189: RET2('-','_');  case 187: RET2('=','+');
+		case 219: RET2('[','{'); case 221: RET2(']','}');  case 220: RET2('\\','|');
+		case 186: RET2(';',':'); case 222: RET2('\'','"'); case 188: RET2(',','<');
+		case 190: RET2('.','>'); case 191: RET2('/','?');
+	}
+	if ( key>=GLFW_KEY_F1 && key<=GLFW_KEY_F12 ) e.key=GsEvent::KeyF1+(key-GLFW_KEY_F1);
+}
+
+static void key_cb ( GLFWwindow* gwin, int key, int scancode, int action, int modifs )
 {
 	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
-	WsWindow* swin = sw->swin;
-	GsEvent e;
-	e.type = GsEvent::Move;
-	e.mousex=(gsint16)x;
-	e.mousey=(gsint16)y;
-	sysevent ( swin, e );
+	GsEvent& e = sw->event;
+	if ( key>=GLFW_KEY_LEFT_SHIFT && action==GLFW_REPEAT ) return; // do not send repeated modifier event
+	e.type = action==GLFW_RELEASE? GsEvent::KeyRelease : GsEvent::Keyboard;
+	e.wheelclicks = 0; 
+	e.button = 0;
+	setkeycode ( e, key, modifs );
+	sysevent ( sw->swin, e );
+}
+
+static void setmouseev ( GLFWwindow* gwin, GsEvent& e, GsEvent::Type t )
+{
+	e.type = t;
+	e.button = 0;
+	e.wheelclicks = 0; 
+	e.key = 0;
+	glfwGetFramebufferSize ( gwin, &e.width, &e.height ); // alternative: glfwGetWindowSize
+	e.button1 = glfwGetMouseButton(gwin,GLFW_MOUSE_BUTTON_LEFT);
+	e.button2 = glfwGetMouseButton(gwin,GLFW_MOUSE_BUTTON_MIDDLE);
+	e.button3 = glfwGetMouseButton(gwin,GLFW_MOUSE_BUTTON_RIGHT);
+}
+
+static void setmousepos ( GsEvent& e, gsint16 x, gsint16 y )
+{
+	e.lmousex=e.mousex;	e.lmousey=e.mousey;
+	e.mousex=x;	e.mousey=y;
+}
+
+static void mouse_cb ( GLFWwindow* gwin, int but, int action, int modifs )
+{
+	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
+	GsEvent& e = sw->event;
+	setmouseev ( gwin, e, action==GLFW_PRESS? GsEvent::Push : GsEvent::Release );
+	setmodifs ( e, modifs );
+	e.button = but==GLFW_MOUSE_BUTTON_LEFT? 1 : but==GLFW_MOUSE_BUTTON_RIGHT? 3 : 2;
+	double x, y;
+	glfwGetCursorPos ( gwin, &x, &y );
+	setmousepos ( e, (gsint16)x, (gsint16)y );
+	sysevent ( sw->swin, e );
+}
+
+static void mousepos_cb ( GLFWwindow* gwin, double x, double y )
+{
+	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
+	GsEvent& e = sw->event;
+	setmouseev ( gwin, e, GsEvent::Move );
+	if ( e.button1 || e.button3 ) e.type=GsEvent::Drag;
+	setmousepos ( e, (gsint16)x, (gsint16)y );
+	sysevent ( sw->swin, e );
+}
+
+static void close_cb ( GLFWwindow* gwin )
+{
+	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
+	delete sw;
 }
 
 static void _init_callbacks ( GLFWwindow* gwin )
@@ -403,9 +437,10 @@ static void _init_callbacks ( GLFWwindow* gwin )
 	glfwSetWindowSizeCallback ( gwin, resize_cb );
 	glfwSetMouseButtonCallback ( gwin, mouse_cb );
 	glfwSetCursorPosCallback ( gwin, mousepos_cb );
+	glfwSetWindowCloseCallback ( gwin, close_cb );
 
-//GLFWAPI GLFWwindowclosefun glfwSetWindowCloseCallback(GLFWwindow* window, GLFWwindowclosefun cbfun);
-//GLFWAPI GLFWkeyfun glfwSetKeyCallback(GLFWwindow* window, GLFWkeyfun cbfun);
+//TO LATER CALL:	glfwTerminate();
+
 //
 //GLFWAPI GLFWcharfun glfwSetCharCallback(GLFWwindow* window, GLFWcharfun cbfun);
 //GLFWAPI GLFWcharmodsfun glfwSetCharModsCallback(GLFWwindow* window, GLFWcharmodsfun cbfun);
@@ -430,37 +465,6 @@ static void _init_callbacks ( GLFWwindow* gwin )
 }
 
 
-//static void setkeycode ( GsEvent& e, WPARAM wParam )
-//{
-//	const gsbyte NS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(' };
-//	if ( (wParam>='0' && wParam<='9') )
-//	{ e.key=wParam; e.character=(gsbyte)(e.shift?NS[wParam-'0']:wParam); return; }
-//
-//	if ( (wParam>='A' && wParam<='Z') )
-//	{ e.key=wParam-'A'+'a'; e.character=(gsbyte)(e.shift?wParam:e.key); return; }
-//
-//	e.character = 0;
-//	# define RET(x) e.key=GsEvent::x; return
-//	# define RET1(x) e.key=x; e.character=(gsbyte)x; return
-//	# define RET2(x,y) e.key=x; e.character=(gsbyte)(e.shift?y:x); return
-//	switch (wParam)
-//	{	case VK_LEFT	: RET(KeyLeft); case VK_RIGHT	: RET(KeyRight);
-//		case VK_UP		: RET(KeyUp);	case VK_DOWN	: RET(KeyDown);
-//		case VK_ESCAPE	: RET(KeyEsc);	case VK_SPACE	: RET1(' ');
-//		case VK_BACK	: RET(KeyBack);
-//		case VK_HOME	: RET(KeyHome); case VK_END		: RET(KeyEnd);
-//		case VK_PRIOR	: RET(KeyPgUp); case VK_NEXT	: RET(KeyPgDn);
-//		case VK_TAB		: RET1('\t');	case VK_RETURN	: RET(KeyEnter);
-//		case VK_INSERT	: RET(KeyIns);	case VK_DELETE	: RET(KeyDel);
-//		case VK_DIVIDE	: RET1('/');	case VK_MULTIPLY: RET1('*');
-//		case VK_ADD		: RET1('+');	case VK_SUBTRACT: RET1('-');
-//		case 192: RET2('`','~'); case 189: RET2('-','_');  case 187: RET2('=','+');
-//		case 219: RET2('[','{'); case 221: RET2(']','}');  case 220: RET2('\\','|');
-//		case 186: RET2(';',':'); case 222: RET2('\'','"'); case 188: RET2(',','<');
-//		case 190: RET2('.','>'); case 191: RET2('/','?');
-//	}
-//	if ( wParam>=VK_F1 && wParam<=VK_F12 ) e.key=GsEvent::KeyF1+(wParam-VK_F1);
-//}
 //
 //static void setstate ( GsEvent& e )
 //{

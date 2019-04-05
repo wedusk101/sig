@@ -23,7 +23,7 @@
 
 /*! GlContext keeps track of the current OpenGL settings during rendering operations. */
 class GlContext : public GsShareable
- { private :
+{  private :
 	// Viewport:
 	int _vpw, _vph;
 	// Transformations:
