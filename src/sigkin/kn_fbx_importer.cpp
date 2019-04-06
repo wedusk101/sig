@@ -222,7 +222,7 @@ void KnFbxImporter::read_mesh ( GsInput& fin, Geom* g )
 	GSMG.push() = g;
 
 	// states:
-	char maptype = 'V'; // V:per vertex, F:per face
+	//char maptype = 'V'; // V:per vertex, F:per face
 	_vi.size(0);
 	_ni.size(0);
 	_ti.size(0);
@@ -247,7 +247,7 @@ void KnFbxImporter::read_mesh ( GsInput& fin, Geom* g )
 		else if ( s=="MappingInformationType" )
 		{	fin.get(); // ':'
 			fin.get();
-			maptype = fin.ltoken()=="ByPolygonVertex"? 'V':'F';
+			//maptype = fin.ltoken()=="ByPolygonVertex"? 'V':'F';
 		}
 		else if ( s=="Normals" )
 		{	int s = _read_numbers(fin,_buffer);
@@ -734,7 +734,7 @@ bool KnFbxImporter::get_skeleton ( KnSkeleton *sk )
 
 	// Now we check if there are geometry deformers which will
 	// define a deformable skin, and if so we build a KnSkin:
-	bool hasskin=false;
+	//bool hasskin=false;
 	for ( int i=0, s=GSMG.size(); i<s; i++ )
 	{	if ( GSMG[i]->d.size()>0 ) // has skin
 		{	sk->skin ( new KnSkin );

@@ -159,7 +159,7 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 	glfwWindowHint ( GLFW_RESIZABLE, 1 );
 	glfwWindowHint ( GLFW_FOCUSED, mode>0? 1:0 );
 	GLFWwindow* sharedwin = AppWindows.size()? AppWindows[0]->gwin:NULL;
-	sw->gwin = glfwCreateWindow ( w, h, label, NULL, NULL );//sharedwin ); // GLFWmonitor* monitor, GLFWwindow* share);
+	sw->gwin = glfwCreateWindow ( w, h, label, NULL, sharedwin );
 	glfwSetWindowUserPointer ( sw->gwin, sw );
 
 	if ( notinit ) // glfw initializations after creating first window
@@ -173,7 +173,7 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 	if ( x<0 ) x = (scw-w)/2;
 	if ( y<0 ) y = (sch-h)/2;
 	glfwSetWindowPos ( sw->gwin, x, y );
-	glfwSetWindowSizeLimits ( sw->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE);
+	glfwSetWindowSizeLimits ( sw->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE );
 
 	if ( sw->gwin==NULL)
 	{	gsout.fatal ( "Window Creation Failed !" );
@@ -340,7 +340,7 @@ static void setmodifs ( GsEvent& e, int modifs )
 
 static void setkeycode ( GsEvent& e, int key, int modifs )
 {
-	const gsbyte NS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(' };
+	//const gsbyte NS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(' };
 
 	setmodifs ( e, modifs );
 	if ( key<=162 ) e.key=key;
