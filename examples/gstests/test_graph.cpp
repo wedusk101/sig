@@ -44,13 +44,13 @@ class MyNode : public GsGraphNode
    ~MyNode () {}
 
 	friend GsOutput& operator<< ( GsOutput& out, const MyNode& n )
-	 {return out<<'\"'<<n.s<<'\"'; }
+	{	return out<<'\"'<<n.s<<'\"'; }
 
 	friend GsInput& operator>> ( GsInput& inp, MyNode& n )
-	 { return inp>>n.s; }
+	{	return inp>>n.s; }
 
 	static inline int compare ( const MyNode* n1, const MyNode* n2 )
-	 { return 0; } // not used
+	{	return 0; } // not used
 };
 
 typedef GsGraph<MyNode,MyLink> MyGraph;
@@ -59,7 +59,7 @@ static void run ()
  {
    MyGraph g;
 
-   MyNode* n0 = g.insert ( new MyNode("n0") );
+   /*MyNode* n0 =*/ g.insert ( new MyNode("n0") ); // n0 is not used in this example
    MyNode* n1 = g.insert ( new MyNode("n1") );
    MyNode* n2 = g.insert ( new MyNode("n2") );
    MyNode* n3 = g.insert ( new MyNode("n3") );

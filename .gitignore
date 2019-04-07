@@ -3,6 +3,7 @@
 obj/
 *.pch
 *.user
+*.pdb
 
 # Prerequisites
 *.d
@@ -13,8 +14,9 @@ obj/
 
 # Compiled libraries
 *.a
+*.so
 *.lib
-*.pdb
+*.dll
 
 # Executables
 *.x

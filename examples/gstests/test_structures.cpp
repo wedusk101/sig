@@ -68,7 +68,7 @@ class MyGraphLink : public GsGraphLink
    GsArray<GsString*> to have an array of pointers and alloc and delete each entry
    in the array manually. */
 struct MyBuf 
- { char buf[20]; 
+{  char buf[20]; 
    void operator= ( const MyBuf& b2 ) { strcpy(buf,b2.buf); }
    friend GsOutput& operator<< ( GsOutput& o, const MyBuf& b ) { return o<<b.buf; }
    static inline int compare ( const MyBuf* a, const MyBuf* b ) { return ::gs_compare(a->buf,b->buf); }
@@ -77,47 +77,44 @@ struct MyBuf
 GsList<MyListNode>	list;
 GsTree<MyTreeNode>	tree;
 GsGraph<MyGraphNode,MyGraphLink>  graph;
-GsSlotMap<GsString>	   set;
+GsSlotMap<GsString>	smap;
 GsArray<MyBuf>		array;
 GsQueue<MyBuf>		queue;
-GsStrings			 sarray;
+GsStrings			sarray;
 
 static void out ()
- {
-   gsout << "TREE   : " << tree	 <<gsnl;
-   gsout << "LIST   : " << list	 <<gsnl;
-   gsout << "SET    : " << set	  <<gsnl;
-   gsout << "ARRAY  : " << array	<<gsnl;
-   gsout << "QUEUE  : " << queue	<<gsnl;
-   gsout << "STARRAY: " << sarray   <<gsnl;
-   gsout << "GRAPH  : " << graph	<<gsnl;
- }
+{
+   gsout << "TREE:    " << tree << gsnl;
+   gsout << "LIST:    " << list << gsnl;
+   gsout << "SLOTMAP: " << smap << gsnl;
+   gsout << "ARRAY:   " << array << gsnl;
+   gsout << "QUEUE:   " << queue << gsnl;
+   gsout << "STARRAY: " << sarray << gsnl;
+   gsout << "GRAPH:   " << graph << gsnl;
+}
 
 void test_structures ()
- {
-   int i;
-   GsString s;
-
-   for ( i=0; i<6; i++ ) 
-	{ int r = gs_random ( 15, 85 );
-	  s.setf("A%02d",r); array.push(); strcpy(array.top().buf,s);
-	  s.setf("Q%02d",r); queue.insert(); strcpy(queue.last().buf,s);
-	  s.setf("S%02d",r); set.insert ( new GsString(s) );
-	  s.setf("L%02d",r); list.insert_next ( new MyListNode(s) );
-	  s.setf("G%02d",r); graph.insert ( new MyGraphNode(s) );
-	  s.setf("T%02d",r); tree.insert_or_del ( new MyTreeNode(s) );
-	  s.setf("S%02d",r); sarray.push ( s );
+{
+	GsString s;
+	for ( int i=0; i<6; i++ ) 
+	{	int r = gs_random ( 15, 85 );
+		s.setf("A%02d",r); array.push(); strcpy(array.top().buf,s);
+		s.setf("Q%02d",r); queue.insert(); strcpy(queue.last().buf,s);
+		s.setf("S%02d",r); smap.insert ( new GsString(s) );
+		s.setf("L%02d",r); list.insert_next ( new MyListNode(s) );
+		s.setf("G%02d",r); graph.insert ( new MyGraphNode(s) );
+		s.setf("T%02d",r); tree.insert_or_del ( new MyTreeNode(s) );
+		s.setf("S%02d",r); sarray.push ( s );
 	}
 
-   out();
+	out();
 
-   array.sort(MyBuf::compare);
-   sarray.sort();
-   list.sort();
-   queue.flush();
-   queue.compress();
+	array.sort(MyBuf::compare);
+	sarray.sort();
+	list.sort();
+	queue.flush();
+	queue.compress();
    
-   gsout << "\nAfter sorting arrays and list:\n"; 
-   out ();
- }
-	
+	gsout << "\nAfter sorting arrays and list:\n"; 
+	out ();
+}

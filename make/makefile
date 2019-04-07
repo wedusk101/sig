@@ -1,59 +1,61 @@
-# root is relative from inside the created subdirectories in this folder:
-export ROOT = ../..
-export SYSTEM = ubuntu
-export LIBDIR = $(ROOT)/lib/$(SYSTEM)
+# Names of the modules to be compiled:
+TARGETLIBS = sig sigogl sigos sigkin
+TARGETEXS = gstests shapes cameratest customnode fontgen modelviewer polyeditor scenetest skelviewer uidemo vgtest
+OBJDIR = obj
+
+# SIG location relative to subdirectories of modules:
+export ROOT = ../../..
+
+# Compilation options:
 export INCLUDEDIR = -I$(ROOT)/include -I/X11
-export LIBS32 = -lsig32
-export LIBS64 = -lsigogl64 -lsigos64 -lsig64 -lglfw -lX11 -lGL
- #-lglfw -lrt -lm -lGL -lGLU 
-
-# note: not all the libs listed above are needed to all examples
-
-# names of the modules to be compiled:
-
-target = libsig64 libsigogl64 libsigos64 libsigkin64 gstests64 shapes64
-DIRS = $(target)
-
-# to be included later: libsigogl64
-
-# compilation options:
 export CC = g++
-export OPT32 = -O2 -m32 -std=c++11
-export OPT64 = -O2 -m64 -std=c++11
-export WARN = -Wall -Wno-switch -Wno-maybe-uninitialized
+export COPT = -O2 -std=c++11
+export CFLAGS = $(COPT) $(WARN) $(INCLUDEDIR)
+export WARN = -Wall -Wno-switch -Wno-maybe-uninitialized -Wno-unused-function
 
-export CFLAGS32 = $(OPT32) $(WARN) $(INCLUDEDIR)
-export CFLAGS64 = $(OPT64) $(WARN) $(INCLUDEDIR)
-export LFLAGS32 = -m32 -L$(LIBDIR) $(LIBS32)
-export LFLAGS64 = -m64 -L$(LIBDIR) $(LIBS64)
+# Linker options:
+export SYSTEM = linux
+export LIBDIR = $(ROOT)/lib/$(SYSTEM)
+export LIBS = -lsigogl -lsigos -lsigkin -lsig -lglfw -lX11 -lGL
+export LFLAGS = -L$(LIBDIR) $(LIBS)
+export TARGET = target
 
 # Be quiet when building:
 .SILENT:
 
-# call makefiles of modules:
+# Call makefiles of modules:
 all: 
-	@for dir in $(DIRS); do\
-		echo "=== making $$dir ===";\
-		mkdir -p $$dir; \
-		cd $$dir; \
-		$(MAKE) -f ../makefile.$$dir.mf;\
-		cd ..; \
+	@for dir in $(TARGETLIBS); do\
+		echo "=== building $$dir ===";\
+		mkdir -p $(OBJDIR)/$$dir;\
+		cd $(OBJDIR)/$$dir;\
+		TARGET=$$dir;\
+		$(MAKE) -f ../../makefilelib.mk;\
+		cd ../../; \
+	done
+	@for dir in $(TARGETEXS); do\
+		echo "=== building $$dir ===";\
+		mkdir -p $(OBJDIR)/$$dir;\
+		cd $(OBJDIR)/$$dir;\
+		TARGET=$$dir;\
+		$(MAKE) -f ../../makefileex.mk;\
+		cd ../../; \
 	done
 	echo "=== done ===";
 
-clean:
+# Clean options:
+cleanall:
 	$(RM) core *.o *~ *.x
-	@for dir in $(DIRS); do \
-		$(RM) -f -r $$dir; \
+	$(RM) ../lib/$(SYSTEM)/*.a
+	$(RM) -f -r $(OBJDIR)
+
+# Clean options:
+cleanex:
+	$(RM) core *.o *~ *.x
+	@for dir in $(TARGETEXS); do\
+		$(RM) -f -r $(OBJDIR)/$$dir; \
 	done
 
-cleanx:
-	$(RM) core *.o *~ *.x
-
-cleanogl:
-	$(RM) core *.o *~ *.x
-	$(RM) -f -r libsigogl64;
-
-cleanos:
-	$(RM) core *.o *~ *.x
-	$(RM) -f -r libsigos64;
+clean:
+	$(RM) core *.o *~
+	$(RM) -f -r $(OBJDIR)

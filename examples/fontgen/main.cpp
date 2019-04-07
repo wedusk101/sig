@@ -223,7 +223,7 @@ void MyWindow::test ()
 	if ( !ok ) { ui_message("Could not load newfont.fnt !"); return; }
 
 	GLuint id = _texture->id;
-	_testpo->start_group ( SnPlanarObjects::Masked, _texture->id );
+	_testpo->start_group ( SnPlanarObjects::Masked, id );
 
 	float x = 5;
 	float y = 6;
@@ -245,7 +245,7 @@ void MyWindow::test ()
 
 ExampleFont CurExFont=(ExampleFont)0;
 
-void main ( int ac, char** av )
+int main ( int ac, char** av )
 {
 	// Create my window:
 	MyWindow* w = new MyWindow ( 800, 600, "SIG Font Generator" );
@@ -260,4 +260,5 @@ void main ( int ac, char** av )
 
 	// Run:
 	ws_run();
+	return 0;
 }

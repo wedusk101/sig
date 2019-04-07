@@ -173,7 +173,7 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 	if ( x<0 ) x = (scw-w)/2;
 	if ( y<0 ) y = (sch-h)/2;
 	glfwSetWindowPos ( sw->gwin, x, y );
-	glfwSetWindowSizeLimits ( sw->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE );
+//xxx	glfwSetWindowSizeLimits ( sw->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE );
 
 	if ( sw->gwin==NULL)
 	{	gsout.fatal ( "Window Creation Failed !" );

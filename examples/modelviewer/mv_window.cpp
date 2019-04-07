@@ -30,6 +30,8 @@
 //# define GS_USE_TRACE1 
 # include <sig/gs_trace.h>
 
+# include <stdlib.h> // atof
+
 MvWindow::MvWindow ( int x, int y, int w, int h, const char *label ) : WsViewer(x,y,w,h,label)
 {
 	_last_crease_angle_deg = 35.0f;

@@ -95,8 +95,6 @@ void MyWindow::build_ui ()
 
 int MyWindow::uievent ( int e )
 {
-	int dlg = -1;
-
 	switch ( e )
 	{
 		case CmdPanels:	test_panels(); break;
@@ -113,7 +111,7 @@ int MyWindow::uievent ( int e )
 		case CmdColorDlg:
 		{	GsColor c;
 			bool ok = ui_color ( "Select color:", c );
-			if (ok && ui_confirm("Set as background?") )
+			if ( ok && ui_confirm("Set as background?") )
 			{	UiStyle::Current().color.background = c; // this is only needed if a new window will be open
 				WsWindow::activate_ogl_context();
 				WsWindow::glrenderer()->glcontext()->clear_color(c);
@@ -130,10 +128,12 @@ int MyWindow::uievent ( int e )
 
 		case CmdConfirmDlg:
 		{	bool ok = ui_confirm ( "Please confirm action" );
+			if (!ok) ui_message ( "You selected Cancel!" );
 		} break;
 
 		case CmdAskDlg:
-		{	bool ok = ui_ask ( "Continue?" );
+		{	bool yes = ui_ask ( "Continue?" );
+			if (!yes) ui_message ( "You selected No!" );
 		} break;
 
 		case CmdMessageDlg:
@@ -191,7 +191,7 @@ int MyWindow::uievent ( int e )
 	return 1; // since uievent() is not overriden it is ok to always return 1 here
 }
 
-void main ()
+int main ()
 {
 	// Let's start in dark style:
 	UiStyle::Current().set_dark_style();
@@ -211,4 +211,5 @@ void main ()
 
 	// Run:
 	ws_run();
+	return 0;
 }

@@ -26,7 +26,7 @@ static void runex1 ()
 	int i, id;
 	for ( i=0; i<10; i++ ) sm[sm.insert()]->s.setf("E%d",i);
 
-	gsout << "Orig Set: " << sm << gsnl;
+	gsout << "Orig: " << sm << gsnl;
 
 	sm.remove ( 2 );
 	sm.remove ( 6 );

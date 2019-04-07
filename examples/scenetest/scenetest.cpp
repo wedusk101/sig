@@ -50,9 +50,10 @@ PrimViewer::PrimViewer ( int x, int y, int w, int h, const char* l ) : WsViewer(
 // as an example, this function will be called when the manipulator moves:
 static void manip_cb ( SnManipulator* manip, const GsEvent& e, void* udata )
 {
-	PrimViewer* v = (PrimViewer*)udata;
-	GsMat& m = manip->mat(); // access to the manipulator matrix
-	// now do something:
+	// Access data like this:
+	// PrimViewer* v = (PrimViewer*)udata;
+	// GsMat& m = manip->mat(); // access to the manipulator matrix
+	// Then do something:
 	// v->do_something (  m );
 }
 
@@ -111,7 +112,6 @@ void PrimViewer::show_normals ( bool b )
 
 void PrimViewer::build_scene ()
 {
-	SnGroup* group = new SnGroup;
 	SnPrimitive* p;
 
 	p = new SnPrimitive(GsPrimitive::Box,1,3,1);

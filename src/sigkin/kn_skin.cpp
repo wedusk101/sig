@@ -41,7 +41,7 @@ int KnSkin::add_model ( KnSkeleton* sk, GsModel* m )
 {
 	if ( _skeleton!=sk ) { updrefs(_skeleton,sk); }
 	if ( !m ) m = new GsModel;
-	int vs = m->V.size();
+	//int vs = m->V.size();
 	int ms = _models.size();
 	_models.push(m); // m will be referenced by _models array
 	_infstart.push() = _infs.size(); // starting point for new influences

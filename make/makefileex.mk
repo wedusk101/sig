@@ -1,5 +1,5 @@
-SRCDIR = $(ROOT)/examples/shapes/
-BIN = $(ROOT)/make/shapes64.x
+SRCDIR = $(ROOT)/examples/$(TARGET)/
+BIN = $(ROOT)/make/$(TARGET).x
 
 CPPFILES := $(shell echo $(SRCDIR)*.cpp)
 OBJFILES = $(CPPFILES:.cpp=.o)
@@ -8,15 +8,15 @@ DEPENDS = $(OBJECTS:.o=.d)
 
 $(BIN): $(OBJECTS)
 	echo "creating:" $(BIN);
-	$(CC) $(OBJECTS) $(LFLAGS64) -o $(BIN)
+	$(CC) $(OBJECTS) $(LFLAGS) -o $(BIN)
 
 %.o: $(SRCDIR)%.cpp
 	echo "compiling:" $<;
-	$(CC) -c $(CFLAGS64) -Wno-unused-variable -Wno-unused-function $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 %.d: $(SRCDIR)%.cpp
 	echo "upddepend:" $<;
-	$(CC) -MM $(CFLAGS64) $< > $@
+	$(CC) -MM $(CFLAGS) $< > $@
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPENDS)

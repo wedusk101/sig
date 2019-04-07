@@ -1,5 +1,5 @@
-SRCDIR = $(ROOT)/src/sigkin/
-LIB = $(LIBDIR)/libsigkin64.a
+SRCDIR = $(ROOT)/src/$(TARGET)/
+LIB = $(LIBDIR)/lib$(TARGET).a
 
 CPPFILES := $(shell echo $(SRCDIR)*.cpp)
 OBJFILES = $(CPPFILES:.cpp=.o)
@@ -11,14 +11,12 @@ $(LIB): $(OBJECTS)
 
 %.o: $(SRCDIR)%.cpp
 	echo "compiling:" $<;
-	$(CC) -c $(CFLAGS64) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 
 %.d: $(SRCDIR)%.cpp
 	echo "upddepend:" $<;
-	$(CC) -MM $(CFLAGS64) $< > $@
+	$(CC) -MM $(CFLAGS) $< > $@
 
 ifneq ($(MAKECMDGOALS),clean)
 -include $(DEPENDS)
 endif
-
-
