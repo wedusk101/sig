@@ -30,7 +30,7 @@ all:
 		mkdir -p $(OBJDIR)/$$dir;\
 		cd $(OBJDIR)/$$dir;\
 		TARGET=$$dir;\
-		$(MAKE) -f ../../makefilelib.mk;\
+		$(MAKE) -f ../../makefile-libs.mk;\
 		cd ../../; \
 	done
 	@for dir in $(TARGETEXS); do\
@@ -38,7 +38,7 @@ all:
 		mkdir -p $(OBJDIR)/$$dir;\
 		cd $(OBJDIR)/$$dir;\
 		TARGET=$$dir;\
-		$(MAKE) -f ../../makefileex.mk;\
+		$(MAKE) -f ../../makefile-exs.mk;\
 		cd ../../; \
 	done
 	echo "=== done ===";

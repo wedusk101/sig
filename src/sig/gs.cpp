@@ -34,9 +34,9 @@ float gs_cubicmix ( float a, float b, float t )
 {
 	t = GS_CUBIC(t); // cubic spline mapping
 	return GS_MIX(a,b,t);
-   // shape comparison with sine for graphmatica:
-   // y=-(2.0*(x*x*x)) + (3.0*(x*x))
-   // y=sin((x-0.5)*3)/2+0.5
+	// shape comparison with sine for graphmatica:
+	// y=-(2.0*(x*x*x)) + (3.0*(x*x))
+	// y=sin((x-0.5)*3)/2+0.5
 }
 
 float gs_todeg ( float radians )
@@ -90,7 +90,7 @@ float gs_anglerp ( float radians1, float radians2, float t )
 		{	a = GS_MIX(a2,a1,t); }
 		if ( a>=gs2pi ) a-=gs2pi;
 	}
-   //gsout<<gs_todeg(radians1)<<gspc<<gs_todeg(radians2)<<gspc<<gs_todeg(a)<<gsnl;
+	//gsout<<gs_todeg(radians1)<<gspc<<gs_todeg(radians2)<<gspc<<gs_todeg(a)<<gsnl;
 	return a;
 }
 
