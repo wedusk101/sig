@@ -337,8 +337,8 @@ void gs_string_append ( char*&s, const char* toadd )
 	char *tmp=0;
 	if ( toadd==s ) { tmp=gs_string_new(toadd); toadd=tmp; }
 
-	int slen = s? strlen(s):0;
-	int newlen = slen+strlen(toadd)+1;
+	int slen = s? (int)strlen(s):0;
+	int newlen = slen+(int)strlen(toadd)+1;
 	gs_string_renew ( s, newlen );
 	strcat ( s, toadd );
 
@@ -410,7 +410,7 @@ const char* gs_filename ( const char* fname )
 {
 	if ( !fname ) return 0;
 
-	int i, len = strlen(fname);
+	int i, len = (int)strlen(fname);
 
 	for ( i=len-1; i>=0; i-- )
 	{	if ( fname[i]=='/' || fname[i]=='\\' )
@@ -424,7 +424,7 @@ const char* gs_extension (  const char* fname )
 {
 	if ( !fname ) return 0;
 
-	int i, len = strlen(fname);
+	int i, len = (int)strlen(fname);
 
 	for ( i=len-1; i>=0; i-- )
 	{	if ( fname[i]=='.' ) { return fname+i+1; }

@@ -177,12 +177,12 @@ void GsInput::readall ( GsArray<gsbyte>& buf )
 		int size = (int)(ftell(_cur.f)-start);
 		fseek ( _cur.f, start, SEEK_SET );
 		buf.size ( size );
-		int rs = fread ( (void*)(&buf[0]), sizeof(char), (size_t)size, _cur.f );
+		int rs = (int)fread ( (void*)(&buf[0]), sizeof(char), (size_t)size, _cur.f );
 		if ( rs!=size ) buf.size ( size ); // if _cur.f was open as a text file adjust len to address CRNL convertions
 	}
 	else if ( ISSTRING )
 	{
-		int len = strlen(_cur.s);
+		int len = (int)strlen(_cur.s);
 		buf.sizecap ( len, len+1 );
 		strcpy ( (char*)&buf[0], _cur.s );
 		_cur.s += buf.size();
@@ -198,7 +198,7 @@ void GsInput::readall ( GsString& buf )
 		int size = (int)(ftell(_cur.f)-start);
 		fseek ( _cur.f, start, SEEK_SET );
 		buf.len ( size ); // will add 0 at the end
-		size = fread ( (void*)(&buf[0]), sizeof(char), (size_t)size, _cur.f );
+		size = (int)fread ( (void*)(&buf[0]), sizeof(char), (size_t)size, _cur.f );
 		buf.len ( size ); // if _cur.f was open as a text file adjust len to address CRNL convertions
 	}
 	else if ( ISSTRING )
@@ -374,8 +374,7 @@ void GsInput::unget ()
 void GsInput::unget ( const char* s )
  {
    if ( !s ) return;
-   int i;
-   for ( i=strlen(s)-1; i>=0; i-- ) unget ( s[i] );
+   for ( int i=(int)strlen(s)-1; i>=0; i-- ) unget ( s[i] );
  }
 
 void GsInput::unget ( char c )

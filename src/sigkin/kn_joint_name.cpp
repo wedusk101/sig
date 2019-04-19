@@ -9,7 +9,7 @@
 
 //============================= KnJointName ============================
 
-GsTable<long> KnJointName::_htable;
+GsTable<gsintp> KnJointName::_htable;
 gsword KnJointName::_undefid = gsword(65535);
 
 void KnJointName::operator= ( const char* st )

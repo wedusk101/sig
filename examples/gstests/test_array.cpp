@@ -102,8 +102,8 @@ static void run_example3 ()
 	GsArray<float> af; //af.size(10);
 	std::vector<float> vf; //vf.resize(10);
 
-	gsout<<sizeof(af)<<gsnl;
-	gsout<<sizeof(vf)<<gsnl;
+	gsout<<(gsuint)sizeof(af)<<gsnl;
+	gsout<<(gsuint)sizeof(vf)<<gsnl;
 }
 
 static void run_example4 ()

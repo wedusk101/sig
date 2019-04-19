@@ -19,7 +19,7 @@ class KnJointName
  { private :
 	gsword _id; // the id of this joint name (max is 65535, see gs.h)
 	static gsword _undefid; // to mark undefined ids (mark is max gsword value)
-	static GsTable<long> _htable;
+	static GsTable<gsintp> _htable;
 
    public :
 

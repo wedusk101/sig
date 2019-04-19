@@ -41,7 +41,7 @@ struct MyData
 
 void test_table ()
 {
-	GsTable<long> TB(40);
+	GsTable<gsintp> TB(40);
    
 	TB.insert ( "", 0 );
 	TB.insert ( "atest", 0 );

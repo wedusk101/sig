@@ -700,6 +700,8 @@ void WsViewer::init ( GlContext* c, int w, int h )
 {
 	GS_TRACE2 ( "init "<<w<<gspc<<h );
 	WsWindow::init(c,w,h);
+	// If the viewer is in planar mode it will set the depth test to off. ?
+	//c->depth_test ( _data->viewmode==VCmdPlanar? false:true );
 	c->depth_test ( true );
 	c->cull_face ( true );
 	c->transparency ( true );

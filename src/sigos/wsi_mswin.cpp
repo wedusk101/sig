@@ -338,7 +338,7 @@ void wsi_activate_ogl_context ( void* win )
 void* wsi_get_ogl_procedure ( const char *name )
 {
 	void *p = (void*)wglGetProcAddress(name);
-	if ( !p || (long(p)>=-1 && long(p)<=0x3) ) // cover failure values that may be returned
+	if ( !p || (LONG_PTR(p)>=-1 && LONG_PTR(p)<=0x3) ) // cover failure values that may be returned
 	{	HMODULE module = LoadLibraryA("opengl32.dll"); // will not load multiple times but increment reference count of handle
 		p = !module? 0: (void*)GetProcAddress(module, name);
 	}
@@ -373,10 +373,10 @@ static void setkeycode ( GsEvent& e, WPARAM wParam )
 {
 	const gsbyte NS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(' };
 	if ( (wParam>='0' && wParam<='9') )
-	{ e.key=wParam; e.character=(gsbyte)(e.shift?NS[wParam-'0']:wParam); return; }
+	{ e.key=(int)wParam; e.character=(gsbyte)(e.shift?NS[wParam-'0']:wParam); return; }
 
 	if ( (wParam>='A' && wParam<='Z') )
-	{ e.key=wParam-'A'+'a'; e.character=(gsbyte)(e.shift?wParam:e.key); return; }
+	{ e.key=(int)wParam-'A'+'a'; e.character=(gsbyte)(e.shift?wParam:e.key); return; }
 
 	e.character = 0;
 	# define RET(x) e.key=GsEvent::x; return
@@ -398,7 +398,7 @@ static void setkeycode ( GsEvent& e, WPARAM wParam )
 		case 186: RET2(';',':'); case 222: RET2('\'','"'); case 188: RET2(',','<'); 
 		case 190: RET2('.','>'); case 191: RET2('/','?');
 	}
-	if ( wParam>=VK_F1 && wParam<=VK_F12 ) e.key=GsEvent::KeyF1+(wParam-VK_F1);
+	if ( wParam>=VK_F1 && wParam<=VK_F12 ) e.key=GsEvent::KeyF1+(int(wParam)-VK_F1);
 }
 
 static void setstate ( GsEvent& e )
@@ -704,7 +704,7 @@ const char* wsi_select_folder ( const char* msg, const char* folder )
 	bInfo.lpszTitle			= msg;
 	bInfo.ulFlags			= BIF_USENEWUI|BIF_NEWDIALOGSTYLE;
 	bInfo.lpfn				= BrowseCallbackProc;
-	bInfo.lParam			= (long)&FileBuf[0];
+	bInfo.lParam			= (LPARAM)&FileBuf[0];
 	bInfo.iImage			= 0;
 
 	LPITEMIDLIST lpItem = SHBrowseForFolderA ( &bInfo );

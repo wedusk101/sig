@@ -24,7 +24,7 @@
 	a const char* parameter should accept GsString as parameter. */
 class GsString
 { private:
-	GsArray<char> _data; // size=strlen(_data) and capacity saves space for ending 0
+	GsArray<char> _data; // size=(int)strlen(_data) and capacity saves space for ending 0
 	static const char *_empty; // _data will point to empty instead of having a 0 value
 
    public:

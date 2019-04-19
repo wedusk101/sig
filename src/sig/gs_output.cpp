@@ -277,7 +277,7 @@ void GsOutput::safewrite ( const char* s )
 
 	bool ok = true;
 
-	int i, len=strlen(s);
+	int i, len=(int)strlen(s);
 	if ( len==0 ) { o.put(empty); return; }
 
 	if ( isdigit(s[0]) )
@@ -335,12 +335,6 @@ GsOutput& operator<< ( GsOutput& o, int i )
 }
 
 GsOutput& operator<< ( GsOutput& o, long i )
-{
-	o.putf(o._intfmt,i);
-	return o; 
-}
-
-GsOutput& operator<< ( GsOutput& o, long unsigned int i )
 {
 	o.putf(o._intfmt,i);
 	return o; 

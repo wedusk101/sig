@@ -221,9 +221,6 @@ class GsOutput
 	/*! Outputs an long using intfmt with the putf() method. */
 	friend GsOutput& operator<< ( GsOutput& o, long i );
 
-	/*! Outputs an long unsigned int using intfmt with the putf() method. */
-	friend GsOutput& operator<< ( GsOutput& o, long unsigned int i );
-
 	/*! Outputs a bool as "true" or "false" with the put() method. */
 	friend GsOutput& operator<< ( GsOutput& o, bool b );
 

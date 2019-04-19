@@ -42,7 +42,7 @@ UiLabel::~UiLabel ()
 
 int UiLabel::search_fkey () const
 {
-	int i, len=strlen(_text);
+	int i, len=(int)strlen(_text);
 	for ( i=0; i<len; i++ )
 	{	if ( _text[i]=='F' && _text[i+1]>='0' && _text[i+1]<='9') break;
 	}
@@ -91,7 +91,7 @@ void UiLabel::set ( const char* l, bool chkaccel )
 	if ( !l || !l[0] ) { _text.set(0); set_size(" "); return; }
 	if ( !chkaccel ) { _text.set(l); set_size(_text); return; }
 
-	int i, len=strlen(l);
+	int i, len=(int)strlen(l);
 	if ( len>16 ) len=16; // do not search long labels fully
 	for ( i=0; i<len; i++ )
 	{	if ( l[i]=='&' ) { _accel=i; break; }

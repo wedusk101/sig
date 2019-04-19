@@ -92,7 +92,7 @@ void GsString::set ( const char *st )
 		_data.pop()=0;
 	}
 	else 
-	{	_data.size ( strlen(st)+1 ); 
+	{	_data.size ( (int)strlen(st)+1 ); 
 		strcpy ( _data.pt(), st );
 		_data.pop();
 	}
@@ -163,7 +163,7 @@ void GsString::input ( int max )
 	}
    else
 	{
-	  int sl = strlen(&_data[0]);
+	  int sl = (int)strlen(&_data[0]);
 	  if ( _data[sl-1]=='\n' ) sl--;
 	  len(sl);
 	}
@@ -175,7 +175,7 @@ void GsString::append ( const char* st )
 {
 	if ( !st ) return;
 	if ( !st[0] ) return;
-	int stlen = strlen(st);
+	int stlen = (int)strlen(st);
 	int len = _data.size();
 	_data.insert ( len, stlen+1 );
 	strcpy ( &_data[len], st );
@@ -186,7 +186,7 @@ void GsString::insert ( int i, const char *st )
 {
 	if ( !st ) return;
 	if ( !st[0] ) return;
-	int stlen = strlen(st);
+	int stlen = (int)strlen(st);
 	_data.insert ( i, stlen );
 	memmove ( &_data[i], st, stlen );
 	_data.push();
@@ -307,7 +307,7 @@ int GsString::searchcs ( char c, int i ) const
 
 int GsString::search ( const char *st, int i ) const
  {
-   int stlen = strlen(st);
+   int stlen = (int)strlen(st);
    if ( stlen==0 ) return -1;
    if ( i<0 ) i=0;
 
@@ -321,7 +321,7 @@ int GsString::search ( const char *st, int i ) const
 
 int GsString::searchcs ( const char *st, int i ) const
  {
-   int stlen = strlen(st);
+   int stlen = (int)strlen(st);
    if ( stlen==0 ) return -1;
    if ( i<0 ) i=0;
 
@@ -336,7 +336,7 @@ int GsString::searchcs ( const char *st, int i ) const
 int GsString::replace ( int i, int n, const char* newst )
 {
 	int oldlen = n;
-	int newlen = newst? strlen(newst):0;
+	int newlen = newst? (int)strlen(newst):0;
    
 	if ( oldlen<newlen ) // open space
 	{	insert ( i, newlen-oldlen );
@@ -360,7 +360,7 @@ int GsString::replace ( const char* oldst, const char* newst, int i )
  {
    i = search ( oldst, i );
    if ( i<0 ) return i; // not found
-   replace ( i, strlen(oldst), newst );
+   replace ( i, (int)strlen(oldst), newst );
    return i;
  }
 
@@ -368,13 +368,13 @@ int GsString::replacecs ( const char* oldst, const char* newst, int i )
  {
    i = searchcs ( oldst, i );
    if ( i<0 ) return i; // not found
-   replace ( i, strlen(oldst), newst );
+   replace ( i, (int)strlen(oldst), newst );
    return i;
  }
 
 int GsString::replall ( const char* oldst, const char* newst )
  {
-   int count=0, i=0, oldlen=strlen(oldst);
+   int count=0, i=0, oldlen=(int)(int)strlen(oldst);
    while ( true )
 	{ i = search ( oldst, i );
 	  if ( i<0 ) return count;
@@ -392,7 +392,7 @@ int GsString::replall ( char oldc, char newc )
 
 int GsString::replallcs ( const char* oldst, const char* newst )
 {
-	int count=0, i=0, oldlen=strlen(oldst);
+	int count=0, i=0, oldlen=(int)(int)strlen(oldst);
 	while ( true )
 	{	i = searchcs ( oldst, i );
 		if ( i<0 ) return count;

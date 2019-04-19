@@ -170,7 +170,9 @@ int VgViewer::handle_scene_event ( const GsEvent& e )
 int main ( int argc, char** argv )
 {
 	VgViewer* viewer = new VgViewer ( -1, -1, 800, 600, "GsVisGraph Test" );
+gsout<<"1\n";
 	viewer->cmd ( WsViewer::VCmdPlanar );
+
 //	viewer->cmd ( WsViewer::VCmdAxis );
 	viewer->show();
 	ws_run();

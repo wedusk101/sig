@@ -73,7 +73,8 @@ typedef uint16_t gsuint16; //!< 2 bytes unsigned int, from 0 to 65,535
 typedef int16_t	 gsint16;  //!< 2 bytes integer, from -32,768 to 32,767
 typedef uint32_t gsuint32; //!< 4 bytes unsigned int, from 0 to 4294967295
 typedef int32_t	 gsint32;  //!< 4 bytes signed integer, from -2147483648 to 2147483647
-typedef int		 gsint;	   //!< 4 or 8 bytes int depending on the compiler
+typedef long long gsintp;  //!< integer type for pointer type casts in both 32 and 64 bits
+typedef int		 gsint;	   //!< 4 or 8 bytes int depending on the platform
 typedef unsigned int gsuint; //!< 4 or 8 bytes unsigned int depending on the compiler
 
 /*! Defines a typedef for a generic comparison function in the form: 

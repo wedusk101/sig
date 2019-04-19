@@ -260,14 +260,14 @@ static int stb_compress_chunk(stb_uchar *history,
 		int best = 2, dist=0;
 
 		if (q+65536 > end)
-			match_max = end-q;
+			match_max = (stb_uint)(end-q);
 		else
 			match_max = 65536;
 
 #define stb__nc(b,d)  ((d) <= window && ((b) > 9 || stb_not_crap(b,d)))
 
 #define STB__TRY(t,p)  /* avoid retrying a match we already tried */ \
-	if (p ? dist != q-t : 1)							 \
+	if (p ? dist!=q-t:1)							 \
 	if ((m = stb_matchlen(t, q, match_max)) > best)	 \
 	if (stb__nc(m,q-(t)))								\
 	best = m, dist = q - (t)
