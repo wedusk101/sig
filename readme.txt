@@ -1,6 +1,6 @@
 ===============================================================
        Standalone Interactive Graphics (SIG) Toolkit
-          Copyright (c) 2018-2019 Marcelo Kallmann
+          Copyright (c) 2018-2019-2019 Marcelo Kallmann
 ===============================================================
 
 SIG is a C++ class toolkit for the development of applications displaying

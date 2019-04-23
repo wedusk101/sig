@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -59,7 +59,7 @@ class UiElement : public GsShareable
 	gscenum	_changed;	 // 0:no change, 1:needs redraw, 2:needs build
 	gsbyte	_xspc,_yspc; // spacing between rect borders and the element's contents
 	gsbyte	_pspc,_nspc; // prior and next spacing outside the element's rect (in its panel)
-	gsword	_minw,_minh; // minimum size of the element, user-specified and updated during build()
+	gsuint16	_minw,_minh; // minimum size of the element, user-specified and updated during build()
 	gsbyte	_lxs;		 // group alignment spacing, from border to label, used in build and resize, specified by derived classes
 
    protected : // constructor below requires a type and should only be used by derived elements

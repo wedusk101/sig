@@ -11,3 +11,7 @@ cleanall : clean libraries, executables and temporary files
 For developing your own application, start from the project in
 ../examples/sigapp.7z, which is prepared to be compiled outside
 of the SIG distribution folder.
+
+Linux installation:
+Graphics-based applications will need: X11 OpenGL and GLFW3
+ 

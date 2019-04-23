@@ -1,6 +1,6 @@
 ===============================================================
        Standalone Interactive Graphics (SIG) Toolkit
-           Copyright (c) 2018 Marcelo Kallmann
+           Copyright (c) 2018-2019 Marcelo Kallmann
 ===============================================================
 
 The author is thankful to the University of California for being supportive of this project.

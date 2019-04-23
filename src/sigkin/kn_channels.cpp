@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -14,13 +14,13 @@
    The hash table is created and used whenever methods KnChannels::search() and 
    KnChannels::map() are called (methods implementation in the end of this file)*/
 class KnChannels::HashTable
- { public:
+{  public:
 	struct Entry
-	 { int	  jname_key;   // KnJointName::id()
-	   char	 ctype_key;   // the KnChannel::Type enumerator [-127,128] (see gs.h)
-	   gsuint16 pos_data;	// the position of the key in the channel array max is 65,535
-	   gsint16  next;		// the index of the next colliding item in [-32768,32767]
-	   void set ( int jk, char ck, gsword pos, gsint16 n )
+	{	int	  jname_key;   // KnJointName::id()
+		char	 ctype_key;   // the KnChannel::Type enumerator [-127,128] (see gs.h)
+		gsuint16 pos_data;	// the position of the key in the channel array max is 65,535
+		gsint16  next;		// the index of the next colliding item in [-32768,32767]
+		void set ( int jk, char ck, gsuint16 pos, gsint16 n )
 		{ jname_key=jk; ctype_key=ck; pos_data=pos; next=n; }
 	 };
 	GsArray<Entry> table;
@@ -32,7 +32,7 @@ class KnChannels::HashTable
 	int collisions () const { return table.size()-hash_size; }
 	int longest_entry () const;					   // for inspection purposes only
 	int lookup ( int jname, char ctype ) const;	   // returns position or -1 if not there
-	int insert ( int jname, char ctype, gsword pos ); // return -1 if already inserted
+	int insert ( int jname, char ctype, gsuint16 pos ); // return -1 if already inserted
 	void out ( GsOutput& o );
 };
 
@@ -267,7 +267,7 @@ void KnChannels::rebuild_hash_table () const
    // build the hash table:
    _htable->init ( csize*2 );
    for ( i=0; i<csize; i++ )
-	{ _htable->insert ( _channels[i].jname().id(), (char)_channels[i].type(), (gsword)i );
+	{ _htable->insert ( _channels[i].jname().id(), (char)_channels[i].type(), (gsuint16)i );
 	  // duplicated entries will not be inserted, but they should not exist.
 	}
 	
@@ -518,7 +518,7 @@ int KnChannels::HashTable::lookup ( int jname, char ctype ) const
 	}
  }
 
-int KnChannels::HashTable::insert ( int jname, char ctype, gsword pos )
+int KnChannels::HashTable::insert ( int jname, char ctype, gsuint16 pos )
  {
    int id = ::hash ( jname, ctype, hash_size );
 

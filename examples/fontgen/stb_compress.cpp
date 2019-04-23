@@ -19,10 +19,14 @@
 #include <stdlib.h>
 #include <assert.h>
 
+// Using gs types to help warning-free 64-bit compilation:
+#include <sig/gs.h>
+
 // stb_compress* from stb.h - declaration
 typedef unsigned int stb_uint;
 typedef unsigned char stb_uchar;
-stb_uint stb_compress(stb_uchar *out,stb_uchar *in,stb_uint len);
+typedef gsintp stb_intp; // using gs type that is correct for for pointer arithmetic in 64 bits
+stb_intp stb_compress ( stb_uchar *out, stb_uchar *in, stb_intp len );
 
 //static bool binary_to_compressed_c(const char* filename, const char* symbol, bool use_base85_encoding, bool use_compression);
 //
@@ -63,7 +67,7 @@ bool binary_to_compressed_c ( const char* filename, const char* symbol, bool use
 	// Read file
 	FILE* f = fopen(filename, "rb");
 	if (!f) return false;
-	int data_sz;
+	stb_intp data_sz;
 	if (fseek(f, 0, SEEK_END) || (data_sz = (int)ftell(f)) == -1 || fseek(f, 0, SEEK_SET)) { fclose(f); return false; }
 	char* data = new char[data_sz+4];
 	if (fread(data, 1, data_sz, f) != (size_t)data_sz) { fclose(f); delete[] data; return false; }
@@ -71,9 +75,9 @@ bool binary_to_compressed_c ( const char* filename, const char* symbol, bool use
 	fclose(f);
 
 	// Compress
-	int maxlen = data_sz + 512 + (data_sz >> 2) + sizeof(int); // total guess
+	stb_intp maxlen = data_sz + 512 + (data_sz >> 2) + sizeof(int); // total guess
 	char* compressed = use_compression ? new char[maxlen] : data;
-	int compressed_sz = use_compression ? stb_compress((stb_uchar*)compressed, (stb_uchar*)data, data_sz) : data_sz;
+	stb_intp compressed_sz = use_compression ? stb_compress((stb_uchar*)compressed, (stb_uchar*)data, data_sz) : data_sz;
 	if (use_compression)
 		memset(compressed + compressed_sz, 0, maxlen - compressed_sz);
 
@@ -137,11 +141,11 @@ bool binary_to_compressed_c ( const char* filename, const char* symbol, bool use
 
 ////////////////////		   compressor		 ///////////////////////
 
-static stb_uint stb_adler32(stb_uint adler32, stb_uchar *buffer, stb_uint buflen)
+static stb_intp stb_adler32 ( stb_intp adler32, stb_uchar *buffer, stb_intp buflen)
 {
 	const unsigned long ADLER_MOD = 65521;
-	unsigned long s1 = adler32 & 0xffff, s2 = adler32 >> 16;
-	unsigned long blocklen, i;
+	stb_intp s1 = adler32 & 0xffff, s2 = adler32 >> 16; // was unsigned long
+	stb_intp blocklen, i; // was unsigned long
 
 	blocklen = buflen % 5552;
 	while (buflen) {
@@ -191,11 +195,11 @@ static void stb__write(unsigned char v)
 //#define stb_out(v)	(stb__out ? *stb__out++ = (stb_uchar) (v) : stb__write((stb_uchar) (v)))
 #define stb_out(v)	do { if (stb__out) *stb__out++ = (stb_uchar) (v); else stb__write((stb_uchar) (v)); } while (0)
 
-static void stb_out2(stb_uint v) { stb_out(v >> 8); stb_out(v); }
-static void stb_out3(stb_uint v) { stb_out(v >> 16); stb_out(v >> 8); stb_out(v); }
-static void stb_out4(stb_uint v) { stb_out(v >> 24); stb_out(v >> 16); stb_out(v >> 8 ); stb_out(v); }
+static void stb_out2(stb_intp v) { stb_out(v >> 8); stb_out(v); }
+static void stb_out3(stb_intp v) { stb_out(v >> 16); stb_out(v >> 8); stb_out(v); }
+static void stb_out4(stb_intp v) { stb_out(v >> 24); stb_out(v >> 16); stb_out(v >> 8 ); stb_out(v); }
 
-static void outliterals(stb_uchar *in, int numlit)
+static void outliterals ( stb_uchar *in, stb_intp numlit )
 {
 	while (numlit > 65536) {
 		outliterals(in,65536);
@@ -217,7 +221,7 @@ static void outliterals(stb_uchar *in, int numlit)
 
 static int stb__window = 0x40000; // 256K
 
-static int stb_not_crap(int best, int dist)
+static int stb_not_crap ( int best, stb_intp dist )
 {
 	return   ((best > 2  &&  dist <= 0x00100)	 
 		|| (best > 5  &&  dist <= 0x04000)
@@ -232,13 +236,13 @@ static  stb_uint stb__hashsize = 32768;
 #define stb__hc2(q,h,c,d)   (((h) << 14) + ((h) >> 18) + (q[c] << 7) + q[d])
 #define stb__hc3(q,c,d,e)   ((q[c] << 14) + (q[d] << 7) + q[e])
 
-static unsigned int stb__running_adler;
+static stb_intp stb__running_adler;
 
-static int stb_compress_chunk(stb_uchar *history,
+static stb_intp stb_compress_chunk(stb_uchar *history,
 	stb_uchar *start,
 	stb_uchar *end,
-	int length,
-	int *pending_literals,
+	stb_intp length,
+	stb_intp *pending_literals,
 	stb_uchar **chash,
 	stb_uint mask)
 {
@@ -257,14 +261,15 @@ static int stb_compress_chunk(stb_uchar *history,
 		int m;
 		stb_uint h1,h2,h3,h4, h;
 		stb_uchar *t;
-		int best = 2, dist=0;
+		int best = 2;
+		stb_intp dist=0; // distance between pointers
 
 		if (q+65536 > end)
 			match_max = (stb_uint)(end-q);
 		else
 			match_max = 65536;
 
-#define stb__nc(b,d)  ((d) <= window && ((b) > 9 || stb_not_crap(b,d)))
+#define stb__nc(b,d)  ( (d)<=window && ( (b)>9 || stb_not_crap(b,d) ) )
 
 #define STB__TRY(t,p)  /* avoid retrying a match we already tried */ \
 	if (p ? dist!=q-t:1)							 \
@@ -279,9 +284,9 @@ static int stb_compress_chunk(stb_uchar *history,
 		h = stb__hc3(q,0, 1, 2); h1 = STB__SCRAMBLE(h);
 		t = chash[h1]; if (t) STB__TRY(t,0);
 		h = stb__hc2(q,h, 3, 4); h2 = STB__SCRAMBLE(h);
-		h = stb__hc2(q,h, 5, 6);		t = chash[h2]; if (t) STB__TRY(t,1);
+		h = stb__hc2(q,h, 5, 6); t = chash[h2]; if (t) STB__TRY(t,1);
 		h = stb__hc2(q,h, 7, 8); h3 = STB__SCRAMBLE(h);
-		h = stb__hc2(q,h, 9,10);		t = chash[h3]; if (t) STB__TRY(t,1);
+		h = stb__hc2(q,h, 9,10); t = chash[h3]; if (t) STB__TRY(t,1);
 		h = stb__hc2(q,h,11,12); h4 = STB__SCRAMBLE(h);
 		t = chash[h4]; if (t) STB__TRY(t,1);
 
@@ -329,7 +334,7 @@ static int stb_compress_chunk(stb_uchar *history,
 	}
 
 	// if we didn't get all the way, add the rest to literals
-	if (q-start < length)
+	if ( (q-start) < length )
 		q = start+length;
 
 	// the literals are everything from lit_start to q
@@ -339,10 +344,11 @@ static int stb_compress_chunk(stb_uchar *history,
 	return q - start;
 }
 
-static int stb_compress_inner(stb_uchar *input, stb_uint length)
+static int stb_compress_inner ( stb_uchar *input, stb_intp length )
 {
-	int literals = 0;
-	stb_uint len,i;
+	stb_intp literals = 0;
+	stb_uint i;
+	stb_intp len;
 
 	stb_uchar **chash;
 	chash = (stb_uchar**) malloc(stb__hashsize * sizeof(stb_uchar*));
@@ -374,12 +380,10 @@ static int stb_compress_inner(stb_uchar *input, stb_uint length)
 	return 1; // success
 }
 
-stb_uint stb_compress(stb_uchar *out, stb_uchar *input, stb_uint length)
+stb_intp stb_compress ( stb_uchar *out, stb_uchar *input, stb_intp length )
 {
 	stb__out = out;
 	stb__outfile = NULL;
-
-	stb_compress_inner(input, length);
-
+	stb_compress_inner ( input, length );
 	return stb__out - out;
 }

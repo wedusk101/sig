@@ -1,5 +1,5 @@
 ﻿/*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -37,10 +37,10 @@
 # include <sig/gs_trace.h>
 
 # ifdef GS_WINDOWS
+# define WIN32_LEAN_AND_MEAN 1
+# include <windows.h>
 # include <Shlobj.h>
 # include <Commdlg.h>
-# define WIN32_LEAN_AND_MEAN 1 // exclude rarely-used stuff from Windows headers
-# include <windows.h>
 # define GLFW_INCLUDE_NONE
 # endif // GS_WINDOWS
 

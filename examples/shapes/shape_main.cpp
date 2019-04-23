@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -19,7 +19,6 @@ int main ( int argc, char** argv )
 	v->cmd ( WsViewer::VCmdAxis );
 	v->cmd ( WsViewer::VCmdStatistics );
 	v->view_all ( &scenebox );
-
 	v->show ();
 
 	int test=0; // this can be enabled to start with specific tests

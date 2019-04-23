@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -35,7 +35,7 @@ class GsStrokeFont
 	   n: number of vertices to describe the character,
 	   s: horizontal spacing of the character,
 	   i: vertex data starting index. */
-	struct ChDesc { gsbyte n, s; gsword i; };
+	struct ChDesc { gsbyte n, s; gsuint16 i; };
 
 	/*! Character info for the simplex font. */
 	static const ChDesc SimplexChar[95];

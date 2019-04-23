@@ -1,5 +1,5 @@
 SRCDIR = $(ROOT)/examples/$(TARGET)/
-BIN = $(ROOT)/make/$(TARGET).x
+BIN = $(ROOT)/make/$(TARGET)$(ARCH).x
 
 CPPFILES := $(shell echo $(SRCDIR)*.cpp)
 OBJFILES = $(CPPFILES:.cpp=.o)

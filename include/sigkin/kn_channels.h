@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -17,7 +17,7 @@ class KnPosture;
 /*! KnChannels manipulates an array of channels and is used to
 	specify postures and motions. */
 class KnChannels : public GsShareable
- { protected :
+{  protected :
 	class HashTable;
 	GsArray<KnChannel> _channels;
 	mutable HashTable* _htable;

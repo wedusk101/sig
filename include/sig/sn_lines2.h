@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -36,7 +36,7 @@ class SnLines2 : public SnShape
 	GsArray<gsuint>  I;  //<! Each index in I gives polyline start
 	GsArray<gsuint>  Is; //<! Each value in Is gives polyline size
 	float  zcoordinate;  //<! z coordinate for all the 2D points
-	gsword patfactor;	//<! Factor to repeat dash pattern bit, currently only used for EPS Exporter - default is 0 (no pattern)
+	gsuint16 patfactor;	//<! Factor to repeat dash pattern bit, currently only used for EPS Exporter - default is 0 (no pattern)
 
    protected:
 	gscbool _colorspervertex; //<! Internal flag indicatting if color arrays are to be used or not

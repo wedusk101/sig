@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution.
@@ -15,11 +15,13 @@
 # include <sig/gs_output.h>
 
 # ifdef GS_WINDOWS
+# define WIN32_LEAN_AND_MEAN 1
 # include <Windows.h>
 # include <sys/timeb.h>
 # include <io.h>
 # else
 # include <unistd.h>
+# include <time.h>
 # include <sys/time.h>
 # endif
 
@@ -245,10 +247,8 @@ int gs_comparecs ( const char *s1, const char *s2 )
 
 int gs_compare ( const char *s1, const char *s2, int n )
 {
+	// printf("[%s]<>[%s] (%d)\n",s1,s2,n);
 	int c1, c2; // ANSI definition of toupper() uses int types
-
-	//   printf("[%s]<>[%s] (%d)\n",s1,s2,n);
-
 	while ( *s1 && *s2 )
 	{	c1 = GS_UPPER(*s1);
 		c2 = GS_UPPER(*s2);
@@ -348,13 +348,13 @@ void gs_string_append ( char*&s, const char* toadd )
 //========================== IO ==========================
 
 # ifdef GS_WINDOWS
-static bool ConsoleShown=false;
+static bool ConsoleShown=0;
 # endif
 
 void gs_output_to_disk ( const char* outfile, const char* errfile )
 {
 	# ifdef GS_WINDOWS
-	ConsoleShown=true;
+	ConsoleShown=1;
 	# endif
 
 	if ( freopen ( outfile? outfile:"stdout.txt", "w", stdout ) )
@@ -367,21 +367,18 @@ void gs_output_to_disk ( const char* outfile, const char* errfile )
 void gs_show_console ()
 {
 	# ifdef GS_WINDOWS 
-	# ifndef __CYGWIN32__
-	ConsoleShown = true;
-	if ( !AttachConsole(ATTACH_PARENT_PROCESS) ) // if there is already a console attch to it
-	{ AllocConsole(); } // otherwise create one
+	ConsoleShown = 1;
+	if ( !AttachConsole(ATTACH_PARENT_PROCESS) ) AllocConsole();
 	freopen("conin$", "r", stdin);
 	freopen("conout$", "w", stdout);
 	freopen("conout$", "w", stderr);
-	# endif
 	# endif
 }
 
 bool gs_console_shown ()
 {
 	# ifdef GS_WINDOWS
-	return ConsoleShown;
+	return (bool)ConsoleShown;
 	# else
 	return true;
 	# endif
@@ -490,15 +487,13 @@ void gs_sleep ( int milisecs )
 
 double gs_time ()
 {
+	# ifdef GS_WINDOWS
 	static bool first=true;
-	#ifdef GS_WINDOWS
 	static double _perf_freq = 0.0;
 	static double _utc_origin = 0.0;
-	#endif
 
 	if ( first )
 	{	first = false;
-		# ifdef GS_WINDOWS
 		LARGE_INTEGER lpFrequency;
 		LARGE_INTEGER lpPerformanceCount;
 		struct _timeb tbuf;
@@ -512,10 +507,8 @@ double gs_time ()
 			double utcTime = double(tbuf.time) + double(tbuf.millitm)*1.0E-3;
 			_utc_origin = utcTime - hrcTime;
 		}
-		# endif
 	}
 
-	# ifdef GS_WINDOWS
 	if ( _perf_freq==0 ) // not available
 	{	_timeb tp;
 		_ftime(&tp);
@@ -529,6 +522,10 @@ double gs_time ()
 	# endif
 
 	# ifdef GS_LINUX
+	// Possibly higher resolution version to be tested:
+	//timespec t;
+	//clock_gettime ( CLOCK_MONOTONIC, &t );
+	//return double(t.tv_sec);// + double(t.tv_nsec)
 	timeval tp;
 	if ( gettimeofday(&tp,0)==-1 ) return 0;
 	return 0.000001*(double)tp.tv_usec + (double)tp.tv_sec;

@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -17,7 +17,7 @@
 class GlObjects
 {  public :
 	GLuint *va, *buf;
-	gsuint16 na, nb;
+	GLsizei na, nb;
 
    public :
 	GlObjects () { va=0; buf=0; na=nb=0; }

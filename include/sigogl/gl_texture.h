@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -20,7 +20,7 @@ class GlTexture
 {  public :
 	enum Settings { Filtered, MipMapped, Plain };
 	GLuint id;
-	gsword width, height;
+	gsuint16 width, height;
    private : // resource management information
 	GlTextureDecl* _decl;
 	friend GlResources;

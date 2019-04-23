@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -15,7 +15,7 @@
  *************************************************************************
  *
  *            Standalone Interactive Graphics (SIG) Toolkit
- *      Copyright (c) 2018 Marcelo Kallmann
+ *      Copyright (c) 2018-2019 Marcelo Kallmann
  *
  *   Design goals are to be simple, efficient, and cross-platform.
  *   - Angle parameters are in radians, but degrees are used in text files
@@ -43,39 +43,52 @@
 
 // ==================================== Types =================================
 
-# include <stdint.h>
-
 /*! \brief sig main namespace.
 	Namespace sig is currently only used in few places where
 	there is a need to protect potential namespace conflicts. */
-namespace sig { }
+namespace sig {}
 
-# if defined(__CYGWIN__)
-#  define GS_CYGWIN  //!< Defined if compiled with cygwin
-# elif defined(_WIN32) || defined(WINDOWS) || defined(WIN32)
-#  define GS_WINDOWS	//!< Defined if compiled in windows with MS
-#  pragma warning(disable : 4996) // for VS secure function warning
+# if defined (__CYGWIN__)
+  # define GS_CYGWIN  //!< Defined if compiled with cygwin
+# elif defined (_WIN32) || defined (_WIN64)
+  # define GS_WINDOWS	//!< Defined if compiled in windows with VS
+  # pragma warning(disable:4996) // for VS secure function warning
+  # if defined (_WIN64)
+    # define GS_64BITS
+  # endif
 # else
-#  define GS_LINUX	//!< Defined if not compiled in windows
+  # define GS_LINUX	//!< Defined if not compiled in windows
+  # if defined (__LP64__)
+    # define GS_64BITS
+  # endif
 # endif
 
 # ifdef GS_DEF_BOOL
 enum bool { false, true }; //!< use this for old compilers without bool/true/false keywords
 # endif
 
-// The following types should be adjusted according to the used system
-typedef int8_t	 gschar;   //!< 1 byte signed int, from -127 to 128
-typedef uint8_t	 gsbyte;   //!< 1 byte unsigned int, from 0 to 255
-typedef uint8_t	 gscbool;  //!< 1 byte char type intended to store a boolean value
-typedef int8_t	 gscenum;  //!< 1 byte signed char type intended to store an enumerator
-typedef uint16_t gsword;   //!< 2 bytes unsigned int, from 0 to 65,535
-typedef uint16_t gsuint16; //!< 2 bytes unsigned int, from 0 to 65,535
-typedef int16_t	 gsint16;  //!< 2 bytes integer, from -32,768 to 32,767
-typedef uint32_t gsuint32; //!< 4 bytes unsigned int, from 0 to 4294967295
-typedef int32_t	 gsint32;  //!< 4 bytes signed integer, from -2147483648 to 2147483647
-typedef long long gsintp;  //!< integer type for pointer type casts in both 32 and 64 bits
-typedef int		 gsint;	   //!< 4 or 8 bytes int depending on the platform
-typedef unsigned int gsuint; //!< 4 or 8 bytes unsigned int depending on the compiler
+// Main typical types used:
+typedef signed char   gschar;  //!< 1 byte signed int, from -127 to 128
+typedef unsigned char gsbyte;  //!< 1 byte unsigned int, from 0 to 255
+typedef unsigned char gscbool; //!< 1 byte char type intended to store a boolean value
+typedef unsigned char gscenum; //!< 1 byte signed char type intended to store an enumerator
+typedef signed int	  gsint;   //!< usually 4 bytes signed integer
+typedef unsigned int  gsuint;  //!< usually 4 bytes unsigned integer
+
+// Types that may depend on the specific platform:
+# if defined (GS_64BITS)
+typedef signed short   gsint16;  //!< 2 bytes integer, from -32,768 to 32,767
+typedef unsigned short gsuint16; //!< 2 bytes unsigned int, from 0 to 65,535
+typedef signed int	   gsint32;  //!< 4 bytes signed integer, from -2147483648 to 2147483647
+typedef unsigned int   gsuint32; //!< 4 bytes unsigned int, from 0 to 4294967295
+typedef signed long long gsintp; //!< integer type with same size as a memory pointer: 64 bits
+# else
+typedef signed short   gsint16;  //!< 2 bytes integer, from -32,768 to 32,767
+typedef unsigned short gsuint16; //!< 2 bytes unsigned int, from 0 to 65,535
+typedef signed int	   gsint32;  //!< 4 bytes signed integer, from -2147483648 to 2147483647
+typedef unsigned int   gsuint32; //!< 4 bytes unsigned int, from 0 to 4294967295
+typedef signed long    gsintp;   //!< integer type with same size as a memory pointer: 32 bits
+# endif
 
 /*! Defines a typedef for a generic comparison function in the form: 
 	int gscompare ( const void*, const void* ), that is used by data structure classes. */
@@ -273,8 +286,7 @@ struct GsCharPt
 
 /*! Redirects the C streams stdout and stderr to the files with given
 	file names. In case the parameters are null (the default), the
-	output is directed to the text files stdout.txt and stderr.txt
-	in the current folder */
+	output is directed to files stdout.txt and stderr.txt. */
 void gs_output_to_disk ( const char* outfile=0, const char* errfile=0 );
 
 /*! Opens a console and attach it to the std streams. Only applicable

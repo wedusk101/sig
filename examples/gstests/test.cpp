@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -12,25 +12,27 @@
 # include <sig/gs_input.h>
 # include <sig/gs_mat.h>
 
-void test_random ();
-void test_mat ();
-void test_matn ();
-void test_euler ();
-void test_vars ();
-void test_heap ();
-void test_table ();
-void test_slotmap ();
-void test_string ();
-void test_structures ();
-void test_timer ();
-void test_array ();
-void test_arraylist ();
-void test_graph ();
-void test_grid ();
-void test_list ();
+extern void test_types ();
+extern void test_random ();
+extern void test_mat ();
+extern void test_matn ();
+extern void test_euler ();
+extern void test_vars ();
+extern void test_heap ();
+extern void test_table ();
+extern void test_slotmap ();
+extern void test_string ();
+extern void test_structures ();
+extern void test_timer ();
+extern void test_array ();
+extern void test_arraylist ();
+extern void test_graph ();
+extern void test_grid ();
+extern void test_list ();
 
 struct FuncDesc { void (*func) (); const char* name; } FD[] =
-{	{ test_random,	"random" },
+{	{ test_types,	"types" },
+	{ test_random,	"random" },
 	{ test_timer,	"timer" },
 	{ test_string,	"string" },
 	{ test_vars,	"vars" },
@@ -51,7 +53,7 @@ struct FuncDesc { void (*func) (); const char* name; } FD[] =
 int main ( int argc, char** argv )
 {
 	int i;
-	const char* test = 0; //"arraylist";
+	const char* test = 0; //test="types";
 	GsString s(test);
 
 	if ( !test )
@@ -67,7 +69,7 @@ int main ( int argc, char** argv )
 
 	if ( !FD[i].name ) { gsout<<"unknown test!\n"; return 0; }
 
-	if ( !gs_console_shown() ) gsout.pause("\nDone.");
+	gsout.pause ( "\n<Press Enter to Exit>" );
 
 	return 0;
 }

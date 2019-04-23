@@ -1,5 +1,5 @@
 ﻿/*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -32,7 +32,7 @@
 //# define GS_USE_TRACE7 // mouse move event
 # include <sig/gs_trace.h>
 
-# define WIN32_LEAN_AND_MEAN 1 // exclude rarely-used stuff from Windows headers
+# define WIN32_LEAN_AND_MEAN 1
 # include <windows.h>
 
 //===== Global Data ===========================================================================

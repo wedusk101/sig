@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -17,8 +17,8 @@
 	(name comparison is always case-insensitive). */
 class KnJointName
  { private :
-	gsword _id; // the id of this joint name (max is 65535, see gs.h)
-	static gsword _undefid; // to mark undefined ids (mark is max gsword value)
+	gsuint16 _id; // the id of this joint name (max is 65535, see gs.h)
+	static gsuint16 _undefid; // to mark undefined ids (mark is max gsuint16 value)
 	static GsTable<gsintp> _htable;
 
    public :
@@ -62,13 +62,13 @@ class KnJointName
 	const char* st () const { return undefined()? "":_htable.key(_id); }
 
 	/*! Returns the unique id of this name; usefull for debug purposes only */
-	gsword id () const { return _id; }
+	gsuint16 id () const { return _id; }
 	
 	/*! Returns true if the string exists among all joint names */
 	static bool exists ( const char* name );
 
 	/*! return the associated string; "" is returned in case the name is undefined. */
-	static const char* st ( gsword id ) { return id==_undefid? "":_htable.key(id); }
+	static const char* st ( gsuint16 id ) { return id==_undefid? "":_htable.key(id); }
 
    private :
 	void _check () { if ( _htable.hashsize()==0 ) _htable.init(256); }

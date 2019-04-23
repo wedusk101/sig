@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018 Marcelo Kallmann.
+   Copyright (c) 2018-2019 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -59,11 +59,11 @@ class GsFont
 	 };
 
    private :   
-	Character* _chars;
-	gsword _nchars;
-	gsword _imgw, _imgh;
-	gscbool _allocateddata;
 	float _top, _ascent, _descent, _bottom;
+	Character* _chars;
+	gsuint16 _nchars;
+	gsuint16 _imgw, _imgh;
+	gscbool _allocateddata;
 
    public :
 	GsFont ();
