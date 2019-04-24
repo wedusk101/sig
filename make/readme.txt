@@ -13,5 +13,8 @@ For developing your own application, start from the project in
 of the SIG distribution folder.
 
 Linux installation:
-Graphics-based applications will need: X11 OpenGL and GLFW3
+libsig and libsigkin are graphics-independent and just require:
+
+The other modules require the following packages:
+X11 OpenGL and GLFW3
  
