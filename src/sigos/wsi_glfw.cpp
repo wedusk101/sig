@@ -5,8 +5,7 @@
    at the base folder of the distribution. 
   =======================================================================*/
 
-//================================= SIG-GLFW integration  ==========================================
-//================================= and x11 port via glfw ==========================================
+//=================================  SIG-GLFW integration  ==========================================
 
 # include <sig/gs.h> // needed here to define macro below
 
@@ -155,10 +154,11 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 	glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR, 3 );
 	glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR, 3 );
 	glfwWindowHint ( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-	glfwWindowHint ( GLFW_DOUBLEBUFFER, 1 );
-	glfwWindowHint ( GLFW_RESIZABLE, 1 );
+	glfwWindowHint ( GLFW_DOUBLEBUFFER, GLFW_TRUE );
+	//glfwWindowHint ( GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API );
+	glfwWindowHint ( GLFW_RESIZABLE, GLFW_TRUE );
 	glfwWindowHint ( GLFW_FOCUSED, mode>0? 1:0 );
-	GLFWwindow* sharedwin = AppWindows.size()? AppWindows[0]->gwin:NULL;
+	GLFWwindow* sharedwin = AppWindows.size()>0? AppWindows[0]->gwin:NULL;
 	sw->gwin = glfwCreateWindow ( w, h, label, NULL, sharedwin );
 	glfwSetWindowUserPointer ( sw->gwin, sw );
 
@@ -287,7 +287,7 @@ void wsi_screen_resolution ( int& w, int& h )
 {
 	const GLFWvidmode* m = glfwGetVideoMode ( glfwGetPrimaryMonitor() );
 	w = m->width;
-    h = m->height;
+	h = m->height;
 }
 
 //==== Callbacks ==============================================================================
@@ -656,10 +656,8 @@ int wsi_program_argc ()
 	return AppArgs.size()-1;
 }
 
-// the main function entry point must be provided elsewhere:
-extern int main ( int, char** );
-
 # ifdef GS_WINDOWS
+extern int main ( int, char** ); // the main function entry point must be provided elsewhere
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
 	GS_TRACE1 ( "WinMain..." );
@@ -686,9 +684,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	// Reminder: SIG config file loading and OpenGL initialization are performed
 	// automatically at the time of opening the first graphical window.
 }
-# endif
-
-
+# endif // GS_WINDOWS
 
 # endif // GS_LINUX
 
