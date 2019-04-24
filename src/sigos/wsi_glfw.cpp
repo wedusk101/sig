@@ -145,6 +145,8 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 
 	// dialog boxes are simulated with mode>0 (DialogBox() function does not return until callback function terminates)
 	GS_TRACE1 ( "Creating window..." );
+	glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+	glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR, 3 );
 	glfwWindowHint ( GLFW_RED_BITS, 8 );
 	glfwWindowHint ( GLFW_BLUE_BITS, 8 );
 	glfwWindowHint ( GLFW_GREEN_BITS, 8 );
