@@ -49,9 +49,9 @@ all:
 # Clean options:
 cleanall:
 	$(RM) core *.o *~ *.x
+	$(RM) -f -r $(OBJDIR)
 	$(RM) ../lib/$(BASELDIRNAME)32/*.a
 	$(RM) ../lib/$(BASELDIRNAME)64/*.a
-	$(RM) -f -r $(OBJDIR)
 
 # Clean options:
 cleanex:

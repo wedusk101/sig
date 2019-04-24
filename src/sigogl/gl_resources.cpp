@@ -628,7 +628,6 @@ void GlResources::declare_default_shaders ()
 	r.declare_uniform ( p, 6, "Mode" );
 	r.declare_uniform ( p, 7, "TexId" );
 
-
 	p = r.declare_program ( "3dphong", 3, vs3dphong, fsphong, fshadefunc );
 	r.declare_uniform ( p, 0, "vProj" );
 	r.declare_uniform ( p, 1, "vView" );
@@ -705,7 +704,7 @@ void GlResources::print_report ()
 		GlProgram* p = tp.data(i);
 		GlProgramDecl* pi = tp.data(i)->_decl;
 		gsout<<" glid="<<p->id<<": ";
-		if ( !p->linked() ) gsout<<"not "; gsout<<"linked";
+		if ( !p->linked() ) { gsout<<"not "; } gsout<<"linked";
 		if ( !pi ) 
 		{	gsout << ".\n"; }
 		else
@@ -725,7 +724,7 @@ void GlResources::print_report ()
 	{	if ( !tt.key(i) ) continue;
 		gsout<<i<<": "<<tt.key(i)<<": ";
 		GlTexture* t = tt.data(i);
-		if ( !t->valid() ) gsout<<"not "; gsout<<"loaded";
+		if ( !t->valid() ) { gsout<<"not "; } gsout<<"loaded";
 		if ( !t->_decl ) gsout << ".\n"; else gsout << gspc << t->_decl->filename << gsnl;
 		n++;
 	}
@@ -738,7 +737,7 @@ void GlResources::print_report ()
 		gsout<<i<<": "<<tf.key(i)<<": ";
 		GlFont* f = tf.data(i);//->res;
 		GlFontDecl* d = (GlFontDecl*)tf.data(i)->_decl;
-		if ( !f->characters() ) gsout<<"not "; gsout<<"loaded";
+		if ( !f->characters() ) { gsout<<"not "; } gsout<<"loaded";
 		if ( !d ) gsout << ".\n"; else gsout << gspc << d->filename << gsnl;
 		n++;
 	}

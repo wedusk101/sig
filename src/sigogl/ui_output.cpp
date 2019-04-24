@@ -104,7 +104,7 @@ void UiOutput::draw ( UiPanel* panel )
 		float w=0;
 		c=0;
 		while ( true )
-		{	for ( i=c; _text[i] && _text[i]!=' ' && _text[i]!='\t' && _text[i]!='\n'; i++ );
+		{	for ( i=c; _text[i] && _text[i]!=' ' && _text[i]!='\t' && _text[i]!='\n'; i++ ) {}
 			if ( !_text[i] ) break;
 			w += font->text_width ( fs, _text+c, i-c+1 );
 			if ( _text[i]=='\n' )

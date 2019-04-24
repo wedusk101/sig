@@ -103,8 +103,8 @@ int UiInput::handle ( const GsEvent& e, UiManager* uim )
 			  case GsEvent::KeyHome:  _cursor=_curini=0; break;
 			  case GsEvent::KeyEnd:   _cursor=_text.len(); break;
 			  case GsEvent::KeyDel:   delc=_text[_cursor]; _text.remove(_cursor,1); break;
-			  case GsEvent::KeyBack:  if (_cursor>0) { delc=_text[--_cursor]; _text.remove(_cursor,1); }
-									  if (_cursor<_curini)_curini--; break;
+			  case GsEvent::KeyBack:  { if (_cursor>0) { delc=_text[--_cursor]; _text.remove(_cursor,1); }
+									  							if (_cursor<_curini)_curini--; } break;
 			  case GsEvent::KeyEsc:   _cursor=_curini=0; _inuse=0; uim->focus(0); _text=_restext; break;
 			  case '\t': // treat tab as enter
 			  case GsEvent::KeyEnter:

@@ -91,27 +91,27 @@ void test_random ()
    int i, s=20;
    gsuint rs = 198312;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
 
    rs = 987;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
 
    rs = 198312;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
    gs_rseed ( rs );
-   for ( i=0; i<s; i++ ) gsout<<gs_random(0,9)<<gspc; gsout<<gsnl;
+   for ( i=0; i<s; i++ ) { gsout<<gs_random(0,9)<<gspc; } gsout<<gsnl;
 
    //test_01 ();
  }
