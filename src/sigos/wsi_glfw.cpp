@@ -23,6 +23,7 @@
 # include <sigogl/ws_osinterface.h>
 # include <sigogl/gl_loader.h>
 # include <sigogl/gl_resources.h>
+# include <sigogl/ui_dialogs.h>
 
 //# define GS_USE_TRACE_COUNTER
 //# define GS_USE_TRACE1 // trace main functions
@@ -44,13 +45,6 @@
 # endif // GS_WINDOWS
 
 // This port to GLFW is not fully implemented yet
-
-//#include <GL/glu.h>
-//    #include <GL/glx.h>
-//    #include <GL/glxext.h>
-    //#define glXGetProcAddress(x) (*glXGetProcAddressARB)((const GLubyte*)x)
-
-//# include <GL/gl.h> 
 
 # include <GLFW/glfw3.h>
 
@@ -151,13 +145,13 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 
 	// dialog boxes are simulated with mode>0 (DialogBox() function does not return until callback function terminates)
 	GS_TRACE1 ( "Creating window..." );
-	glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR, 3 );
-	glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR, 3 );
-	glfwWindowHint ( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-	glfwWindowHint ( GLFW_DOUBLEBUFFER, GLFW_TRUE );
-	//glfwWindowHint ( GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API );
-	glfwWindowHint ( GLFW_RESIZABLE, GLFW_TRUE );
-	glfwWindowHint ( GLFW_FOCUSED, mode>0? 1:0 );
+	glfwWindowHint ( GLFW_RED_BITS, 8 );
+	glfwWindowHint ( GLFW_BLUE_BITS, 8 );
+	glfwWindowHint ( GLFW_GREEN_BITS, 8 );
+	glfwWindowHint ( GLFW_ALPHA_BITS, 8 );
+	glfwWindowHint ( GLFW_DOUBLEBUFFER, 1 );
+	glfwWindowHint ( GLFW_DEPTH_BITS, 32 );
+	//glfwWindowHint ( GLFW_FOCUSED, mode>0? 1:0 );
 	GLFWwindow* sharedwin = AppWindows.size()>0? AppWindows[0]->gwin:NULL;
 	sw->gwin = glfwCreateWindow ( w, h, label, NULL, sharedwin );
 	glfwSetWindowUserPointer ( sw->gwin, sw );
@@ -165,6 +159,7 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 	if ( notinit ) // glfw initializations after creating first window
 	{	glfwMakeContextCurrent ( sw->gwin );
 		gl_load_and_initialize (); // only overall 1st call will actually load ogl
+		//ui_set_dialog_parent_window ( sw->swin );
 		notinit=false;
 	}
 
@@ -249,13 +244,13 @@ void wsi_win_size ( void* win, int& w, int& h )
 bool wsi_win_visible ( void* win )
 {
 	GS_TRACE2 ( "wsi_win_visible..." );
-	return true; // IsWindowVisible ( ((SwSysWin*)win)->gwin )==1;
+	return (bool) glfwGetWindowAttrib ( ((SwSysWin*)win)->gwin, GLFW_VISIBLE );
 }
 
 bool wsi_win_minimized ( void* win )
 {
-	GS_TRACE2 ( "wsi_win_iconized..." );
-	return false; // IsIconic ( ((SwSysWin*)win)->gwin )==1;
+	GS_TRACE2 ( "wsi_win_minimized..." );
+	return (bool) glfwGetWindowAttrib ( ((SwSysWin*)win)->gwin, GLFW_ICONIFIED );
 }
 
 void wsi_activate_ogl_context ( void* win )
@@ -298,11 +293,10 @@ inline void sysinit ( WsWindow* win, int w, int h ) { win->init(win->_glcontext,
 inline void sysresize ( WsWindow* win, int w, int h ) { win->resize(win->_glcontext,w,h); }
 inline void sysevent ( WsWindow* win, GsEvent& e ) { win->handle(e); }
 
-static void draw_cb ( GLFWwindow* gwin )
+static void draw_func ( SwSysWin* sw, GLFWwindow* gwin )
 {
-	GS_TRACE2 ( "draw_cb..." );
+	GS_TRACE2 ( "draw_func..." );
 	glfwMakeContextCurrent ( gwin );
-	SwSysWin* sw = (SwSysWin*)glfwGetWindowUserPointer(gwin);
 	if (sw->needsinit)
 	{	int w, h;
 		glfwGetWindowSize ( sw->gwin, &w, &h );
@@ -311,14 +305,22 @@ static void draw_cb ( GLFWwindow* gwin )
 	}
 	sysdraw ( sw->swin ); // this will call the user's window draw method
 	glfwSwapBuffers ( gwin );
-	sw->redrawcalled=0;
+}
+
+static void draw_cb ( GLFWwindow* gwin )
+{
+	GS_TRACE2 ( "draw_cb..." );
+	draw_func ( (SwSysWin*)glfwGetWindowUserPointer(gwin), gwin );
 }
 
 void wsi_win_redraw ( void* win )
 {
 	GS_TRACE2 ( "wsi_win_redraw..." );
 	SwSysWin* sw = (SwSysWin*)win;
-	draw_cb(sw->gwin);
+	if (sw->redrawcalled) return; // protection from recursive calls
+	sw->redrawcalled=1;
+	draw_func ( sw, sw->gwin );
+	sw->redrawcalled=0;
 }
 
 void resize_cb ( GLFWwindow* gwin, int w, int h )
