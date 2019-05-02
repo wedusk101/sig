@@ -978,11 +978,11 @@ void GsModel::transform ( const GsMat& mat, bool primtransf )
 	for ( i=0; i<size; i++ ) V[i] = m * V[i];
 
 	size = N.size();
-	if ( size<=0 ) return;
-   
-	// ok, apply to N:
-	m.setrans ( 0, 0, 0 ); // remove translation
-	for ( i=0; i<size; i++ ) { N[i]= m*N[i]; N[i].normalize(); }  // MatChange: affects here
+	if ( size )
+	{	m.setrans ( 0, 0, 0 ); // remove translation before applying to N
+		for ( i=0; i<size; i++ )
+		{	N[i]= m*N[i]; N[i].normalize(); }  // MatChange: affects here
+	}
 
 	// will no longer be a primitive:
 	if ( primitive ) { delete primitive; primitive=0; }

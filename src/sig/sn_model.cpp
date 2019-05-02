@@ -69,10 +69,7 @@ void SnModel::model ( GsModel* m )
 
 void SnModel::get_bounding_box ( GsBox& b ) const
 {
-	if ( _model->primitive )
-		_model->primitive->get_bounding_box(b);
-	else
-		_model->get_bounding_box(b);
+	_model->get_bounding_box(b);
 }
 
 /*Notes:
