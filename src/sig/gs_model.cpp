@@ -964,7 +964,6 @@ void GsModel::centralize ()
 void GsModel::transform ( const GsMat& mat, bool primtransf )
 {
 	int i, size;
-	GsMat m = mat;
 
 	if ( primtransf )
 	{	GsQuat q(mat);
@@ -975,11 +974,12 @@ void GsModel::transform ( const GsMat& mat, bool primtransf )
 	}
 
 	size = V.size();
-	for ( i=0; i<size; i++ ) V[i] = m * V[i];
+	for ( i=0; i<size; i++ ) V[i] = mat * V[i];
 
 	size = N.size();
 	if ( size )
-	{	m.setrans ( 0, 0, 0 ); // remove translation before applying to N
+	{	GsMat m = mat;
+		m.setrans ( 0, 0, 0 ); // remove translation before applying to N
 		for ( i=0; i<size; i++ )
 		{	N[i]= m*N[i]; N[i].normalize(); }  // MatChange: affects here
 	}

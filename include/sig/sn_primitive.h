@@ -47,10 +47,6 @@ class SnPrimitive : public SnModel
 
    public :
 
-	/*! Returns the bounding box of all vertices used.
-		The returned box can be empty. */
-	virtual void get_bounding_box ( GsBox &b ) const override;
-
 	/*! Called right before rendering and other actions */
 	virtual void update_node () override;
 };
@@ -58,4 +54,3 @@ class SnPrimitive : public SnModel
 //================================ End of File =================================================
 
 # endif  // SN_PRIMITIVE_H
-

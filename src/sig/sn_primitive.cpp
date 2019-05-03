@@ -57,13 +57,6 @@ const GsPrimitive& SnPrimitive::cprim ()
 	return *_model->primitive; // no call to touch
 }
 
-void SnPrimitive::get_bounding_box ( GsBox& b ) const
-{
-	b.set_empty ();
-	if ( !_model->primitive ) return;
-	_model->primitive->get_bounding_box(b);
-}
-
 void SnPrimitive::update_node ()
 {
 	GS_TRACE2 ( "Preparing to render " << instance_name() << ": " << action_ready() );
