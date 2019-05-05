@@ -36,8 +36,8 @@
 # include <windows.h>
 
 //===== Global Data ===========================================================================
-struct SwSysWin; // fwd decl
-static GsBuffer<SwSysWin*> AppWindows;
+struct OsWin; // fwd decl
+static GsBuffer<OsWin*> AppWindows;
 static HINSTANCE	AppInstance=0;
 static HINSTANCE	AppPrevInstance=0;
 static MSG			AppMsg;
@@ -50,7 +50,7 @@ static int (*AppCallBack)( const GsEvent& ev, void* wdata )=0;
 static LRESULT CALLBACK WndProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 
 //===== Window Data ===========================================================================
-struct SwSysWin
+struct OsWin
 {	char*	 label;			// window label
 	WsWindow* uwindow;		// user window data
 	GsEvent  event;			// event being sent to window
@@ -62,13 +62,13 @@ struct SwSysWin
 	HWND	 window;		// window handle
 	HDC		 gldevcontext;	// opengl device context
 	HGLRC	 glrendcontext;	// opengl rendering context
-	SwSysWin() { label=0; uwindow=0; }
-   ~SwSysWin(); // destructor
+	OsWin() { label=0; uwindow=0; }
+   ~OsWin(); // destructor
 };
 
-SwSysWin::~SwSysWin()
+OsWin::~OsWin()
 {
-	GS_TRACE1 ( "SwSysWin Destructor ["<<label<<']' );
+	GS_TRACE1 ( "OsWin Destructor ["<<label<<']' );
 	delete uwindow; // destructor will call wsi_del_win()
 	free ( label );
 	if ( isdialog ) DialogRunning--;
@@ -80,16 +80,16 @@ SwSysWin::~SwSysWin()
 
 void wsi_del_win ( void *win ) // this function is called by the WsWindow destructor, possibly by the user
 {
-	GS_TRACE1 ( "wsi_del_win ["<<((SwSysWin*)win)->label<<"]..." );
-	SwSysWin* sw = (SwSysWin*)win;
-	if ( sw->isdialog ) { DialogRunning--; sw->isdialog=0; } // important to allow other windows to receive events
-	wsi_win_hide ( sw );
+	GS_TRACE1 ( "wsi_del_win ["<<((OsWin*)win)->label<<"]..." );
+	OsWin* ow = (OsWin*)win;
+	if ( ow->isdialog ) { DialogRunning--; ow->isdialog=0; } // important to allow other windows to receive events
+	wsi_win_hide ( ow );
 
-	if ( sw->glrendcontext && sw->gldevcontext ) // the user called this function
-	{	sw->uwindow=0; // if user deletes sw, this is being called before SwSysWin destructor, stop a 2nd delete
-		PostMessage ( sw->window, WM_DESTROY, 0, 0 ); // sw will then be deleted from WndProc
+	if ( ow->glrendcontext && ow->gldevcontext ) // the user called this function
+	{	ow->uwindow=0; // if user deletes sw, this is being called before OsWin destructor, stop a 2nd delete
+		PostMessage ( ow->window, WM_DESTROY, 0, 0 ); // sw will then be deleted from WndProc
 	}
-	else // this call came from SwSysWin desctructor triggered by a DESTROY event
+	else // this call came from OsWin desctructor triggered by a DESTROY event
 	{	// nothing more to do
 	}
 }
@@ -100,17 +100,17 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* uwi
 
 	GlResources::load_configuration_file (); // only overall 1st call will actually load config file
 
-	SwSysWin* sw = new SwSysWin;
-	sw->label = _strdup ( label );
-	sw->uwindow = uwindow;
-	sw->justresized = 1;
-	sw->needsinit = 1;
-	sw->event.width = w;
-	sw->event.height = h;
-	sw->visible = 0;
-	sw->isdialog = mode;
-	sw->redrawcalled = 0;
-	sw->window = 0;
+	OsWin* ow = new OsWin;
+	ow->label = _strdup ( label );
+	ow->uwindow = uwindow;
+	ow->justresized = 1;
+	ow->needsinit = 1;
+	ow->event.width = w;
+	ow->event.height = h;
+	ow->visible = 0;
+	ow->isdialog = mode;
+	ow->redrawcalled = 0;
+	ow->window = 0;
 
 	if ( mode>0 ) DialogRunning++;
 
@@ -150,10 +150,10 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* uwi
 
 	// dialog boxes are simulated with mode>0 (DialogBox() function does not return until callback function terminates)
 	GS_TRACE1 ( "Creating window..." );
-	sw->window = CreateWindowEx (
+	ow->window = CreateWindowEx (
 		mode>0? WS_EX_DLGMODALFRAME|WS_EX_TOPMOST : WS_EX_ACCEPTFILES, // recall WS_EX_CLIENTEDGE WS_EX_TOOLWINDOW
 		AppName, 
-		sw->label,
+		ow->label,
 		mode==2? WS_SIZEBOX : mode==1? WS_DLGFRAME : WS_OVERLAPPEDWINDOW,
 		x<=0? CW_USEDEFAULT:x,
 		y<=0? CW_USEDEFAULT:y,
@@ -162,9 +162,9 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* uwi
 		NULL, // parent: perhaps should use first non-dialog active window
 		NULL, // menu
 		AppInstance, 
-		sw );
+		ow );
 
-	if ( sw->window==NULL)
+	if ( ow->window==NULL)
 	{	MessageBox ( NULL, "Window Creation Failed !", "", MB_ICONEXCLAMATION | MB_OK );
 		exit(0);
 	}
@@ -180,7 +180,7 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* uwi
 	if ( buffers==2 ) flags |= PFD_DOUBLEBUFFER; // set to be double buffered 
 
 	// create an OpenGL rendering context:
-	sw->gldevcontext = GetDC ( sw->window );
+	ow->gldevcontext = GetDC ( ow->window );
    
 	PIXELFORMATDESCRIPTOR pfd = 
 	{	sizeof(PIXELFORMATDESCRIPTOR), // size of this pfd 
@@ -202,111 +202,111 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* uwi
 		0, 0, 0			// layer masks ignored 
 	};
 
-	int pixformat = ChoosePixelFormat ( sw->gldevcontext, &pfd );
+	int pixformat = ChoosePixelFormat ( ow->gldevcontext, &pfd );
 	if ( pixformat==NULL)
 	{	MessageBox ( NULL, "Pixel Format Error !", "", MB_ICONEXCLAMATION | MB_OK );
 		exit(0);
 	}
 	   
-	if ( !SetPixelFormat ( sw->gldevcontext, pixformat, &pfd ) )
+	if ( !SetPixelFormat ( ow->gldevcontext, pixformat, &pfd ) )
 	{	MessageBox ( NULL, "Pixel Format Set Error !", "", MB_ICONEXCLAMATION | MB_OK );
 		exit(0);
 	}
 
-	sw->glrendcontext = wglCreateContext ( sw->gldevcontext );
-	if ( AppWindows.size() ) wglShareLists ( AppWindows[0]->glrendcontext, sw->glrendcontext );
+	ow->glrendcontext = wglCreateContext ( ow->gldevcontext );
+	if ( AppWindows.size() ) wglShareLists ( AppWindows[0]->glrendcontext, ow->glrendcontext );
 
-	AppWindows.push ( sw );
+	AppWindows.push ( ow );
 
-	if ( sw->glrendcontext==NULL)
+	if ( ow->glrendcontext==NULL)
 	{	MessageBox ( NULL, "Could Not Create OpenGL Context !", "", MB_ICONEXCLAMATION | MB_OK );
 		exit(0);
 	}
 
-	SetFocus ( sw->window ); // needed if this window is not the first one
-	return (void*)sw;
+	SetFocus ( ow->window ); // needed if this window is not the first one
+	return (void*)ow;
 }
 
 const char* wsi_win_label ( void* win )
 {
-	GS_TRACE2 ( "wsi_win_label ["<<((SwSysWin*)win)->label<<"] label requested." );
-	return ((SwSysWin*)win)->label;
+	GS_TRACE2 ( "wsi_win_label ["<<((OsWin*)win)->label<<"] label requested." );
+	return ((OsWin*)win)->label;
 }
 
 void wsi_win_label ( void* win, const char* label )
 {
-	GS_TRACE2 ( "wsi_win_label ["<<((SwSysWin*)win)->label<<"] to "<<label<<"..." );
-	SwSysWin* sw = (SwSysWin*)win;
-	free ( sw->label );
-	sw->label = _strdup ( label );
-	SetWindowText ( sw->window, sw->label );
+	GS_TRACE2 ( "wsi_win_label ["<<((OsWin*)win)->label<<"] to "<<label<<"..." );
+	OsWin* ow = (OsWin*)win;
+	free ( ow->label );
+	ow->label = _strdup ( label );
+	SetWindowText ( ow->window, ow->label );
 }
 
 void wsi_win_show ( void* win )
 {
 	GS_TRACE2 ( "wsi_win_show..." );
-	SwSysWin* sw = (SwSysWin*)win;
-	if ( !sw->visible ) { AppNumVisWindows++; sw->visible=1; }
-	ShowWindow ( sw->window, 1 );
+	OsWin* ow = (OsWin*)win;
+	if ( !ow->visible ) { AppNumVisWindows++; ow->visible=1; }
+	ShowWindow ( ow->window, 1 );
 }
 
 void wsi_win_hide ( void* win )
 {
 	GS_TRACE2 ( "wsi_win_hide..." );
-	SwSysWin* sw = (SwSysWin*)win;
-	if ( sw->visible ) { AppNumVisWindows--; sw->visible=0; }
-	ShowWindow ( sw->window, 0 );
+	OsWin* ow = (OsWin*)win;
+	if ( ow->visible ) { AppNumVisWindows--; ow->visible=0; }
+	ShowWindow ( ow->window, 0 );
 }
 
 void wsi_win_move ( void* win, int x, int y, int w, int h )
 {
 	GS_TRACE2 ( "wsi_win_move..." );
-	SwSysWin* sw = (SwSysWin*)win;
-	sw->justresized = true;
-	RECT rc; GetClientRect ( sw->window, &rc );
-	RECT rw; GetWindowRect ( sw->window, &rw );
+	OsWin* ow = (OsWin*)win;
+	ow->justresized = true;
+	RECT rc; GetClientRect ( ow->window, &rc );
+	RECT rw; GetWindowRect ( ow->window, &rw );
 	int dw = (rw.right-rw.left)-rc.right;
 	int dh = (rw.bottom-rw.top)-rc.bottom;
 	if ( x<0 ) x = rw.left;
 	if ( y<0 ) y = rw.top;
-	if ( w<0 ) w = sw->event.width; else sw->event.width = w;
-	if ( h<0 ) h = sw->event.height; else sw->event.height = h;
-	MoveWindow ( sw->window, x, y, w+dw, h+dh, TRUE );
+	if ( w<0 ) w = ow->event.width; else ow->event.width = w;
+	if ( h<0 ) h = ow->event.height; else ow->event.height = h;
+	MoveWindow ( ow->window, x, y, w+dw, h+dh, TRUE );
 }
 
 void wsi_win_pos ( void* win, int& x, int& y )
 {
 	GS_TRACE2 ( "wsi_win_pos..." );
-	SwSysWin* sw = (SwSysWin*)win;
+	OsWin* ow = (OsWin*)win;
 	RECT r; 
-	GetWindowRect ( sw->window, &r );
+	GetWindowRect ( ow->window, &r );
 	x=r.left; y=r.top;
 }
 
 void wsi_win_size ( void* win, int& w, int& h )
 {
 	GS_TRACE2 ( "wsi_win_size..." );
-	SwSysWin* sw = (SwSysWin*)win;
+	OsWin* ow = (OsWin*)win;
 	RECT r;
-	GetClientRect ( sw->window, &r );
+	GetClientRect ( ow->window, &r );
 	w=r.right; h=r.bottom;
 }
 
 void wsi_win_redraw ( void* win )
 {
 	GS_TRACE2 ( "wsi_win_redraw..." );
-	SwSysWin* sw = (SwSysWin*)win;
-	if ( sw->redrawcalled ) return; // already invalidated
-	InvalidateRect ( sw->window, NULL, TRUE );
-	sw->redrawcalled = 1;
+	OsWin* ow = (OsWin*)win;
+	if ( ow->redrawcalled ) return; // already invalidated
+	InvalidateRect ( ow->window, NULL, TRUE );
+	ow->redrawcalled = 1;
 	// Recall this function if drawing before emptying events is needed at some point:
-	// UpdateWindow (sw->window); // sends a WM_PAINT msg bypassing the application queue (if update region not empty)
+	// UpdateWindow (ow->window); // sends a WM_PAINT msg bypassing the application queue (if update region not empty)
 }
 
 void wsi_win_setoglcontext ( void* win, bool b )
 {
 	if ( b )
-		wglMakeCurrent ( ((SwSysWin*)win)->gldevcontext, ((SwSysWin*)win)->glrendcontext );
+		wglMakeCurrent ( ((OsWin*)win)->gldevcontext, ((OsWin*)win)->glrendcontext );
 	else
 		wglMakeCurrent ( NULL, NULL );
 }
@@ -314,13 +314,13 @@ void wsi_win_setoglcontext ( void* win, bool b )
 bool wsi_win_visible ( void* win )
 {
 	GS_TRACE2 ( "wsi_win_visible..." );
-	return IsWindowVisible ( ((SwSysWin*)win)->window )==1;
+	return IsWindowVisible ( ((OsWin*)win)->window )==1;
 }
 
 bool wsi_win_minimized ( void* win )
 {
 	GS_TRACE2 ( "wsi_win_iconized..." );
-	return IsIconic ( ((SwSysWin*)win)->window )==1;
+	return IsIconic ( ((OsWin*)win)->window )==1;
 }
 
 int wsi_num_windows ()
@@ -332,7 +332,7 @@ int wsi_num_windows ()
 void wsi_activate_ogl_context ( void* win )
 {
 	GS_TRACE2 ( "wsi_set_ogl_context..." );
-	wglMakeCurrent ( ((SwSysWin*)win)->gldevcontext, ((SwSysWin*)win)->glrendcontext );
+	wglMakeCurrent ( ((OsWin*)win)->gldevcontext, ((OsWin*)win)->glrendcontext );
 }
 
 void* wsi_get_ogl_procedure ( const char *name )
@@ -412,65 +412,65 @@ static void setstate ( GsEvent& e )
 }
 
 // this makes sure the client size is the specified one (and not the window size)
-static void fixsize ( SwSysWin* sw )
+static void fixsize ( OsWin* ow )
 {
 	RECT c;
-	GetClientRect ( sw->window, &c );
-	if ( c.right==sw->event.width && c.bottom==sw->event.height ) return;
+	GetClientRect ( ow->window, &c );
+	if ( c.right==ow->event.width && c.bottom==ow->event.height ) return;
 	GS_TRACE1 ( "FIXING SIZE..." );
 	RECT w;
-	GetWindowRect ( sw->window, &w );
+	GetWindowRect ( ow->window, &w );
 	GS_TRACE1 ( "Client: "<<c.right<<"x"<<c.bottom );
 	GS_TRACE1 ( "Window: "<<(w.bottom-w.top-1)<<"x"<<(w.right-w.left-1) );
 	int dw = (w.right-w.left)-c.right;
 	int dh = (w.bottom-w.top)-c.bottom;
-	int nw = sw->event.width + dw;
-	int nh = sw->event.height + dh;
-	MoveWindow ( sw->window, w.left, w.top, nw, nh, TRUE );
+	int nw = ow->event.width + dw;
+	int nh = ow->event.height + dh;
+	MoveWindow ( ow->window, w.left, w.top, nw, nh, TRUE );
 }
 
 // The following are inline friend functions of WsWindow:
-inline void sysdraw ( WsWindow* win ) { win->draw(win->_glrenderer); }
-inline void sysinit ( WsWindow* win, int w, int h ) { win->init(win->_glcontext,w,h); }
-inline void sysresize ( WsWindow* win, int w, int h ) { win->resize(win->_glcontext,w,h); }
-inline void sysevent ( WsWindow* win, GsEvent& e ) { win->handle(e); }
+inline void osdraw ( WsWindow* win ) { win->draw(win->_glrenderer); }
+inline void osinit ( WsWindow* win, int w, int h ) { win->init(win->_glcontext,w,h); }
+inline void osresize ( WsWindow* win, int w, int h ) { win->resize(win->_glcontext,w,h); }
+inline void osevent ( WsWindow* win, GsEvent& e ) { win->handle(e); }
 
 static LRESULT CALLBACK WndProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
 {
-	if ( uMsg==WM_NCCREATE ) // associate SwSysWin data to the window (WM_NCCREATE happens before WM_CREATE)
+	if ( uMsg==WM_NCCREATE ) // associate OsWin data to the window (WM_NCCREATE happens before WM_CREATE)
 	{	GS_TRACE5 ( "WM_NCCREATE..." );
 		LPCREATESTRUCT create_struct = reinterpret_cast<LPCREATESTRUCT>(lParam);
 		void* lpCreateParam = create_struct->lpCreateParams;
-		SwSysWin* sw = reinterpret_cast<SwSysWin*>(lpCreateParam);
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(sw));
+		OsWin* ow = reinterpret_cast<OsWin*>(lpCreateParam);
+		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(ow));
 		return DefWindowProc ( hWnd, uMsg, wParam, lParam );
 	}
 
-	SwSysWin* sw = reinterpret_cast<SwSysWin*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-	if (!sw) { return DefWindowProc ( hWnd, uMsg, wParam, lParam ); }
+	OsWin* ow = reinterpret_cast<OsWin*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+	if (!ow) { return DefWindowProc ( hWnd, uMsg, wParam, lParam ); }
 
 	if ( uMsg==WM_PAINT ) // process paint first 
-	{	GS_TRACE5 ( "WM_PAINT ["<<sw->label<<"]..." );
+	{	GS_TRACE5 ( "WM_PAINT ["<<ow->label<<"]..." );
 		//static int i=0; gsout<<"WM_PAINT ["<<(i++)<<"]...\n";
 		DefWindowProc ( hWnd, uMsg, wParam, lParam ); // Windows has also to process it
-		wglMakeCurrent ( sw->gldevcontext, sw->glrendcontext ); // needed when working with multiple windows
-		if (sw->needsinit)
+		wglMakeCurrent ( ow->gldevcontext, ow->glrendcontext ); // needed when working with multiple windows
+		if (ow->needsinit)
 		{	gl_load_and_initialize (); // only overall 1st call will actually load ogl
 			int w, h; 
-			wsi_win_size ( sw, w, h ); 
-			sysinit ( sw->uwindow, w, h );
-			sw->needsinit=0;
+			wsi_win_size ( ow, w, h ); 
+			osinit ( ow->uwindow, w, h );
+			ow->needsinit=0;
 		}
-		sysdraw ( sw->uwindow ); // this will call user's draw function
-		SwapBuffers ( sw->gldevcontext );
+		osdraw ( ow->uwindow ); // this will call user's draw function
+		SwapBuffers ( ow->gldevcontext );
 		wglMakeCurrent ( NULL, NULL ); // needed when working with multiple windows
-		sw->redrawcalled=0;
+		ow->redrawcalled=0;
 		return 0;
 	}
 
-	if ( DialogRunning && !sw->isdialog ) return DefWindowProc ( hWnd, uMsg, wParam, lParam );
+	if ( DialogRunning && !ow->isdialog ) return DefWindowProc ( hWnd, uMsg, wParam, lParam );
 
-	GsEvent& e = sw->event;
+	GsEvent& e = ow->event;
 	e.type = GsEvent::None;
 	e.wheelclicks = 0; 
 	e.button = 0;
@@ -540,10 +540,10 @@ static LRESULT CALLBACK WndProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			break;
 
 		case WM_SIZE :
-			GS_TRACE5 ( "WM_SIZE "<<sw->event.width<<"x"<<sw->event.height<<" to "<<LOWORD(lParam)<<"x"<<HIWORD(lParam)<<"..." );
-			if (sw->justresized) 
-			{	sw->justresized=false; fixsize(sw); 
-				RECT r; GetClientRect ( sw->window, &r ); // get client rect in case size was adjusted
+			GS_TRACE5 ( "WM_SIZE "<<ow->event.width<<"x"<<ow->event.height<<" to "<<LOWORD(lParam)<<"x"<<HIWORD(lParam)<<"..." );
+			if (ow->justresized) 
+			{	ow->justresized=false; fixsize(ow); 
+				RECT r; GetClientRect ( ow->window, &r ); // get client rect in case size was adjusted
 				e.width = r.right; // if not adjusted could use LOWORD(lParam)
 				e.height = r.bottom; // if not adjusted could use HIWORD(lParam)
 			}
@@ -553,21 +553,21 @@ static LRESULT CALLBACK WndProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			}
 			if ( e.width==0 || e.height==0 ) return 0; // window is being minimized
 			// Only signal user's window if the window and OpenGL are initialized:
-			if ( !sw->needsinit ) 
-			{	wglMakeCurrent ( sw->gldevcontext, sw->glrendcontext );
-				sysresize ( sw->uwindow, e.width, e.height );
+			if ( !ow->needsinit ) 
+			{	wglMakeCurrent ( ow->gldevcontext, ow->glrendcontext );
+				osresize ( ow->uwindow, e.width, e.height );
 				wglMakeCurrent ( NULL, NULL );
 			}
-			InvalidateRect ( sw->window, NULL, TRUE ); // force paint since a shrink will not do it
+			InvalidateRect ( ow->window, NULL, TRUE ); // force paint since a shrink will not do it
 			return 0;
 
 		case WM_DESTROY :
-			GS_TRACE5 ( "WM_DESTROY ["<<sw->label<<"]..." );
+			GS_TRACE5 ( "WM_DESTROY ["<<ow->label<<"]..." );
 			PostQuitMessage ( 0 );
 			if ( AppWindows.size()>1 ) // Do not delete last OpenGL Context because all shared resources would be lost
-			{	wglDeleteContext ( sw->glrendcontext ); sw->glrendcontext=NULL; }
-			ReleaseDC ( hWnd, sw->gldevcontext ); sw->gldevcontext=NULL;
-			delete sw;
+			{	wglDeleteContext ( ow->glrendcontext ); ow->glrendcontext=NULL; }
+			ReleaseDC ( hWnd, ow->gldevcontext ); ow->gldevcontext=NULL;
+			delete ow;
 			return 0;
 
 		case WM_SYSCOMMAND:
@@ -585,7 +585,7 @@ static LRESULT CALLBACK WndProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			return DefWindowProc ( hWnd, uMsg, wParam, lParam );
 	}
 
-	sysevent ( sw->uwindow, e );
+	osevent ( ow->uwindow, e );
 	return 0;
 }
 
