@@ -30,11 +30,11 @@ class WsWindow
 	GlRenderer* _glrenderer;
 	UiManager* _uim;
 
-   private : // declarations to allow system-dependent calls to protected methods
-	friend void sysdraw ( WsWindow* );
-	friend void sysinit ( WsWindow*, int, int );
-	friend void sysevent ( WsWindow*, GsEvent& );
-	friend void sysresize ( WsWindow*, int, int );
+   private : // declarations to allow the os to interface with the window:
+	friend void osdraw ( WsWindow* );
+	friend void osinit ( WsWindow*, int, int );
+	friend void osevent ( WsWindow*, GsEvent& );
+	friend void osresize ( WsWindow*, int, int );
 	friend UiManager;
 
    public : //----> public definitions
