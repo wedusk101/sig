@@ -26,6 +26,6 @@
 
 ===== State of Examples =====
 
-- uidemo: reviewt alignment in panels including key cmds
+- uidemo: review alignment in panels including key cmds
 - skelviewer: complete motions and skin integration
-- modelviewer: complete
+- modelviewer: complete manipulation and processing of multiple models
