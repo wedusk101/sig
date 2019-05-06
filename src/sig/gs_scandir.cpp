@@ -13,7 +13,7 @@
 # include <sig/gs_string.h>
 # include <sig/gs_scandir.h>
 
-# ifdef GS_WINDOWS
+# ifdef GS_MSWIN
 # define WIN32_LEAN_AND_MEAN 1
 # include <Windows.h>
 # include <sys/timeb.h>
@@ -26,7 +26,7 @@
 
 //================================ scandir ============================================
 
-# ifdef GS_WINDOWS
+# ifdef GS_MSWIN
 
 struct dirent {
 	long		   d_ino; // 0
@@ -94,14 +94,14 @@ static int scandir(const char *dirname,  dirent ***namelist,
 	return nDir;
 }
 
-# endif // GS_WINDOWS
+# endif // GS_MSWIN
 
 //================================ scandir ============================================
 
 static int _scandir ( const char *d, dirent ***list,
 					  int (*sort)(dirent **, dirent **) )
 {
-	#ifdef GS_WINDOWS
+	#ifdef GS_MSWIN
 	int n = scandir(d, list, 0, sort);
 	#else
 	int n = scandir(d, list, 0, (int(*)(const dirent **, const dirent **))sort);

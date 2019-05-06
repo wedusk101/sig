@@ -9,7 +9,7 @@
 
 # include <sig/gs.h>
 
-# if defined (GS_WINDOWS) && !defined (GS_GLFW)
+# if defined (GS_MSWIN) && !defined (GS_GLFW)
 
 # include <sig/gs_array.h>
 # include <sig/gs_buffer.h>
@@ -764,6 +764,6 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	// automatically at the time of opening the first graphical window.
 }
 
-# endif // GS_WINDOWS
+# endif // GS_MSWIN
 
 //================================ End of File =================================================

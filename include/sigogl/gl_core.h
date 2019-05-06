@@ -16,7 +16,7 @@
 # include <sig/gs.h>
 # include <sig/gs_color.h>
 
-# ifdef GS_WINDOWS
+# ifdef GS_MSWIN
 	# include <sigogl/glcorearb.h> // this header file comes from the link above
 	# include <sigogl/glcorearb_functions.h>
 # else

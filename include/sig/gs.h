@@ -51,7 +51,7 @@ namespace sig {}
 # if defined (__CYGWIN__)
   # define GS_CYGWIN  //!< Defined if compiled with cygwin
 # elif defined (_WIN32) || defined (_WIN64)
-  # define GS_WINDOWS	//!< Defined if compiled in windows with VS
+  # define GS_MSWIN	//!< Defined if compiled in windows with VS
   # pragma warning(disable:4996) // for VS secure function warning
   # if defined (_WIN64)
     # define GS_64BITS

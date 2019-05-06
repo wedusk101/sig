@@ -36,13 +36,13 @@
 //# define GS_USE_TRACE8 // glfw callbacks
 # include <sig/gs_trace.h>
 
-# ifdef GS_WINDOWS
+# ifdef GS_MSWIN
 # define WIN32_LEAN_AND_MEAN 1
 # include <windows.h>
 # include <Shlobj.h>
 # include <Commdlg.h>
 # define GLFW_INCLUDE_NONE
-# endif // GS_WINDOWS
+# endif // GS_MSWIN
 
 # include <GLFW/glfw3.h>
 
@@ -116,7 +116,7 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 	GlResources::load_configuration_file (); // only overall 1st call will actually load config file
 
 	OsWin* ow = new OsWin;
-	# ifdef GS_WINDOWS
+	# ifdef GS_MSWIN
 	ow->label = _strdup ( label );
 	# else
 	ow->label = strdup ( label );
@@ -183,7 +183,7 @@ void wsi_win_label ( void* win, const char* label )
 	GS_TRACE2 ( "wsi_win_label ["<<((OsWin*)win)->label<<"] to "<<label<<"..." );
 	OsWin* ow = (OsWin*)win;
 	free ( ow->label );
-	# ifdef GS_WINDOWS
+	# ifdef GS_MSWIN
 	ow->label = _strdup ( label );
 	# else
 	ow->label = strdup ( label );
@@ -521,7 +521,7 @@ int wsi_program_argc ()
 }
 
 // It is also possible to run this glfw interface in windows:
-# ifdef GS_WINDOWS
+# ifdef GS_MSWIN
 extern int main ( int, char** ); // the main function entry point must be provided elsewhere
 int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
@@ -549,7 +549,7 @@ int WINAPI WinMain ( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	// Reminder: SIG config file loading and OpenGL initialization are performed
 	// automatically at the time of opening the first graphical window.
 }
-# endif // GS_WINDOWS
+# endif // GS_MSWIN
 
 # endif // GS_LINUX
 

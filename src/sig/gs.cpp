@@ -14,7 +14,7 @@
 # include <sig/gs.h>
 # include <sig/gs_output.h>
 
-# ifdef GS_WINDOWS
+# ifdef GS_MSWIN
 # define WIN32_LEAN_AND_MEAN 1
 # include <Windows.h>
 # include <sys/timeb.h>
@@ -347,13 +347,13 @@ void gs_string_append ( char*&s, const char* toadd )
 
 //========================== IO ==========================
 
-# ifdef GS_WINDOWS
+# ifdef GS_MSWIN
 static bool ConsoleShown=0;
 # endif
 
 void gs_output_to_disk ( const char* outfile, const char* errfile )
 {
-	# ifdef GS_WINDOWS
+	# ifdef GS_MSWIN
 	ConsoleShown=1;
 	# endif
 
@@ -366,7 +366,7 @@ void gs_output_to_disk ( const char* outfile, const char* errfile )
 
 void gs_show_console ()
 {
-	# ifdef GS_WINDOWS 
+	# ifdef GS_MSWIN 
 	ConsoleShown = 1;
 	if ( !AttachConsole(ATTACH_PARENT_PROCESS) ) AllocConsole();
 	freopen("conin$", "r", stdin);
@@ -377,7 +377,7 @@ void gs_show_console ()
 
 bool gs_console_shown ()
 {
-	# ifdef GS_WINDOWS
+	# ifdef GS_MSWIN
 	return (bool)ConsoleShown;
 	# else
 	return true;
@@ -476,7 +476,7 @@ void gs_exit ( int code )
 
 void gs_sleep ( int milisecs )
 {
-	# ifdef GS_WINDOWS
+	# ifdef GS_MSWIN
 	SleepEx ( (DWORD)(milisecs), TRUE );
 	# else
 	usleep ( ((useconds_t)milisecs)*useconds_t(1000) );
@@ -487,7 +487,7 @@ void gs_sleep ( int milisecs )
 
 double gs_time ()
 {
-	# ifdef GS_WINDOWS
+	# ifdef GS_MSWIN
 	static bool first=true;
 	static double _perf_freq = 0.0;
 	static double _utc_origin = 0.0;
