@@ -40,7 +40,7 @@ void GsModel::Group::copyfrom ( const Group& g )
 
 //=================================== GsModel =================================================
 
-GsModel::GsModel ()
+void GsModel::construct() // private
 {
 	primitive = 0;
 	culling = 1;
@@ -150,12 +150,10 @@ void GsModel::operator = ( const GsModel& m )
 	F = m.F;
 	Fn = m.Fn;
 	Ft = m.Fn;
+	G = m.G;
 
 	name = m.name;
 	filename = m.filename;
-
-	clear_groups();
-   
 
 	culling = m.culling;
 	_geomode = m._geomode;
@@ -340,8 +338,10 @@ void GsModel::add_model ( const GsModel& m )
 void GsModel::set_one_material ( const GsMaterial& m, const char* name, bool comp )
 {
 	clear_groups();
-	M.size(1); M[0] = m;
+	M.size(1);
+	M[0] = m;
 	G.push ( new Group( 0, F.size() ) );
+	if ( name ) G.top()->mtlname = name;
 	if ( comp ) compress ();
 	_mtlmode = PerGroupMtl;
 }
@@ -400,7 +400,7 @@ void GsModel::define_groups ( const GsArray<int>& Fm, const GsStrings* mtlnames 
 		if ( A.empty() ) continue;
 		nM.push()=M[m];
 		G.push ( new Group ( nF.size(), A.size() ) );
-		if (mtlnames) G.top()->mtlname = mtlnames->get(0); // copy operator used
+		if (mtlnames) G.top()->mtlname.set ( mtlnames->get(0) ); // copy operator used
 		GS_TRACE1 ( "Reindexing group "<<(G.size()-1)<<"...");
 		for ( int i=0; i<A.size(); i++ )
 		{	nF.push()=F[A[i]];

@@ -476,6 +476,10 @@ class GsArrayPt : protected GsArray<X*>
 	/* Access to the base class operator of same name. */
 	const X* operator() ( int i ) const { return GsArray<X*>::operator()(i); }
 
+	/* Copy operator assumes X has a copy constructor. */
+	void operator = ( const GsArrayPt<X>& a )
+	{	init(); while ( size()<a.size() ) push ( new X(*a[size()])); }
+
 	/* Swap stored pointers in the two positions. */
 	void swap ( int i, int j ) { X* tmp; GS_SWAP(GsArray<X*>::get(i),GsArray<X*>::get(j)); }
 };
@@ -551,6 +555,10 @@ class GsArrayRef : protected GsArray<X*>
 
 	/* Access to the base class operator of same name. */
 	const X* operator() ( int i ) const { return GsArray<X*>::operator()(i); }
+
+	/* Copy operator assumes X has a copy constructor. */
+	void operator = ( const GsArrayRef<X>& a )
+	{	init(); while ( size()<a.size() ) push ( new X(*a[size()])); }
 
 	/* Performs linear search to find the entry, return position if found, -1 if not. */
 	int lsearch ( X* x ) const

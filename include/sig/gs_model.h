@@ -63,6 +63,7 @@ class GsModel : public GsShareable
 		GsCharPt mtlname;	//!< name of the material used by this group
 		Texture* dmap;		//!< diffuse color map, or null pointer if none
 		Group ( int i=0, int n=0 ) { fi=i; fn=n; dmap=0; }
+		Group ( const Group& g ) { dmap=0; copyfrom(g); }
 	   ~Group () { delete dmap; }
 		void copyfrom ( const Group& g );
 	};
@@ -118,11 +119,15 @@ class GsModel : public GsShareable
    private:
 	gscenum _geomode; // modes have to bet set with mode() so that basic checks can take place
 	gscenum _mtlmode; 
+	void construct();
 
    public :
 
 	/*! Constructor lets all internal arrays as empty and culling is set to true */
-	GsModel ();
+	GsModel () { construct(); }
+
+	/*! Copy constructor */
+	GsModel ( const GsModel& m ) { construct(); *this=m; }
 
 	/*! Virtual Destructor */
 	virtual ~GsModel ();
@@ -163,8 +168,8 @@ class GsModel : public GsShareable
 		materials or materials defined per group. Primitive information, if any, is lost. */
 	void add_model ( const GsModel& m );
 
-	/*! Clear materials and then set M and G so that all triangles use the
-		same material m, with compression (if last param is true) and MtlMode update. */
+	/*! Clear materials and then set M and G so that all triangles use the same material m,
+		with full model compression (if last param is true) and MtlMode updated to PerGroupMtl. */
 	void set_one_material ( const GsMaterial& m, const char* name=0, bool comp=true );
 
 	/*! Clear material names, and the M and Fm array (with compression) */
