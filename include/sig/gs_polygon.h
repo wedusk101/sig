@@ -97,11 +97,12 @@ class GsPolygon : public GsArray<GsPnt2>
 	/*! Calculates the total length along edges */
 	float perimeter () const;
 
-	/*! Compute point along edges where parameter t is in interval [0,perimeter()].
+	/*! Computes a point along edges parameterized by t in interval [0,perimeter()].
 		The search for the 2 vertices to be interpolated is done linearly; however,
-		as most evaluations are monotone, the last vertex index used as a starting
-		point for the search can be passed to subsequent calls, greatly optimizing
-		evaluations in long polygons. */
+		as most evaluations are monotone, the last vertex index and accumulated length
+		from a previous interpolation can be passed to subsequent calls, eliminating
+		the search. To use this optimization, lastv and lastl should be valid pointers
+		to variables initialized with 0 values. */
 	GsPnt2 interpolate_along_edges ( float t, int* lastv=0, float* lastl=0 ) const;
 
 	/*! Resample the polygon by subdividing edges to ensure that each edge has at 

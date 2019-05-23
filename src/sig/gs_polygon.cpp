@@ -16,7 +16,7 @@
 //# define GS_USE_TRACE3 // convex hull
 //# define GS_USE_TRACE4 // interpolate along edges
 # include <sig/gs_trace.h>
- 
+
 //=================================== GsPolygon =================================================
 
 GsPolygon::GsPolygon ( int s, int c, bool o ) : GsArray<GsVec2> ( s, c ), _open(o)
@@ -189,11 +189,11 @@ GsPnt2 GsPolygon::interpolate_along_edges ( float t, int* lastv, float* lastl ) 
 	if ( psize==0 ) return p;
 	if ( psize==1 || t<=0 ) { GS_TRACE4 ( "Early return: "<<cget(0) ); return cget(0); }
 
-	// example of how to use lastv and lastl:
+	// example of how to use/test lastv and lastl:
 	/* GsPolygon p ("0 0   2 0   2 2   0 2");
 	p.open(false);
 	int lv=0; float ll=0;
-	for ( float t=0; t<p.perimeter()+1.0f; t+=0.7f )
+	for ( float t=-1.0f; t<p.perimeter()+1.0f; t+=0.7f )
 	{	p.interpolate_along_edges(t,&lv,&ll);
 	} */
 
