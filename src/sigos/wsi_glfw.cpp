@@ -166,7 +166,9 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 	if ( x<0 ) x = (scw-w)/2;
 	if ( y<0 ) y = (sch-h)/2;
 	glfwSetWindowPos ( ow->gwin, x, y );
-	glfwSetWindowSizeLimits ( ow->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE );
+	# if defined GLFW_VERSION_MAJOR>=3 && GLFW_VERSION_MINOR>=2
+		glfwSetWindowSizeLimits ( ow->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE ); // added in version 3.2.
+	# endif
 
 	AppWindows.push(ow);
 	return (void*) ow;

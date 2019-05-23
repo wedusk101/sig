@@ -5,9 +5,7 @@ REM q:quiet m:minimum n:normal
 set "PARAMS=/m /nr:false /nologo /verbosity:q /t:Build /p:Platform=x86"
 
 rem ========== build cmds ==========
-call "cleanall.bat"
 call :build siglibs.sln Release
-call "clean.bat"
 pause
 goto end
 

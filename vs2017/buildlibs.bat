@@ -1,18 +1,25 @@
 @echo off
 call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 
-REM q:quiet m:minimum n:normal
-set "PARAMS=/m /nr:false /nologo /verbosity:q /t:Build"
+rem Set compilation parameters:
+set "PARAMS=/m /nr:false /nologo /verbosity:q /t:Build" REM q:quiet m:minimum n:normal
 
-rem ========== build cmds ==========
-call "cleanall.bat"
+rem Check Parameters:
+if [%1] == [] goto buildall
+if [%2] == [] goto end
+
+rem ========= build specific config ==========
+call :build siglibs.sln %1 %2
+goto end
+
+rem ========== default build cmds ==========
+:buildall
 call :build siglibs.sln Release x86
 call :build siglibs.sln ReleaseDLL x86
 call :build siglibs.sln Debug x86
 call :build siglibs.sln Release x64
 call :build siglibs.sln ReleaseDLL x64
 call :build siglibs.sln Debug x64
-call "clean.bat"
 pause
 goto end
 
