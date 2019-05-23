@@ -25,8 +25,8 @@ class KnMotion : public GsShareable
  { protected :
 	struct Frame { float keytime; KnPosture* posture; };
 	GsArray<Frame> _frames;   // frame data
-	char* _name;			  // motion name
-	char* _filename;		  // file name
+	GsCharPt _name;			  // motion name
+	GsCharPt _filename;		  // file name
 	int   _last_apply_frame;  // used to speed up playing with monotone time
 	float _freq;			  // sampling rate
 	GsVars* _userdata;		  // to store user data
@@ -39,19 +39,18 @@ class KnMotion : public GsShareable
 	virtual ~KnMotion();
 
 	/*! Set a name to be associated with the motion */
-	void name ( const char* n ) { gs_string_set(_name,n); }
+	void name ( const char* n ) { _name.set(n); }
 
 	/*! Get the name associated with the motion */
-	const char* name () const { return _name? _name:""; }
+	const char* name () const { return _name.pt? _name.pt:""; }
 
-	/*! Set a file name to be associated with the motion.
-		This information is not saved in the motion file and is
-		not used by KnMotion. It is here just as a convenient
-		place to store the information */
-	void filename ( const char* n ) { gs_string_set(_filename,n); }
+	/*! Set a file name to be associated with the motion. The name is not saved
+		in the motion file and is not used by KnMotion. It is here just as a
+		convenient place to store the information */
+	void filename ( const char* n ) { _filename.set(n); }
 
 	/*! Get the file name associated with the motion */
-	const char* filename () const { return _filename? _filename:""; }
+	const char* filename () const { return _filename.pt? _filename.pt:""; }
 
 	/*! Clears frame data, creating an empty motion. Name and filename are not changed. */
 	void init ();
