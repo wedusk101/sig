@@ -14,6 +14,7 @@
 //# define GS_USE_TRACE1 
 //# define GS_USE_TRACE2 // arc
 //# define GS_USE_TRACE3 // convex hull
+//# define GS_USE_TRACE4 // interpolate along edges
 # include <sig/gs_trace.h>
  
 //=================================== GsPolygon =================================================
@@ -158,7 +159,7 @@ void GsPolygon::circle_approximation ( const GsPnt2& center, float radius, int n
 		push ( p+center );
 		nvertices--;
 	}
-	_open = 0;
+	_open = false;
 }
 
 void GsPolygon::square ( const GsPnt2& center, float radius )
@@ -172,48 +173,77 @@ void GsPolygon::square ( const GsPnt2& center, float radius )
 
 float GsPolygon::perimeter () const
 {
-	if ( size()<2 ) return 0;
-	int i;
+	int i, s=size();
+	if ( s<2 ) return 0;
 	float len=0;
-	for ( i=1; i<size(); i++ ) len += dist ( cget(i-1), cget(i) );
-	if ( !_open ) len += dist ( cget(i), cget(0) );
+	for ( i=1; i<s; i++ ) len += dist ( cget(i-1), cget(i) );
+	if ( !_open ) len += dist ( cget(s-1), cget(0) );
 	return len;
 }
 
-GsPnt2 GsPolygon::interpolate_along_edges ( float t ) const
+GsPnt2 GsPolygon::interpolate_along_edges ( float t, int* lastv, float* lastl ) const
 {
-	int ilast, i1, i2=0;
-	float len1=0, len2=0;
+	GS_TRACE4 ( "Interpolating for t="<<t<<" Perim="<<perimeter() );
+	GsVec2 p;
+	int psize=size();
+	if ( psize==0 ) return p;
+	if ( psize==1 || t<=0 ) { GS_TRACE4 ( "Early return: "<<cget(0) ); return cget(0); }
 
-	GsVec2 v;
-	if ( size()==0 ) return v;
-	if ( size()==1 || t<0 ) return cget(0);
-	ilast = _open? size()-1:0;
+	// example of how to use lastv and lastl:
+	/* GsPolygon p ("0 0   2 0   2 2   0 2");
+	p.open(false);
+	int lv=0; float ll=0;
+	for ( float t=0; t<p.perimeter()+1.0f; t+=0.7f )
+	{	p.interpolate_along_edges(t,&lv,&ll);
+	} */
 
-	v = cget(0);
-	if ( t<=0 ) return v;
+	// initialize and test if starting from last interpolated vertex:
+	int vini=0;
+	int vlast=psize-1;
+	float len1, len2=0;
+	bool lvstart=false; // will be true if starting from last interpolated vertex
+	if ( lastv && lastl )
+	{	if ( t<*lastl )
+		{	*lastv=0; *lastl=0; }
+		else
+		{	lvstart=true; vini=*lastv; len2=*lastl; }
+	}
 
-	for ( i1=0; i1<size(); i1++ )
-	{	if ( i1==size()-1 )
-		{	if ( _open ) break;
-			i2 = 0;
-		}
-		else i2 = i1+1;
+	// find edge containing t:
+	int i1, i2;
+	for ( i1=vini; i1<vlast; i1++ )
+	{	i2 = i1+1;
 		len1 = len2;
 		len2 += dist ( cget(i1), cget(i2) );
-		if ( t<len2 ) break;
+		GS_TRACE4 ( "t="<<t <<": "<< i1<<"<->"<<i2 <<" : " << len1 <<"<->"<< len2 );
+		if ( t<=len2 )
+		{	if ( lvstart ) { if ( t<len2 ) { *lastv=i1; *lastl=len1; } else { *lastv=i2; *lastl=len2; } }
+			break;
+		}
 	}
-   
-	if ( _open )
-	{	if ( i1==ilast ) return cget(ilast); }
-	else
-	{	if ( i2==0 ) return cget(0); }
 
+	// check end conditions:
+	if ( i1==vlast )
+	{	if ( _open ) // passed last vertex:
+		{	GS_TRACE4 ( "Result is v"<<vlast<<": "<<cget(vlast) ); return cget(vlast);
+		}
+		else // closed polygon, check last edge:
+		{	i2 = 0;
+			len1 = len2;
+			len2 += dist ( cget(i1), cget(i2) );
+			GS_TRACE4 ( "t="<<t <<": "<< i1<<"<->"<<i2 <<" : " << len1 <<"<->"<< len2 );
+			if ( lvstart ) { *lastv=i1; *lastl=len1; }
+			if ( t>=len2 ) { GS_TRACE4 ( "Result is v0: "<<cget(0) ); return cget(0); }
+		}
+	}
+
+	// interpolate and return:
 	len2 -= len1;
 	t -= len1;
 	t /= len2;
-	v = mix ( cget(i1), cget(i2), t );
-	return v;
+	p = mix ( cget(i1), cget(i2), t );
+	GS_TRACE4 ( "Result: "<<p );
+	return p;
 }
 
 void GsPolygon::resample ( float maxlen )

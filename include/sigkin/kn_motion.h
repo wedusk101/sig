@@ -192,7 +192,7 @@ class KnMotion : public GsShareable
 
 	/*! Evaluates and applies the motion at time t to the connected skeleton or posture.
 		The search for the 2 keyframes to be interpolated (adjacent to t) is done linearly,
-		however as 99% of the cases the evaluation is monotone, the previous frame number
+		however as most of the cases the evaluation is monotone, the previous frame number
 		used serves as a starting point for the search, resulting in maximum efficiency.
 		To optimize evaluations from several controllers sharing a same motion file,
 		parameter lastframe can be used to maintain the starting frame to be considered.

@@ -175,7 +175,7 @@ void KnMotion::apply ( KnMotion* m, KnChannels* c, int& lastf, float t, KnMotion
    
 	t = _interp ( itype, t, kt0, m->keytime(fsize-1) );
 
-	// optimize keytime search for sequenced calls with increasing t
+	// optimize keytime search for monotone calls with increasing t
 	int fini=0;
 	if ( lastframe ) lastf = *lastframe;
 	if ( lastf>0 && lastf<fsize )
