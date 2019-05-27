@@ -143,7 +143,7 @@ class GsString
 	/*! Same as operator() */
 	const char& cget ( int i ) const { return _data[i]; }
 
-	/*! Returns the last char in the string, or 0 if string is empty. */
+	/*! Returns the last char in the string. Array must not be empty. */
 	char lchar () const { return _data.ctop(); }
 
 	/*! Replaces the last char in the string by c if the string is not empty */
@@ -176,7 +176,7 @@ class GsString
 	void ltrim ();
 
 	/*! Take out ending spaces of GsString. No reallocation is used, so that
-	   GsString keeps its capacity(), regardless of its len(). */
+		GsString keeps its capacity(), regardless of its len(). */
 	void rtrim ();
 
 	/*! Puts in xi and xf the indices of the first and last non-white 
