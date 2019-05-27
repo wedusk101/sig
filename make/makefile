@@ -59,20 +59,21 @@ all:
 libs:
 	$(call build_libs)
 
-# Clean options:
-cleanall:
-	$(RM) core *.o *~ *.x
+# Clean all temporary files:
+clean:
+	$(RM) core *.o *~
 	$(RM) -f -r $(OBJDIR)
-	$(RM) ../lib/$(BASELDIRNAME)32/*.a
-	$(RM) ../lib/$(BASELDIRNAME)64/*.a
 
-# Clean options:
+# Clean executables and their temporary files:
 cleanexe:
 	$(RM) core *.o *~ *.x
 	@for dir in $(TARGETEXS); do\
 		$(RM) -f -r $(OBJDIR)/m$(ARCH)$$dir; \
 	done
 
-clean:
-	$(RM) core *.o *~
+# Clean temporary files, executables and libraries:
+cleanall:
+	$(RM) core *.o *~ *.x
 	$(RM) -f -r $(OBJDIR)
+	$(RM) ../lib/$(BASELDIRNAME)32/*.a
+	$(RM) ../lib/$(BASELDIRNAME)64/*.a
