@@ -26,25 +26,38 @@ export TARGETEXEC = target
 # Be quiet when building:
 .SILENT:
 
-# Call makefiles of modules:
-all: 
+# Compilation functions:
+define build_libs
 	@for dir in $(TARGETLIBS); do\
 		echo "=== building $$dir $(ARCH) ===";\
 		mkdir -p $(OBJDIR)/m$(ARCH)$$dir;\
 		cd $(OBJDIR)/m$(ARCH)$$dir;\
 		TARGET=$$dir;\
 		$(MAKE) -f ../../makefile-libs.mk;\
-		cd ../../; \
+		cd ../../;\
 	done
+endef
+
+define build_exes
 	@for dir in $(TARGETEXS); do\
 		echo "=== building $$dir $(ARCH) ===";\
 		mkdir -p $(OBJDIR)/m$(ARCH)$$dir;\
 		cd $(OBJDIR)/m$(ARCH)$$dir;\
 		TARGET=$$dir;\
 		$(MAKE) -f ../../makefile-exs.mk;\
-		cd ../../; \
+		cd ../../;\
 	done
 	echo "=== done ===";
+endef
+
+# Make libs and executables:
+all:
+	$(call build_libs)
+	$(call build_exes)
+
+# Make only libs:
+libs:
+	$(call build_libs)
 
 # Clean options:
 cleanall:
@@ -54,7 +67,7 @@ cleanall:
 	$(RM) ../lib/$(BASELDIRNAME)64/*.a
 
 # Clean options:
-cleanex:
+cleanexe:
 	$(RM) core *.o *~ *.x
 	@for dir in $(TARGETEXS); do\
 		$(RM) -f -r $(OBJDIR)/m$(ARCH)$$dir; \
