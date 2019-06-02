@@ -14,6 +14,7 @@
 
 //# define GS_USE_TRACE1 // init trace
 //# define GS_USE_TRACE2 // use_program()
+//# define GS_USE_TRACE3 // depth test
 # include <sig/gs_trace.h>
 
 //=================================== GlContext ====================================
@@ -35,7 +36,7 @@ GlContext::GlContext ()
 	_linesmoothing = 0;	// default OpenGL value
 	_curprogram = 0;	// zero refers to an invalid program (v4.5 man pages)
 	_cullface = 0;		// default OpenGL value 
-	_depthtest = 0;		// by default depth test will be on by the OpenGL default is false
+	_depthtest = 0;		// default OpenGL value
 	_polygonmode = GL_FILL; // default OpenGL value 
 }
 
@@ -130,9 +131,10 @@ void GlContext::cull_face ( bool b )
 
 void GlContext::depth_test ( bool b )
 {
+	GS_TRACE3 ( "GlContext::depth_test "<<_depthtest<<"->"<<b );
 	CHECK(_depthtest,b);
 	if (b)
-	{	glEnable(GL_DEPTH_TEST); // by default GL_LESS is used, otherwise call for ex.: glDepthFunc ( GL_LEQUAL );
+	{	glEnable(GL_DEPTH_TEST); // default is GL_LESS, possible alternative: glDepthFunc ( GL_LEQUAL );
 	}
 	else
 	{	glDisable(GL_DEPTH_TEST);

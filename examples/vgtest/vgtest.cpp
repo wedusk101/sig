@@ -49,8 +49,6 @@ VgViewer::VgViewer ( int x, int y, int w, int h, const char* l ) : WsViewer(x,y,
 	rootg()->add ( _graph=new SnLines2 );
 	rootg()->add ( _path=new SnLines2 );
 
-	_path->zcoordinate = 0.01f; // to make sure path appears in front of graph
-
 	_polyed->solid_drawing ( false );
 	_polyed->callback ( my_polyed_callback, this );
 

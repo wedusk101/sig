@@ -305,10 +305,14 @@ void UiManager::render ( GlRenderer* r )
 	r->init(&_projmat, &GsMat::id);
 
 	GS_TRACE2("Rendering... ");
+	GlContext* ctx = r->glcontext();
+	bool deptht = ctx->depth_test();
+	bool cullft = ctx->cull_face();
 	r->glcontext()->depth_test(false);
 	r->glcontext()->cull_face(false);
 	r->apply(group());
-	r->glcontext()->depth_test(true);
+	r->glcontext()->depth_test(deptht);
+	r->glcontext()->cull_face(cullft);
 
 	GS_TRACE2("==Done==");
 	_changed = 0;

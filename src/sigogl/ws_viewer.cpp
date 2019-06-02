@@ -698,11 +698,9 @@ void WsViewer::snapshots ( bool onoff, const char* file, int n )
 
 void WsViewer::init ( GlContext* c, int w, int h )
 {
-	GS_TRACE2 ( "init "<<w<<gspc<<h );
+	GS_TRACE2 ( "init "<<w<<gspc<<h ); // init is called at show() time
 	WsWindow::init(c,w,h);
-	// If the viewer is in planar mode it will set the depth test to off. ?
-	//c->depth_test ( _data->viewmode==VCmdPlanar? false:true );
-	c->depth_test ( true );
+	c->depth_test ( _data->viewmode==ModePlanar? false:true );
 	c->cull_face ( true );
 	c->transparency ( true );
 	c->line_smoothing ( true );
