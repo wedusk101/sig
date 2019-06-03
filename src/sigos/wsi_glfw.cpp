@@ -159,16 +159,18 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 		//ui_set_dialog_parent_window ( ow->swin );
 		//notinit=false;
 	}
-	_init_callbacks ( ow->gwin );
+	//old call: _init_callbacks ( ow->gwin );
 
 	int scw, sch;
 	wsi_screen_resolution ( scw, sch );
 	if ( x<0 ) x = (scw-w)/2;
 	if ( y<0 ) y = (sch-h)/2;
-	glfwSetWindowPos ( ow->gwin, x, y );
 	# if defined GLFW_VERSION_MAJOR>=3 && GLFW_VERSION_MINOR>=2
 		glfwSetWindowSizeLimits ( ow->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE ); // added in version 3.2.
 	# endif
+	glfwSetWindowPos ( ow->gwin, x, y );
+	glfwSetWindowSize ( ow->gwin, w, h );
+	_init_callbacks ( ow->gwin );
 
 	AppWindows.push(ow);
 	return (void*) ow;
