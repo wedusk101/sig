@@ -21,9 +21,6 @@
     <None Include="..\shaders\3dtextured.vert">
       <Filter>shaders</Filter>
     </None>
-    <None Include="..\shaders\3dtextured.frag">
-      <Filter>shaders</Filter>
-    </None>
     <None Include="..\shaders\3dphong.vert">
       <Filter>shaders</Filter>
     </None>
@@ -80,6 +77,9 @@
     </None>
     <None Include="..\src\sigogl\gl_loader_functions.inc">
       <Filter>open gl</Filter>
+    </None>
+    <None Include="..\shaders\3dtextured.frag">
+      <Filter>shaders</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

@@ -66,6 +66,11 @@ void GlContext::clear ()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void GlContext::num_lights ( int n )
+{
+	_numl = GS_BOUND ( n, 1, GlContext::MaxLights );
+}
+
 void GlContext::clear_color ( const GsColor& c )
 {
 	GS_TRACE1 ( "GlContext::clear_color" );

@@ -6,15 +6,18 @@ in vec2 Texc;
 
 out vec4 fColor;
 
-uniform vec3     lPos;	   // light position
-uniform vec3[3]  lInt;	   // light intensities: ambient, diffuse, and specular 
+const int ML=4; // max number of lights
+
+uniform vec3[ML] lPos;	   // light position
+uniform mat3[ML] lInt;	   // light intensities: ambient, diffuse, and specular
+uniform int		 lNum;	  // Number of active lights
 uniform vec3[4]  mColors;  // material colors  : ambient, diffuse, specular, and emission 
 uniform float[2] mParams;  // material params  : shininess, transparency
 
 uniform int Mode;        // 0:textured, 1:not textured
 uniform sampler2D TexId; // diffuse color texture
 
-vec4 shade ( vec3 p, vec3 n, vec3 lp, vec3[3] li, vec3 ka, vec3 kd, vec3 ks, vec3 emi, float sh, float alpha );
+vec4 shade ( vec3 p, vec3 n, vec3 lp, vec3 la, vec3 ld, vec3 ls, vec3 ka, vec3 kd, vec3 ks, vec3 emi, float sh, float alpha );
 
 void main()
 {
@@ -33,5 +36,12 @@ void main()
 		alpha = mParams[1];
 	}
 
-	fColor = shade ( Pos, Norm, lPos, lInt, mColors[0], kd, mColors[2], mColors[3], mParams[0], alpha );
+	// fColor = shade ( Pos, Norm, lPos, lInt[0], lInt[1], lInt[2], mColors[0], kd, mColors[2], mColors[3], mParams[0], alpha );
+
+	fColor = vec4(0,0,0,0);
+	int i=0;
+	if ( i<lNum ) { fColor += shade ( Pos, Norm, lPos[i], lInt[i][0], lInt[i][1], lInt[i][2], mColors[0], kd, mColors[2], mColors[3], mParams[0], alpha ); i++; }
+	if ( i<lNum ) { fColor += shade ( Pos, Norm, lPos[i], lInt[i][0], lInt[i][1], lInt[i][2], mColors[0], kd, mColors[2], mColors[3], mParams[0], alpha ); i++; }
+	if ( i<lNum ) { fColor += shade ( Pos, Norm, lPos[i], lInt[i][0], lInt[i][1], lInt[i][2], mColors[0], kd, mColors[2], mColors[3], mParams[0], alpha ); i++; }
+	if ( i<lNum ) { fColor += shade ( Pos, Norm, lPos[i], lInt[i][0], lInt[i][1], lInt[i][2], mColors[0], kd, mColors[2], mColors[3], mParams[0], alpha ); i++; }
 }

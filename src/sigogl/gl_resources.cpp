@@ -607,42 +607,47 @@ void GlResources::declare_default_shaders ()
 	r.declare_uniform ( p, 1, "vView" );
 	r.declare_uniform ( p, 2, "lPos" );
 	r.declare_uniform ( p, 3, "lInt" );
-	r.declare_uniform ( p, 4, "mColors" );
-	r.declare_uniform ( p, 5, "mParams" );
+	r.declare_uniform ( p, 4, "lNum" );
+	r.declare_uniform ( p, 5, "mColors" );
+	r.declare_uniform ( p, 6, "mParams" );
 
 	p = r.declare_program ( "3dgouraud", 3, vs3dgouraud, vshadefunc, fsgouraud );
 	r.declare_uniform ( p, 0, "vProj" );
 	r.declare_uniform ( p, 1, "vView" );
 	r.declare_uniform ( p, 2, "lPos" );
 	r.declare_uniform ( p, 3, "lInt" );
-	r.declare_uniform ( p, 4, "mColors" );
-	r.declare_uniform ( p, 5, "mParams" );
+	r.declare_uniform ( p, 4, "lNum" );
+	r.declare_uniform ( p, 5, "mColors" );
+	r.declare_uniform ( p, 6, "mParams" );
 
 	p = r.declare_program ( "3dtextured", 3, vs3dtextured, fs3dtextured, fshadefunc );
 	r.declare_uniform ( p, 0, "vProj" );
 	r.declare_uniform ( p, 1, "vView" );
 	r.declare_uniform ( p, 2, "lPos" );
 	r.declare_uniform ( p, 3, "lInt" );
-	r.declare_uniform ( p, 4, "mColors" );
-	r.declare_uniform ( p, 5, "mParams" );
-	r.declare_uniform ( p, 6, "Mode" );
-	r.declare_uniform ( p, 7, "TexId" );
+	r.declare_uniform ( p, 4, "lNum" );
+	r.declare_uniform ( p, 5, "mColors" );
+	r.declare_uniform ( p, 6, "mParams" );
+	r.declare_uniform ( p, 7, "Mode" ); // LighDev: if uniforms are added before, these ids need update in glr_model.cpp
+	r.declare_uniform ( p, 8, "TexId" );
 
 	p = r.declare_program ( "3dphong", 3, vs3dphong, fsphong, fshadefunc );
 	r.declare_uniform ( p, 0, "vProj" );
 	r.declare_uniform ( p, 1, "vView" );
 	r.declare_uniform ( p, 2, "lPos" );
 	r.declare_uniform ( p, 3, "lInt" );
-	r.declare_uniform ( p, 4, "mColors" );
-	r.declare_uniform ( p, 5, "mParams" );
+	r.declare_uniform ( p, 4, "lNum" );
+	r.declare_uniform ( p, 5, "mColors" );
+	r.declare_uniform ( p, 6, "mParams" );
 
 	p = r.declare_program ( "3dphongmc", 3, vs3dphongmc, fsphongmc, fshadefunc );
 	r.declare_uniform ( p, 0, "vProj" );
 	r.declare_uniform ( p, 1, "vView" );
 	r.declare_uniform ( p, 2, "lPos" );
 	r.declare_uniform ( p, 3, "lInt" );
-	r.declare_uniform ( p, 4, "mColors" );
-	r.declare_uniform ( p, 5, "mParams" );
+	r.declare_uniform ( p, 4, "lNum" );
+	r.declare_uniform ( p, 5, "mColors" );
+	r.declare_uniform ( p, 6, "mParams" );
 
 	p = r.declare_program ( "dftext", 2,
 		r.declare_shader ( GL_VERTEX_SHADER,   "vsdftext", "dftext.vert", pds_dftext_vert ),

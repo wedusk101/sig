@@ -1,4 +1,4 @@
-﻿# (c) 2016-2017 Marcelo Kallmann
+﻿# (c) 2016-2019 Marcelo Kallmann
 # Convert shader files to static string definitions
 
 import os
@@ -6,7 +6,7 @@ import os
 out = open('gl_predef_shaders.inc', 'w')
 
 header = ( "//\n"
-           "// Default sig shaders - (c) Marcelo Kallmann 2016-2018\n"
+           "// Default sig shaders - (c) Marcelo Kallmann 2016-2019\n"
            "//\n\n" )
 
 out.writelines ( header )

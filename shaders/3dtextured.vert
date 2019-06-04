@@ -7,7 +7,6 @@ layout (location = 2) in vec2 vTexc;
 uniform mat4 vProj;
 uniform mat4 vView;
 
-//out vec4 Color;
 out vec3 Norm;
 out vec3 Pos;
 out vec2 Texc;

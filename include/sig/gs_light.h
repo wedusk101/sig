@@ -41,6 +41,12 @@ class GsLight
 	float* encode_intensities ( float vec[9] ) const;
 };
 
+/*! Encodes the positions of n lights in the given buffer, which has to have enought size */
+void encode_positions ( const GsLight* l, int n, float* buffer );
+
+/*! Encodes the positions of n lights in the given buffer, which has to have enought size */
+void encode_intensities ( const GsLight* l, int n, float* buffer );
+
 //================================ End of File ======================================
 
 # endif // GS_LIGHT_H

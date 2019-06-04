@@ -79,7 +79,8 @@ class WsViewerData
 	gscbool statistics;		// shows statistics or not
 
 	gscbool lightneedsupdate;
-	GsLight light;
+	GsLight light[GlContext::MaxLights];
+	int numl;
 
 	GsTimer* fcounter;		// To count frames and to measure frame rate
 	void needfcounter() { if ( !fcounter ) fcounter=new GsTimer; }
@@ -231,7 +232,8 @@ WsViewer::WsViewer ( int x, int y, int w, int h, const char *label )
 	_data->fcounter = 0; // frame counter not in use
 	_data->image_number = 0; // not saving images
 
-	_data->light.init();
+	_data->numl = 1; // default is 1 light
+	_data->light[0].init();
 	_data->lightneedsupdate = true;
 
 	_data->bcolor = UiStyle::Current().color.background;
@@ -637,15 +639,25 @@ void WsViewer::camera ( const GsCamera& cam )
 	_data->camera = cam;
 }
 
-GsLight& WsViewer::light ()
+int WsViewer::num_lights () const
 {
-	_data->lightneedsupdate = true;
-	return _data->light;
+	return _data->numl;
 }
 
-void WsViewer::light ( const GsLight& l )
+void WsViewer::num_lights ( int n )
 {
-	_data->light = l;
+	_data->numl = GS_BOUND ( n, 1, GlContext::MaxLights );
+}
+
+GsLight& WsViewer::light ( int i )
+{
+	_data->lightneedsupdate = true;
+	return _data->light[i];
+}
+
+void WsViewer::light ( const GsLight& l, int i )
+{
+	_data->light[i] = l;
 	_data->lightneedsupdate = true;
 }
 
@@ -732,9 +744,12 @@ void WsViewer::draw ( GlRenderer* wr )
 	//----- Set Light ---------------------------------------------------
 	if ( _data->lightneedsupdate )
 	{	_data->lightneedsupdate = false;
-		GsLight& l = _data->light;
-		glc->light = l;
-		//CamDev: define light position and add l.constant_attenuation = 1.0f/dist(eye,center) (was using: _data->camera.scale)
+		glc->num_lights ( _data->numl );
+		for ( int i=0; i<GlContext::MaxLights; i++ )
+			glc->light[i] = _data->light[i];
+		// LightDev: perhaps there is no need to duplicate light information in viewer and glc;
+		//			 light position (0,0,0) seems to be at camera.eye, could have modes so it can be in world coords
+		// CamDev: define light position and add l.constant_attenuation = 1.0f/dist(eye,center) (was using: _data->camera.scale)
 	}
 
 	//----- Render user scene -------------------------------------------

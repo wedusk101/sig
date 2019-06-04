@@ -206,11 +206,18 @@ class WsViewer : public WsWindow
 	/*! Sets a new camera to be used and resets any current spin animation */
 	void camera ( const GsCamera &cam );
 
-	/*! Returns a reference to the internal used light and mark light as changed. */
-	GsLight& light ();
+	/*! Returns the number of lights in use, the default value is 1 */
+	int num_lights () const;
 
-	/*! Sets new light parameters and mark the light as changed. */
-	void light ( const GsLight& l );
+	/*! Sets number of lights to use. The given value will be corrected to be in range
+		1 <= n <= GlContext::MaxLights before being used. */
+	void num_lights ( int n );
+
+	/*! Returns a reference to light index i, 0<=i<max lights, and mark light as changed. */
+	GsLight& light ( int i=0 );
+
+	/*! Sets new light parameters for light index i and mark the light as changed. */
+	void light ( const GsLight& l, int i=0 );
 
 	/*! Exports all GsModels in the scene to files, and in global coordinates */
 	void export_all_models ( const char* prefix=0, const char* dir=0 );

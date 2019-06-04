@@ -42,9 +42,12 @@ class GlContext : public GsShareable
 	bool _depthtest;
 	GLuint _curprogram;
 	GLenum _polygonmode;
+	// Lights:
+	int _numl;
 
    public :
-	GsLight light; // LightDev: add multiple lights
+	static const int MaxLights=4; // max number of lights supported
+	GsLight light[MaxLights]; // LightDev: multiple lights stored in context
 
    public :
 	GlContext ();
@@ -52,7 +55,8 @@ class GlContext : public GsShareable
 	/*! Sets initial setup with transparency, line smoothing, point size 2, 
 		and clear color light gray. Each respective call to OpenGL will only 
 		be made if the GlContext flags indicate the call to be neeed. 
-		Projection and model-view matrices are pointed to identity. */
+		Projection and model-view matrices are pointed to identity.
+		Lights are not changed. */
 	void init ();
 
 	/*! Sets the OpenGL viewport, even if this is a redundant call. */
@@ -62,6 +66,11 @@ class GlContext : public GsShareable
 
 	/*! Clears color and depth buffers. */
 	void clear ();
+
+	/*! Sets number of lights to use. The given value will be corrected to be in range
+		1 <= n <= GlContext::MaxLights before being used. */
+	void num_lights ( int n );
+	int num_lights () const { return _numl; }
 
 	/*! Set pointers for the transformations to be accessed by GlContext. 
 		It is the user resposibility to provide pointers to valid matrices.

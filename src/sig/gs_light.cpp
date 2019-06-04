@@ -7,6 +7,8 @@
 
 # include <sig/gs_light.h>
 
+# include <string.h>
+
 //=============================== GsLight ================================
 
 GsLight::GsLight ()
@@ -28,6 +30,22 @@ float* GsLight::encode_intensities ( float vec[9] ) const
 	diffuse.get3 (vec+3);
 	specular.get3 (vec+6);
 	return vec;
+}
+
+void encode_positions ( const GsLight* l, int n, float* buffer )
+{
+	for ( int i=0; i<n; i++ )
+	{	memcpy ( buffer, l[i].position.e, sizeof(float)*3 );
+		buffer+=sizeof(float)*3;
+	}
+}
+
+void encode_intensities ( const GsLight* l, int n, float* buffer )
+{
+	for ( int i=0; i<n; i++ )
+	{	l[i].encode_intensities ( buffer );
+		buffer+=sizeof(float)*9;
+	}
 }
 
 // Possible extensions to be added could follow earlier OpenGL specifications:

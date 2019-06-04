@@ -215,20 +215,31 @@ void GlrModel::render (  SnShape* s, GlContext* c )
 	c->use_program ( p->id );
 	glBindVertexArray ( _glo.va[0] );
 
-	float buf[12];
+	float buf[36]; // LightDev: 36 is needed to encode 4 lights, otherwise buf[12] is enought
 	glUniformMatrix4fv ( p->uniloc[0], 1, GLTRANSPMAT, c->projection()->e );
 	glUniformMatrix4fv ( p->uniloc[1], 1, GLTRANSPMAT, c->modelview()->e );
 
-	# define DEFINE_LIGHT(L)		glUniform3fv ( p->uniloc[2], 1, L.position.e ); \
-									glUniform3fv ( p->uniloc[3], 3, L.encode_intensities(buf) )
-	# define DEFINE_MATERIAL(M)		glUniform3fv ( p->uniloc[4], 4, M.encode_colors(buf) ); \
-									glUniform1fv ( p->uniloc[5], 2, M.encode_params(buf) )
+	// LightDev: here is where light information is passed to the shaders:
+	// Sending 4x full set of parameters could be optimized by better matching GsLight with the uniforms
+	int NumL=c->num_lights();
+	GsLight* lights = c->light;
+	
+	# define DEFINE_LIGHT0(L)		glUniform3fv ( p->uniloc[2], 1, L[0].position.e ); \
+									glUniformMatrix3fv ( p->uniloc[3], 1, GL_FALSE, L[0].encode_intensities(buf) )
+	# define DEFINE_NLIGHTS(L)		encode_positions(L,NumL,buf); glUniform3fv ( p->uniloc[2], NumL, buf ); \
+									encode_intensities(L,NumL,buf); glUniformMatrix3fv ( p->uniloc[3], 1, GL_FALSE, buf )
+	# define DEFINE_LIGHT(L)		if ( NumL==1 ) { DEFINE_LIGHT0(L); } else { DEFINE_NLIGHTS(L); } \
+									glUniform1i ( p->uniloc[4], NumL );
+
+	# define DEFINE_MATERIAL(M)		glUniform3fv ( p->uniloc[5], 4, M.encode_colors(buf) ); \
+									glUniform1fv ( p->uniloc[6], 2, M.encode_params(buf) )
+
 	# define DRAW_GROUP_ELEMENTS(G) glDrawElements ( GL_TRIANGLES, G.fn*3, GL_UNSIGNED_INT, &m.F[G.fi].a )
 	# define DRAW_GROUP_ARRAYS(G)	glDrawArrays ( GL_TRIANGLES, G.fi*3, G.fn*3 )
 	# define DRAW_GROUP(G,npv) 		if (npv) DRAW_GROUP_ELEMENTS(G); else DRAW_GROUP_ARRAYS(G)
 
 	if ( mtlmode==GsModel::NoMtl )
-	{	DEFINE_LIGHT ( c->light );
+	{	DEFINE_LIGHT ( lights );
 		DEFINE_MATERIAL ( s->material() );
 		if ( _normalspervertex )
 		{	GS_TRACE4 ( "Drawing per-vertex smooth, default material" );
@@ -240,12 +251,12 @@ void GlrModel::render (  SnShape* s, GlContext* c )
 		}
 	}
 	else if ( mtlmode==GsModel::PerGroupMtl )
-	{	DEFINE_LIGHT ( c->light );
+	{	DEFINE_LIGHT ( lights );
 		const int gsize = m.G.size();
 		if ( textured ) // per-group with textures
 		{	GS_TRACE4 ( "Drawing "<<(_normalspervertex?"pre-vertex":"per-face")<<" shading, grouped materials with textures" );
-			glUniform1i ( p->uniloc[6], 0 ); // Mode 0 is with texture
-			glUniform1i ( p->uniloc[7], 0 ); // Tell to use sampler for texture unit 0
+			glUniform1i ( p->uniloc[7], 0 ); // Mode 0 is with texture
+			glUniform1i ( p->uniloc[8], 0 ); // Tell to use sampler for texture unit 0
 			for ( int g=0; g<gsize; g++ )
 			{	GsModel::Group& G=*m.G[g];
 				GsMaterial& M=m.M[g];
@@ -289,7 +300,7 @@ void GlrModel::render (  SnShape* s, GlContext* c )
 		}
 	}
 	else if ( m.mtlmode()==GsModel::PerVertexMtl || m.mtlmode()==GsModel::PerFaceMtl )
-	{	DEFINE_LIGHT ( c->light );
+	{	DEFINE_LIGHT ( lights );
 		DEFINE_MATERIAL ( m.M[0] );
 		if ( _normalspervertex )
 		{	GS_TRACE4 ( "Drawing per-vertex materials, per-vertex normals" );
