@@ -32,16 +32,17 @@ class UiSlider : public UiElement
 
    public :
 	UiSlider ( const char* l, int ev, int x=0, int y=0, int mw=120, int mh=0 );
-	float value () const;
-	float tvalue () const { return _t; }
+	float value () const; // returns value between min, max
+	float tvalue () const { return _t; } // return values between 0,1
 	void value ( float v ); // between min, max
 	void tvalue ( float t ); // between 0,1
 	void range ( float min, float max );
 	float range_min () const { return _min; }
 	float range_max () const { return _max; }
-	void format ( int n, int d ) { _fmt[1]='0'+n; _fmt[3]='0'+d; } // if n==0 number does not show
-	void increment ( float inc ) { _inc=inc; }
+	void format ( int n, int d ) { _fmt[1]='0'+n; _fmt[3]='0'+d; } // n digits, d decimals; if n==0 number does not show
+	void increment ( float inc ) { _inc=inc/(_max-_min); }
 	void configure ( float min, float max, float inc, int n, int d ) { range(min,max); increment(inc); format(n,d); }
+	void configure ( int min, int max, int inc, int n ) { range((float)min,(float)max); increment((float)inc); format(n,0); }
 	void all_events ( bool b ) { _allev=b; }
 	void set_style ( const UiStyle& s );
 

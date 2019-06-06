@@ -129,12 +129,12 @@ int UiSlider::handle ( const GsEvent& e, UiManager* uim )
 	else if ( e.type==GsEvent::Keyboard )
 	{	float t = _t;
 		switch ( e.key )
-		{ case GsEvent::KeyLeft:  _t-=_inc; if(_t<0)_t=0; break;
-		  case GsEvent::KeyRight: _t+=_inc; if(_t>1)_t=1; break;
-		  case GsEvent::KeyPgUp:  _t-=10*_inc; if(_t<0)_t=0; break;
-		  case GsEvent::KeyPgDn:  _t+=10*_inc; if(_t>1)_t=1; break;
-		  case GsEvent::KeyHome:  _t=0; break;
-		  case GsEvent::KeyEnd: _t=1; break;
+		{	case GsEvent::KeyLeft:  _t-=_inc; if(_t<0)_t=0; break;
+			case GsEvent::KeyRight: _t+=_inc; if(_t>1)_t=1; break;
+			case GsEvent::KeyPgUp:  _t-=10*_inc; if(_t<0)_t=0; break;
+			case GsEvent::KeyPgDn:  _t+=10*_inc; if(_t>1)_t=1; break;
+			case GsEvent::KeyHome:  _t=0; break;
+			case GsEvent::KeyEnd:   _t=1; break;
 		}
 		if ( t!=_t ) { uim->uievent(_event,this,false); changed(NeedsRedraw); }
 	}
@@ -142,7 +142,8 @@ int UiSlider::handle ( const GsEvent& e, UiManager* uim )
 	{	uim->uievent(_event,this,false); uim->focus(0);
 	}
 	else if ( e.button3 )
-	{	return 0; } // Let parent panel consider right-click panel movement
+	{	return 0; // Let parent panel consider right-click panel movement
+	}
 
 	return 1;
 }
@@ -172,7 +173,7 @@ void UiSlider::draw ( UiPanel* panel )
 
 	// draw number:
 	if ( _nw>0 )
-	{	char s[16]; 
+	{	char s[16];
 		snprintf(s,16,_fmt,value()); 
 		UiLabel tl;
 		tl.pos ( _label.xp()+_xspc, _label.y() );

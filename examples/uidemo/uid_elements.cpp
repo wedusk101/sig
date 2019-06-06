@@ -60,9 +60,10 @@ void MyWindow::test_elements ()
 	p->add ( in=new UiInput ( "Acceleration:", CmdAny ) ); in->value("2");
 
 	p->add ( new UiElement ("Color:") ); p->top()->separate();
-	p->add ( new UiSlider ( "R:", CmdAny ) );
-	p->add ( new UiSlider ( "G:", CmdAny ) );
-	p->add ( new UiSlider ( "B:", CmdAny ) );
+	UiSlider* sl;
+	p->add ( sl=new UiSlider ( "R:", CmdAny ) ); sl->configure(0,255,1,3);
+	p->add ( sl=new UiSlider ( "G:", CmdAny ) ); sl->configure(0,255,1,3);
+	p->add ( sl=new UiSlider ( "B:", CmdAny ) ); sl->configure(0,255,1,3);
 
    //==================================================================
    // Panel with sliders:
@@ -73,9 +74,9 @@ void MyWindow::test_elements ()
 	p->add ( new UiSlider ( "X:", CmdAny ) ); p->top()->separate();
 	p->add ( new UiSlider ( "Y:", CmdAny ) );
 	p->add ( new UiSlider ( "Z:", CmdAny ) );
-	p->add ( new UiSlider ( "Rx:", CmdAny ) ); p->top()->separate();
-	p->add ( new UiSlider ( "Ry:", CmdAny ) );
-	p->add ( new UiSlider ( "Rz:", CmdAny ) );
+	p->add ( sl=new UiSlider ( "Rx:", CmdAny ) ); sl->configure(-3.1415f,3.1415f,0.1f,3,2); p->top()->separate();
+	p->add ( sl=new UiSlider ( "Ry:", CmdAny ) ); sl->configure(-3.1415f,3.1415f,0.1f,3,2);
+	p->add ( sl=new UiSlider ( "Rz:", CmdAny ) ); sl->configure(-3.1415f,3.1415f,0.1f,3,2);
 
 	// to restore to the original style:
 	UiStyle::Current().restore_style();
