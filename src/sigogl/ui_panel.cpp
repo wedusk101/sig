@@ -503,55 +503,59 @@ int UiPanel::handle ( const GsEvent& e, UiManager* uim )
 		}
 	}
 
-	// 2. If event not inside panel:
-	bool contains = _rect.contains(e.mousex, e.mousey);
-	if ( !contains && !_gotprevev )
-	{	GS_TRACE2("Does not contain.");
-		if ( _inxclose ) { _inxclose=0; changed(NeedsRedraw); }
-		return 0;
-	}
-
-	const bool sub = submenu();
-
-	// If enabled handle panel close button:
-	if ( _xclose>0 && contains && (e.type==GsEvent::Push||e.type==GsEvent::Move)&&e.mousey<=_rect.y+_label.y() ) // in top bar
-	{	gscbool inbut=false;
-		if ( vertical() ) { if ( e.mousex>_rect.x+_xclose ) inbut=true; } // in close button (right side version)
-			else { if ( e.mousex<_rect.x+_xclose ) inbut=true; } // in close button (left side version)
-		if ( inbut!=_inxclose ) { _inxclose=inbut; changed(NeedsRedraw); }
-		if ( _inxclose && e.button==1 ) // close panel
-		{	_inxclose=0; hide(); changed(NeedsRedraw);
-			uim->uievent(UiManager::MCmdPannelWillClose,this);
-			if ( submenu() )
-			{	if ( uim->is_open_submenu(this) ) uim->close_submenus(); // submenu has close button, just close it
-				else // it is a detached submenu
-				{	uim->remove(uim->search(this));
-					_label.set(0); _xclose=-1; build();
-				}
-			}
-			else // normal panel
-			{	uim->remove(uim->search(this)); } // after this call the panel may no longer exist
-			return 2;
+	// Process mouse events (could do this only for dialogs)
+	if ( e.type!=GsEvent::Keyboard ) //|| (_uimparent&&_uimparent->dialog()==this) )
+	{	
+		// 2. If event not inside panel:
+		bool contains = _rect.contains(e.mousex, e.mousey);
+		if ( !contains && !_gotprevev )
+		{	GS_TRACE2("Does not contain.");
+			if ( _inxclose ) { _inxclose=0; changed(NeedsRedraw); }
+			return 0;
 		}
-	}
-	else if (_inxclose) // xclose is >0 but not in top bar: make sure to turn red color off
-	{ _inxclose=0; changed(NeedsRedraw); }
 
-	// 3. Check if panel is to be moved:
-	if ( _moving==0 && e.type==GsEvent::Push && _dock!=TopBar && _dock!=BottomBar &&
-		( !_owner|| (sub&&!uim->rbutton_panel_active() ) ) &&
-		( e.button==3 || _label.rect(_rect.x,_rect.y).contains(e.mousex,e.mousey)) )
-	{	uim->focus(this); // enter moving state of panel
-		_moving = 1;
-		//if ( sub && _parent->_parent && _parent->_parent->panel() ) _parent->_parent->close();
-		//UiDev: revise
-		return 1;
+		const bool sub = submenu();
+
+		// If enabled handle panel close button:
+		if ( _xclose>0 && contains && (e.type==GsEvent::Push||e.type==GsEvent::Move)&&e.mousey<=_rect.y+_label.y() ) // in top bar
+		{	gscbool inbut=false;
+			if ( vertical() ) { if ( e.mousex>_rect.x+_xclose ) inbut=true; } // in close button (right side version)
+						else  { if ( e.mousex<_rect.x+_xclose ) inbut=true; } // in close button (left side version)
+			if ( inbut!=_inxclose ) { _inxclose=inbut; changed(NeedsRedraw); }
+			if ( _inxclose && e.button==1 ) // close panel
+			{	_inxclose=0; hide(); changed(NeedsRedraw);
+				uim->uievent(UiManager::MCmdPannelWillClose,this);
+				if ( submenu() )
+				{	if ( uim->is_open_submenu(this) ) uim->close_submenus(); // submenu has close button, just close it
+					else // it is a detached submenu
+					{	uim->remove(uim->search(this));
+						_label.set(0); _xclose=-1; build();
+					}
+				}
+				else // normal panel
+				{	uim->remove(uim->search(this)); } // after this call the panel may no longer exist
+				return 2;
+			}
+		}
+		else if (_inxclose) // xclose is >0 but not in top bar: make sure to turn red color off
+		{	_inxclose=0; changed(NeedsRedraw); }
+
+		// 3. Check if panel is to be moved:
+		if ( _moving==0 && e.type==GsEvent::Push && _dock!=TopBar && _dock!=BottomBar &&
+			( !_owner|| (sub&&!uim->rbutton_panel_active() ) ) &&
+			( e.button==3 || _label.rect(_rect.x,_rect.y).contains(e.mousex,e.mousey)) )
+		{	uim->focus(this); // enter moving state of panel
+			_moving = 1;
+			//if ( sub && _parent->_parent && _parent->_parent->panel() ) _parent->_parent->close();
+			//UiDev: revise
+			return 1;
+		}
 	}
 
 	// 4. Let contained items handle the event:
 	// -it is assumed that the rect of adjacent items do not overllap, otherwise double selection may occur
 	// -we always send the event to all elements so that highlighted areas can be properly updated
-	GS_TRACE2("Contains.");
+	GS_TRACE2("Contains event or this is a keyboard event.");
 	int eh, h=0;
 	for ( int i=elements()-1; i>=0; i-- )
 	{	if ( get(i)->active() && (eh=get(i)->handle(e,uim)) ) { h=eh; if(h==2)break; }

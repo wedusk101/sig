@@ -50,7 +50,7 @@ static inline void centerdialog ( WsWindow* w, UiPanel* p )
 		 { p->move ( (w->w()-p->w())/2, (w->h()-p->h())/2 ); }
 	}
 	else
-	{ p->move ( (w->w()-p->w())/2, (w->h()-p->h())/2 ); // centralize
+	{	p->move ( (w->w()-p->w())/2, (w->h()-p->h())/2 ); // centralize
 	}
 }
 
@@ -119,9 +119,13 @@ static UiPanel* buttonspanel ( int b1ev=0, int b2ev=0, const char* lb1=0, const 
 	{	case eCANCEL: p->add ( b2=new UiButton(lb2? lb2:"cancel",eCANCEL) ); break;
 		case eNO: p->add ( b2=new UiButton(lb2? lb2:"no",eNO) ); break;
 	}
-	// UiKeyDev: should these accelerators become (temporary) key cmds?
-	if (b1) b1->accelerator ( GsEvent::KeyEnter );
-	if (b2) b2->accelerator ( GsEvent::KeyEsc );
+	// UiKeyDev: these accelerators seem to be working well (instead of using key cmds)
+	if ( b1 && !b2 )
+	{	b1->accelerator ( GsEvent::KeyEnter, GsEvent::KeyEsc ); }
+	else
+	{	if (b1) b1->accelerator ( GsEvent::KeyEnter );
+		if (b2) b2->accelerator ( GsEvent::KeyEsc );
+	}
 	return p;
 }
 
@@ -177,7 +181,7 @@ bool ui_confirm ( const char* msg, const char* wintitle )
 	end ( w, p );
 	return ev==eOK;
 }
- 
+
 bool ui_ask ( const char* msg, const char* wintitle )
 {
 	WsWindow* w = prepare ( wintitle );

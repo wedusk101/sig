@@ -371,7 +371,7 @@ int UiManager::handle ( const GsEvent& e )
 	else if (_dialog) // if not already in focus, handle dialog if one is still open
 	{
 		GS_TRACE5("handling dialog..."); // (focus can be requested inside dialogs)
-		_dialog->handle(e, this);
+		_dialog->handle(e,this);
 		h = 1; // dialog gets all events while it is active
 	}
 	else // handle elements

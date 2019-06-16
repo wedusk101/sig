@@ -25,7 +25,7 @@ void UiButton::_init ( int ev, UiPanel* p )
 	_event = ev;
 	_submenu = 0;
 	_uimcmd = 0;
-	_accelerator = 0;
+	_accel1 = _accel2 = 0;
 	if (p) submenu(p);
 	set_style ( UiStyle::Current() );
 }
@@ -130,7 +130,7 @@ int UiButton::handle ( const GsEvent& e, UiManager* uim )
 	GS_TRACE2("Button [" << _label.text() << "] handling...");
 
 	if ( e.type==GsEvent::Keyboard ) // keyboard check when not in focus
-	{	if ( e.key==_accelerator || (e.alt && e.key==label().accelchar()) )
+	{	if ( e.key==_accel1 || e.key==_accel2 || (e.alt&&e.key==label().accelchar()) )
 		{	if (_submenu)
 			{	if (_submenu->state()==Hidden) _opensub(this, uim);
 				if (_selected!=1) { _selected=1; changed(NeedsRedraw); }

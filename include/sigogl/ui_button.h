@@ -22,7 +22,7 @@ class UiButton : public UiElement
 	gsint16 _event;
 	UiPanel* _submenu;
 	UiManager* _uimcmd;
-	int _accelerator;
+	gsuint16 _accel1, _accel2;
 	void _init ( int ev, UiPanel* p );
    public :
 	UiButton ( const char* l, int ev, int x=0, int y=0, int mw=0, int mh=0, UiPanel* p=0 );
@@ -31,7 +31,8 @@ class UiButton : public UiElement
 	int get_event () const { return _event; }
 	void submenu ( UiPanel* p );
 	UiPanel* submenu () { return _submenu; }
-	void accelerator ( int key ) { _accelerator=key; }
+	void accelerator ( int key ) { _accel1=key; }
+	void accelerator ( int key1, int key2 ) { _accel1=key1; _accel2=key2; }
 	void set_style ( const UiStyle& s );
 	// Overriden virtual methods:
 	virtual void change_style ( const UiStyle& s ) override;
