@@ -205,9 +205,9 @@ class GsModel : public GsShareable
 
   public : // query functions:
 
-	/*! Returns 3F/2, which is the number of edges for "well connected" manifold meshes */
-	int numedges () const { return 3*F.size()/2; }
-   
+	/*! Returns 3F/2, which is the number of edges for "well connected" manifold meshes using Euler's formula */
+	int euleredges () const { return 3*F.size()/2; }
+  
 	/*! Count and return the mean number of edges adjacent to a vertex in the model,
 		by counting the aerage number of faces adjacent to a vertex. */
 	float count_mean_vertex_degree ();
@@ -336,9 +336,12 @@ class GsModel : public GsShareable
 
    public : // Make functions :
 
-	/*! Make a model by sweeping the 2D polygonal cross section p in the direction
-		of vector v. Polygon p must be given in CCW orientation. */
-	void make_sweep ( const GsPolygon& p, const GsVec& v );
+	/*! Make a model by sweeping the 2D polygonal cross section p placed at plane (z=0) in the
+		direction of vector v. Polygon p must be given in CCW orientation. 
+		If parameter bot is true (the default) the bottom of the 3D model (at z=0) is triangulated
+		and filled with the triangles; otherwise it is not filled. Equivalently, parameter top specifies
+		if the top face is to be filled with triangles. For a complete model both need to be true. */
+	void make_sweep ( const GsPolygon& p, const GsVec& v, bool bot=true, bool top=true );
 
 	/*! Make an "open tube" shape */
 	void make_tube (  const GsPnt& a, const GsPnt& b, float ra, float rb, int nfaces, bool smooth );

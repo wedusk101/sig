@@ -18,36 +18,33 @@
 
 # define MINRADIUS 0.001f
 
-void GsModel::make_sweep ( const GsPolygon& pol, const GsVec& v )
+void GsModel::make_sweep ( const GsPolygon& pol, const GsVec& v, bool bot, bool top )
 {
 	if ( pol.size()<3 ) return;
-   
+
 	init ();
 	name = "sweep";
 
-	GsArray<int> t;
-	pol.ear_triangulation ( t );
-
-	int i;
-	//for ( i=0; i<tris.size(); i++ ) t.push() = p.pick_vertex(tris[i],gstiny,true/*first*/);
-
-	int ps = pol.size();
+	// Add all vertices needed:
+	int i, ps = pol.size();
 	for ( i=0; i<ps; i++ ) V.push().set ( pol[i].x, pol[i].y, 0.0f );
 	for ( i=0; i<ps; i++ ) { V.push().set ( pol[i].x, pol[i].y, 0.0f ); V.top()+=v; }
 
-	for ( i=0; i<t.size(); i+=3 )
-	{	F.push().set ( t[i], t[i+2], t[i+1] );
-		F.push().set ( t[i]+ps, t[i+1]+ps, t[i+2]+ps );
+	// Add bottom and/or top:
+	if ( bot || top )
+	{	GsArray<int> t;
+		pol.ear_triangulation ( t );
+		int ts = t.size();
+		if ( bot ) { for ( i=0; i<ts; i+=3 ) F.push().set ( t[i], t[i+2], t[i+1] ); }
+		if ( top ) { for ( i=0; i<ts; i+=3 ) F.push().set ( t[i]+ps, t[i+1]+ps, t[i+2]+ps ); }
 	}
 
-	int i2;
+	// Add sides:
 	for ( i=0; i<ps; i++ )
-	{	i2 = (i+1)%ps;
+	{	int i2 = (i+1)%ps;
 		F.push().set ( i, i2, i+ps );
 		F.push().set ( i+ps, i2, i2+ps );
 	}
-
-   //if (delpt) delete pt;
 }
 
 void GsModel::make_tube ( const GsPnt& a, const GsPnt& b, float ra, float rb, int nfaces, bool smooth )
