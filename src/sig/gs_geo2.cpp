@@ -234,7 +234,8 @@ double gs_anglen ( double v1x, double v1y, double v2x, double v2y )
 
 inline double gspsegdist2 ( double px, double py, double p1x, double p1y, double p2x, double p2y, double& t )
 {
-	gs_line_projection ( p1x, p1y, p2x, p2y, px, py, t );
+	// ortho vect = ( -(p2y-p1y), p2x-p1x ) = (p2-p1).ortho(), ortho==(-y,x)
+	gslinesintersect ( p1x, p1y, p2x, p2y, px, py, px-(p2y-p1y), py+(p2x-p1x), t );
 
 	if ( t<=0.0 ) // get dist(p,p1)
 	{	px = px-p1x;
@@ -256,6 +257,7 @@ inline double gspsegdist2 ( double px, double py, double p1x, double p1y, double
 {
 	// ortho vect = ( -(p2y-p1y), p2x-p1x ) = (p2-p1).ortho(), ortho==(-y,x)
 	gslinesintersect ( p1x, p1y, p2x, p2y, px, py, px-(p2y-p1y), py+(p2x-p1x), qx, qy, t );
+
 	if ( t<0.0 ) // get dist(p,p1)
 	{	px = px-p1x;
 		py = py-p1y;
@@ -297,13 +299,13 @@ double gs_point_segment_dist2 ( double px, double py, double p1x, double p1y, do
 inline double gssegsegd2 ( double p1x, double p1y, double p2x, double p2y,
 						   double p3x, double p3y, double p4x, double p4y )
 {
-	double t, d, dmin, qx, qy;
-	dmin = gspsegdist2( p1x, p1y, p3x, p3y, p4x, p4y, t, qx, qy );
-	d = gspsegdist2( p2x, p2y, p3x, p3y, p4x, p4y, t, qx, qy );
+	double t, d, dmin;
+	dmin = gspsegdist2( p1x, p1y, p3x, p3y, p4x, p4y, t );
+	d = gspsegdist2( p2x, p2y, p3x, p3y, p4x, p4y, t );
 	if ( d<dmin ) dmin=d;
-	d = gspsegdist2( p3x, p3y, p1x, p1y, p2x, p2y, t, qx, qy );
+	d = gspsegdist2( p3x, p3y, p1x, p1y, p2x, p2y, t );
 	if ( d<dmin ) dmin=d;
-	d = gspsegdist2( p4x, p4y, p1x, p1y, p2x, p2y, t, qx, qy );
+	d = gspsegdist2( p4x, p4y, p1x, p1y, p2x, p2y, t );
 	if ( d<dmin ) dmin=d;
 	return dmin;
 }
@@ -353,8 +355,8 @@ double gs_ccw ( double p1x, double p1y, double p2x, double p2y, double p3x, doub
 
 bool gs_in_segment ( double p1x, double p1y, double p2x, double p2y, double px, double py, double epsilon )
 {
-	double t, qx, qy;
-	return gspsegdist2( px, py, p1x, p1y, p2x, p2y, t, qx, qy ) > epsilon*epsilon? false:true;
+	double t;
+	return gspsegdist2( px, py, p1x, p1y, p2x, p2y, t ) > epsilon*epsilon? false:true;
 }
 
 bool gs_in_segment ( double p1x, double p1y, double p2x, double p2y, double px, double py,

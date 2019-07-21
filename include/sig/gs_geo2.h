@@ -111,13 +111,14 @@ double gs_point_segment_dist2 ( double px, double py,
 								double p1x, double p1y, double p2x, double p2y );
 
 /*! Same parameters as the previous function, but also returning parameter t,
-	which will contain the parametric location of the closest point in the line passing
-	by {p1,p2} (not the segment), such that if t is in (0,1), the point is inside the segment,
+	which will contain the parametric location of the closest point in the line
+	passing by {p1,p2}, such that if t is in (0,1), the point is inside the segment,
 	if t<=0 the closest point of the segment is p1, and if t>=1 it is p2. */
 double gs_point_segment_dist2 ( double px, double py,
 								double p1x, double p1y, double p2x, double p2y, double& t );
 
-/*! Same parameters as the previous function, but also returning the projection point in q */
+/*! Same parameters as the previous function, but also returning in q the projection point
+	of point p in the line passing by {p1,p2} (not the segment). */
 double gs_point_segment_dist2 ( double px, double py,
 								double p1x, double p1y, double p2x, double p2y, 
 								double& t, double& qx, double& qy );
