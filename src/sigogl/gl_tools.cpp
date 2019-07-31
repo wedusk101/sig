@@ -58,7 +58,7 @@ void gl_snapshot ( GsImage& img )
 bool gl_get_error ( char s, const char* msg )
 {
 	GLenum e = glGetError();
-	if ( e=='s' ) return e==GL_NO_ERROR? false:true;
+	if ( s=='s' ) return e==GL_NO_ERROR? false:true;
 
 	if ( msg ) gsout<<msg<<": ";
 	if ( e==GL_NO_ERROR ) { gsout<<"GL_NO_ERROR.\n"; return false; }
