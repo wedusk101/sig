@@ -8,6 +8,7 @@
 # include <sig/sa_action.h>
 # include <sig/sn_group.h>
 # include <sig/sn_editor.h>
+# include <sig/sn_material.h>
 # include <sig/sn_transform.h>
 
 //# define GS_USE_TRACE1 // constructor / destructor
@@ -31,6 +32,7 @@ SaAction::SaAction ( int c )
 	}
 
 	_curmaterial = 0;
+	_curmaterialn = 0;
 }
 
 SaAction::~SaAction ()
@@ -140,6 +142,7 @@ bool SaAction::material_apply ( const SnMaterial* m )
 {
 	GS_TRACE2 ( "SaAction::material_apply" );
 	_curmaterial = m;
+	_curmaterialn = m->num_affected_shapes();
 	return true;
 }
 

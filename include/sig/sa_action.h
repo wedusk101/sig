@@ -30,6 +30,7 @@ class SaAction : public GsShareable
 { protected :
 	GsArray<GsMat> _matstack;
 	const SnMaterial* _curmaterial;
+	gsuint _curmaterialn;
 	friend class SnGroup;
 	friend class SnEditor;
 	friend class SnTransform;
@@ -94,10 +95,12 @@ class SaAction : public GsShareable
 		False can be returned to halt the traversal, otherwise true must be returned. */
 	virtual bool editor_apply ( SnEditor* e );
 
-	/*! Simply makes internal pointer _curmaterial to point to m, allowing the next shape
-		in the traversal to retrieve and use the material. After its first use, the
-		internal _curmaterial pointer is again set to zero. The derived renderer action is
-		responsible for correctly implementing this behavior. */
+	/*! Simply makes the internal SnMaterial pointer _curmaterial to point to m, meaning
+		that the specified number in m of next SnShapes in the traversal should retrieve
+		and use the material in m instead of their SnShape materials.
+		After the given number of SnShapes use the material, the internal _curmaterial
+		pointer is again set to zero to prevent affecting additional shapes. The derived
+		renderer action is responsible for correctly implementing this behavior. */
 	virtual bool material_apply ( const SnMaterial* m );
 };
 

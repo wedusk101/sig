@@ -24,7 +24,7 @@ SnMaterial::SnMaterial ()
 SnMaterial::SnMaterial ( const GsMaterial& m )
 		   :SnNode ( SnNode::TypeTransform, SnMaterial::class_name )
 {
-	GS_TRACE1 ( "Constructor from GsMat" );
+	GS_TRACE1 ( "Constructor from GsMaterial" );
 	_material = m;
 }
 
