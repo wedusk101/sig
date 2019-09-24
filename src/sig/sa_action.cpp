@@ -136,7 +136,7 @@ bool SaAction::editor_apply ( SnEditor* e )
 	return b;
 }
 
-bool SaAction::material_apply ( SnMaterial* m )
+bool SaAction::material_apply ( const SnMaterial* m )
 {
 	GS_TRACE2 ( "SaAction::material_apply" );
 	_curmaterial = m;

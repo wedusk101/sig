@@ -29,7 +29,7 @@ class SnMaterial;
 class SaAction : public GsShareable
 { protected :
 	GsArray<GsMat> _matstack;
-	SnMaterial* _curmaterial;
+	const SnMaterial* _curmaterial;
 	friend class SnGroup;
 	friend class SnEditor;
 	friend class SnTransform;
@@ -94,9 +94,11 @@ class SaAction : public GsShareable
 		False can be returned to halt the traversal, otherwise true must be returned. */
 	virtual bool editor_apply ( SnEditor* e );
 
-	/*! Simply makes pointer _curmaterial to point to m, allowing the next shape to
-		retrieve and use the material. */
-	virtual bool material_apply ( SnMaterial* m );
+	/*! Simply makes internal pointer _curmaterial to point to m, allowing the next shape
+		in the traversal to retrieve and use the material. After its first use, the
+		internal _curmaterial pointer is again set to zero. The derived renderer action is
+		responsible for correctly implementing this behavior. */
+	virtual bool material_apply ( const SnMaterial* m );
 };
 
 //================================ End of File =================================================

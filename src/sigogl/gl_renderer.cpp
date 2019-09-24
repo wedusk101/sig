@@ -77,7 +77,7 @@ bool GlRenderer::shape_apply ( SnShape* s )
 	s->update_node();
 	if ( s->prep_render() )
 	{	if ( _curmaterial ) // apply this material
-		{	s->material ( _curmaterial->material() );
+		{	s->material ( _curmaterial->cmaterial() );
 			_curmaterial = 0;
 		}
 		((GlrBase*)s->renderer())->render(s,_context);
