@@ -15,10 +15,10 @@
 
 - SkinDev:  skeletal skinning
 - CamDev:   updates to camera control
-- UiDev:	user interface development
+- UiDev:	  user interface development
 - UiKeyDev: inclusion of key navigation in UI
 - LightDev: Shader support for multiple lights
-- SgDev:	scene graph development
+- SgDev:	  scene graph development
 - ManipDev: development to include rotation in SnManipulator
 - TodoNote: functionality not yet implemented
 - ImprNote: possible functionality improvement

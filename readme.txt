@@ -21,6 +21,8 @@ at the base folder of the distribution.
 
 Sig is available from: https://bitbucket.org/mkallmann/sig
 
+Sig's forum is here: https://sigdev.boardhost.com/
+
 ==== INSTALLATION GUIDELINES ====
 
 Windows: use the visual studio solution(s) in the vs20NN folder
