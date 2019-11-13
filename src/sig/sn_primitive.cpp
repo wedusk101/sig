@@ -62,8 +62,9 @@ void SnPrimitive::update_node ()
 	GS_TRACE2 ( "Preparing to render " << instance_name() << ": " << action_ready() );
 	if ( _nodeuptodate ) return;
 	_nodeuptodate = 1;
-	GsPrimitive p = *_model->primitive;
-	_model->make_primitive ( p );
+	const GsPrimitive& p = *_model->primitive;
+	_model->make_primitive ( p, GsModel::UseNoMtl );
+	material ( p.material );
 }
 
 //================================ EOF =================================================
