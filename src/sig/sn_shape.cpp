@@ -7,6 +7,7 @@
 
 # include <sigogl/gl_core.h>
 # include <sig/sn_shape.h>
+# include <sig/sn_material.h>
 # include <sig/sa_action.h>
 
 //# define GS_USE_TRACE1  // Const/Dest
@@ -83,7 +84,7 @@ void SnShape::color ( GsColor c )
 	_changed |= MaterialChanged;
 }
 
-bool SnShape::prep_render ()
+bool SnShape::prep_render ( SaAction* a )
 {
 	// 1. Check visibility
 	if ( !visible() ) return false;
@@ -95,19 +96,37 @@ bool SnShape::prep_render ()
 		_renderer->init ( this );
 	}
 
-	// 3. Return ok to render
+	// 3. Check (and process it) if there is an active SnMaterial:
+	if ( a->_curmaterialn>0 )
+	{	if ( !_material_is_overriden ) // overriden matrial has priority
+		{	if ( a->_curmaterial->restore() )
+			{	_overriden_material = _material;
+				_material_is_overriden = 2;
+			}
+			_material = a->_curmaterial->cmaterial(); // override
+		}
+		a->_curmaterialn--; // decrement counter
+	}
+
+	// 4. Return ok to render
 	return true;
 }
 
 void SnShape::post_render ()
 {
-	// 4. Reset changed flag
+	// 5. restore material if needed
+	if ( _material_is_overriden==2 )
+	{	_material = _overriden_material;
+		_material_is_overriden=0;
+	}
+
+	// 6. Reset changed flag
 	changed ( Unchanged );
 }
 
 bool SnShape::apply ( SaAction* a )
 {
-	return a->shape_apply(this);
+	return a->shape_apply(this); // this will trigger prep, render, and post calls
 }
 
 //===================================== EOF ====================================

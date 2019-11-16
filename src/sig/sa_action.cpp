@@ -141,6 +141,7 @@ bool SaAction::editor_apply ( SnEditor* e )
 bool SaAction::material_apply ( const SnMaterial* m )
 {
 	GS_TRACE2 ( "SaAction::material_apply" );
+	// Parameters are set here so that SnShape pre/post methods can handle them:
 	_curmaterial = m;
 	_curmaterialn = m->num_affected_shapes();
 	return true;

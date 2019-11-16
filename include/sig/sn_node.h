@@ -24,17 +24,17 @@ template <typename X> class GsBuffer; // forward declaration
 	\brief base of all scene node classes
 
 	Defines a base class for all scene nodes.
-	1. It cannot be directly instantiated by the user, and so there is no 
-	   public constructor available.
-	2. Scene nodes start with Sn (scene actions start with Sa, see sa_action.h).
-	3. A reference counter is used for automatically deleting unused nodes,
-	   see ref() and unref() methods in the parent class GsShareable. 
-	4. Each node is of a given type among 5 possible ones:
+	- It cannot be directly instantiated by the user, and so there is no 
+	  public constructor available.
+	- Scene nodes start with Sn (scene actions start with Sa, see sa_action.h).
+	- A reference counter is used for automatically deleting unused nodes,
+	  see ref() and unref() methods in the parent class GsShareable. 
+	- Each node is of a given type among 5 possible ones:
 	1. a group manages a list of children nodes;
 	2. a transform defines a transformation to affect children nodes;
 	3. a shape defines a geometric shape to be rendered;
 	4. an editor node handles events, a transformation, and children nodes;
-	5. a material node gives material info to the next shape for geometry sharing. */
+	5. a material node defines a new material to shapes rendered after it. */
 class SnNode : public GsShareable
 {  public :
 	enum Type { TypeGroup, TypeTransform, TypeShape, TypeEditor, TypeMaterial };

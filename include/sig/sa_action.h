@@ -78,16 +78,16 @@ class SaAction : public GsShareable
 	virtual void pop_matrix ();
 
 	/*! Simply calls multi_matrix() with current mat, if m->visible() state is true. 
-		False can be returned to stop the traverse, otherwise true must be returned. */
+		False can be returned to stop the traversal, otherwise true must be returned. */
 	virtual bool transform_apply ( SnTransform* t );
 
 	/*! Apply the action to each group child, pushing/popping the current
 		matrix if the group is acting as a separator.
-		False can be returned to stop the traverse, otherwise true must be returned. */
+		False can be returned to stop the traversal, otherwise true must be returned. */
 	virtual bool group_apply ( SnGroup* g );
 
 	/*! Apply the action to a shape, SaAction implementation simply returns true.
-		False can be returned to stop the traverse, otherwise true must be returned. */
+		False can be returned to stop the traversal, otherwise true must be returned. */
 	virtual bool shape_apply ( SnShape* s );
 
 	/*! Apply the action to the child and helpers, pushing/popping the current
@@ -95,12 +95,9 @@ class SaAction : public GsShareable
 		False can be returned to halt the traversal, otherwise true must be returned. */
 	virtual bool editor_apply ( SnEditor* e );
 
-	/*! Simply makes the internal SnMaterial pointer _curmaterial to point to m, meaning
-		that the specified number in m of next SnShapes in the traversal should retrieve
-		and use the material in m instead of their SnShape materials.
-		After the given number of SnShapes use the material, the internal _curmaterial
-		pointer is again set to zero to prevent affecting additional shapes. The derived
-		renderer action is responsible for correctly implementing this behavior. */
+	/*! Makes the internal SnMaterial pointer _curmaterial to point to m, meaning that
+		the specified number in m of next SnShapes in the traversal should use the
+		material in m instead of their SnShape materials. */
 	virtual bool material_apply ( const SnMaterial* m );
 };
 

@@ -69,33 +69,18 @@ void GlRenderer::apply ( SnNode* n )
 
 //==================================== virtuals ====================================
 
-# define RENDER ((GlrBase*)s->renderer())->render(s,_context); s->post_render()
-
 bool GlRenderer::shape_apply ( SnShape* s )
 {
 	GS_TRACE3 ( "Rendering Shape: "<<s->instance_name() );
 
 	// Render the node:
 	s->update_node();
-	if ( s->prep_render() )
-	{	if ( !_curmaterial )
-		{	RENDER;
-		}
-		else if ( _curmaterial->restore() )
-		{	GsMaterial origm = s->material();
-			s->material ( _curmaterial->cmaterial() );
-			if ( --_curmaterialn==0 ) _curmaterial=0;
-			RENDER;
-			s->material ( origm );
-		}
-		else
-		{	s->material ( _curmaterial->cmaterial() );
-			if ( --_curmaterialn==0 ) _curmaterial=0;
-			RENDER;
-		}
+	if ( s->prep_render(this) )
+	{	((GlrBase*)s->renderer())->render(s,_context);
+		s->post_render();
 	}
 
-	// Continue to render:
+	// Continue to rendering traversal:
 	return true;
 }
 

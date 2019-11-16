@@ -18,11 +18,11 @@
 //======================================= SnMaterial ====================================
 
 /*! \class SnMaterial sn_material.h
-	\brief material information to be used by the next shape node
+	\brief Defines material to be used by the next shape nodes
 
 	SnMaterial stores material information to be used by the next n shape nodes, allowing
 	different materials to be used by a same shared SnShape during rendering traversal.
-	Note: only when shapes use the SnShape::material information that they will change appearance. */
+	Note: only when shapes use the SnShape::material information that they will be affected. */
 class SnMaterial : public SnNode
  { private :
 	GsMaterial _material;
@@ -42,7 +42,7 @@ class SnMaterial : public SnNode
 	/*! Constructor receiving a material */
 	SnMaterial ( const GsMaterial& m );
 
-	/*! Sets to affect 1 shape and without original amterial restoration */
+	/*! Sets to affect 1 shape and without original material restoration */
 	void init() { _n=1; _restore=false; }
 
 	/*! Sets the material to be used for the shape */

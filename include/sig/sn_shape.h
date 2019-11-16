@@ -61,8 +61,8 @@ class SnShape : public SnNode
 	mutable gscbool _auto_clear_data; // default is 0
 	gscenum _render_mode;
 	gscenum _overriden_render_mode; // -1 if not overriden
+	gscenum _material_is_overriden; // 0:no, 1:yes, 2:yes by a SnMaterial
 	gscbool _can_override_render_mode;
-	gscbool _material_is_overriden;
 	GsMaterial _material;
 	GsMaterial _overriden_material;
 	SnShapeRenderer* _renderer;
@@ -146,7 +146,7 @@ class SnShape : public SnNode
 
 	/*! Preparation method for rendering the shape. It will check visibility,
 		initialize the renderer if needed, and return true if the shape indeed needs rendering */
-	virtual bool prep_render ();
+	virtual bool prep_render ( SaAction* a );
 
 	/*! Method to be called after rendering. Here it sets internal changed state to Unchanged */
 	virtual void post_render ();
