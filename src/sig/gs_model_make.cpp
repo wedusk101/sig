@@ -116,12 +116,7 @@ void GsModel::make_tube ( const GsPnt& a, const GsPnt& b, float ra, float rb, in
 		}
 	}
 
-	if ( smooth )
-	{	_geomode=Hybrid;
-	}
-	else
-	{	_geomode=Flat; 
-	}
+	_geomode = smooth? Hybrid : Faces;
 	compress ();
 }
 
@@ -153,6 +148,7 @@ void GsModel::make_box ( const GsBox& b )
 	F[10].set(0,3,4); F[11].set(4,3,5); // plane crossing -Y
 
 	compress();
+	_geomode = Faces;
 }
 
 static int getv ( GsArray<GsVec>& V, int a, int b, float r )
@@ -222,6 +218,9 @@ void GsModel::make_sphere ( const GsPnt& c, float r, int nfaces, bool smooth )
 		for ( i=0; i<vs; i++ ) { N[i]=V[i]; N[i].normalize(); }
 		_geomode=Smooth;
 	}
+	else
+	{	_geomode=Faces;
+	}
 
 	if ( c!=GsPnt::null ) translate(c);
 	compress();
@@ -268,6 +267,7 @@ void GsModel::make_ellipsoid ( const GsPnt& c, float r, float ratio, int nfaces,
 	}
 
 	if ( smooth ) GsModel::smooth(); // smooth() may be slow, ok for low face count, but should be avoided
+		else _geomode=Faces;
 
 	if ( c!=GsPnt::null ) translate(c);
 	compress();
@@ -308,7 +308,9 @@ void GsModel::make_cylinder ( const GsPnt& a, const GsPnt& b, float ra, float rb
 	if ( smooth )
 	{	N.push()=minus_va;
 		N.push()=va;
+		_geomode=Hybrid;
 	}
+	else _geomode=Faces;
 
 	compress ();
 }
@@ -404,15 +406,19 @@ void GsModel::make_capsule ( const GsPnt& a, const GsPnt& b, float ra, float rb,
 		arc1=arc2;
 	}
 
-	if ( smooth ) GsModel::smooth(0);
+	if ( smooth ) GsModel::smooth(); // smooth() may be slow, ok for low face count, but should be avoided
+		else _geomode=Faces;
+
 	compress ();
 }
 
 void GsModel::make_primitive ( const GsPrimitive& p, MakePrimitiveMtlChoice mtlchoice )
 {
-	GsMaterial mtl = p.material;
-	if ( mtlchoice==UseModelMtl && M.size()>0 ) mtl=M[0];
+	// 1. Save primitive pointer, if any, and set it as 0 to prevent init() to delete it (if existing):
+	GsPrimitive* origprimpt = primitive? primitive : new GsPrimitive;
+	primitive=0; // this will prevent deletion when a make method is called
 
+	// 2. Make geometry
 	switch ( p.type )
 	{	case GsPrimitive::Box :
 		{	GsBox b ( GsPnt(-p.ra,-p.rb,-p.rc), GsPnt(p.ra,p.rb,p.rc) );
@@ -420,34 +426,37 @@ void GsModel::make_primitive ( const GsPrimitive& p, MakePrimitiveMtlChoice mtlc
 		} break;
 
 		case GsPrimitive::Sphere :
-		{	make_sphere ( GsPnt::null, p.ra, p.nfaces, p.smooth==1 );
+		{	make_sphere ( GsPnt::null, p.ra, p.nfaces, p.smooth );
 		} break;
 
 		case GsPrimitive::Cylinder :
 		{	GsVec v ( 0.0f, p.rc, 0.0f );
-			make_cylinder ( -v, v, p.ra, p.rb, p.nfaces, p.smooth==1 );
+			make_cylinder ( -v, v, p.ra, p.rb, p.nfaces, p.smooth );
 		} break;
 
 		case GsPrimitive::Capsule :
 		{	GsVec v ( 0.0f, p.rc, 0.0f );
-			make_capsule ( -v, v, p.ra, p.rb, p.nfaces, p.smooth==1 );
+			make_capsule ( -v, v, p.ra, p.rb, p.nfaces, p.smooth );
 		} break;
 
 		case GsPrimitive::Ellipsoid :
-		{	make_ellipsoid ( GsPnt::null, p.ra, p.rc, p.nfaces, p.smooth==1 );
+		{	make_ellipsoid ( GsPnt::null, p.ra, p.rc, p.nfaces, p.smooth );
 		} break;
 	}
 
-	GsPrimitive* modelprim = primitive? primitive : new GsPrimitive;
-	primitive=0; // set as NULL so that rotate() and translate() will not accumulate transformations in primitive
-
+	// 3. Apply transformations while keeping primitive 0 so rotate() and translate()
+	//	  will not accumulate transformations in primitive:
 	if ( p.orientation!=GsQuat::null ) rotate ( p.orientation );
 	if ( p.center!=GsVec::null ) translate ( p.center );
 
-	primitive = modelprim;
+	// 4. Restore primitive pointer and apply material:
+	primitive = origprimpt;
 	*(primitive) = p;
-
-	if ( mtlchoice!=UseNoMtl ) set_one_material ( mtl );
+	switch (mtlchoice)
+	{	case UseModelMtl: set_one_material ( M.size()>0? M[0]:p.material ); break; 
+		case UsePrimMtl: set_one_material ( p.material ); break;
+		case UseNoMtl: break;
+	}
 }
 
 //================================ End of File =================================================

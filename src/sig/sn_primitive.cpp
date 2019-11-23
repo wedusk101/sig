@@ -57,14 +57,20 @@ const GsPrimitive& SnPrimitive::cprim ()
 	return *_model->primitive; // no call to touch
 }
 
-void SnPrimitive::update_node ()
+void SnPrimitive::build ()
 {
-	GS_TRACE2 ( "Preparing to render " << instance_name() << ": " << action_ready() );
-	if ( _nodeuptodate ) return;
-	_nodeuptodate = 1;
 	const GsPrimitive& p = *_model->primitive;
 	_model->make_primitive ( p, GsModel::UseNoMtl );
 	material ( p.material );
+	_nodeuptodate = 1;
+}
+
+void SnPrimitive::update_node ()
+{
+	GS_TRACE2 ( "Updating node " << instance_name() << ", up to date: " << _nodeuptodate );
+	if ( _nodeuptodate ) return;
+	build ();
+	GS_TRACE2 ( "Updated." );
 }
 
 //================================ EOF =================================================

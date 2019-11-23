@@ -16,11 +16,11 @@
 SnNode::SnNode ( SnNode::Type t, const char* class_name ) 
  {
    GS_TRACE1 ( "Constructor" );
-   _visible = 1;
-   _nodeuptodate = 0;
-   _type = t;
    _udata = 0;
    _instance_name = class_name;
+   _type = t;
+   _visible = 1;
+   _nodeuptodate = 0;
  }
 
 SnNode::~SnNode ()

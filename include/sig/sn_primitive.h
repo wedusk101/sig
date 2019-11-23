@@ -18,7 +18,9 @@
 /*! \class GsPrimitive sn_primitive.h
 	\brief primitive model shape node
 
-	Defines a primitive model, which releases the model mesh data after rendering. */
+	Defines a primitive model, which will be used to build the GsModel of the base
+	class at rendering time. Every time the primitive parameters are changed the
+	model will automatically be re-built. */
 class SnPrimitive : public SnModel
 {  public :
 	static const char* class_name; //<! Contains string SnModel
@@ -44,6 +46,10 @@ class SnPrimitive : public SnModel
 
 	/*! Const access to the primitive specification class. */
 	const GsPrimitive& cprim ();
+
+	/*! Forces to build now the underlying GsModel from the GsPrimitive
+		specification instead of at first rendering call */
+	void build ();
 
    public :
 
