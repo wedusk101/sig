@@ -4,6 +4,7 @@ obj/
 *.pch
 *.user
 *.pdb
+*.idb
 
 # Prerequisites
 *.d

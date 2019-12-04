@@ -122,15 +122,18 @@ class SnGroup : public SnNode
 	/*! Adds a new separator group with one node as child. */
 	SnGroup* add_separator_group ( SnNode* n1 ) { return add_group(n1,0,0,true); }
 
-	/*! Removes one child. If the node removed has no more references it is 
-		deallocated together with all its sub-graph and 0 is returned. 0 is 
+	/*! Removes one child. If the node removed has no more references to it it is 
+		then deallocated together with all its sub-graph and 0 is returned. 0 is 
 		also returned if the group has no children. If pos==-1 (the default)
 		or pos is larger than the maximum child index, the last child is 
-		removed. Otherwise, the removed node is returned. */
+		removed. If the node was succesfully removed and was not deallocated
+		in the process a pointer to it is returned, otherwise 0 is returned. */
 	SnNode *remove ( int pos=-1 );
 
 	/*! Searches for the position of the given child pointer and removes it 
-		with remove_child ( position ). */
+		with remove ( position ). If the node was succesfully found, removed,
+		and was not deallocated	in the process, a pointer to it is returned,
+		otherwise 0 is returned. */
 	SnNode *remove ( SnNode *n );
 
 	/*! Removes all children, calling the unref() method of each children. 
