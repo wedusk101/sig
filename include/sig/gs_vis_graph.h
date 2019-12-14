@@ -44,13 +44,12 @@ class GsVisGraphNode : public GsGraphNode
 };
 
 /*! \class GsVisGraph gs_vis_graph.h
-	\brief a simple visibility graph for 2D path planning
-*/   
+	\brief A simple visibility graph implementation for 2D path planning */   
 class GsVisGraph : public GsShareable
 {  protected :
 	float _radius, _dang;
 	GsVisGraphNode *_vi, *_vg;
-	GsPolygons* _polygons;  // sharable polygons
+	GsPolygons* _polygons;  // shareable polygons
 	GsArray<GsVec> _bdisks; // bounding disks per polygon
 	GsArrayPt<GsBuffer<GsVisGraphNode*>> _nodes;
 	GsGraph<GsVisGraphNode,GsVisGraphLink> _graph;
