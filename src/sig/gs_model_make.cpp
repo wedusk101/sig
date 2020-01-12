@@ -58,23 +58,20 @@ void GsModel::make_tube ( const GsPnt& a, const GsPnt& b, float ra, float rb, in
    
 	// compute vertical axis:
 	float dang = gs2pi/float(nfaces);
-	GsVec vaxis = b-a; 
-	GsVec va = vaxis; 
-	va.normalize(); // axial vector
+	GsVec vaxis ( b-a );
+	vaxis.normalize(); // axial vector
 
 	// compute radial vectors:
-	GsVec vra;
-	float deg = GS_TODEG ( angle(GsVec::i,va) );
-	if ( deg<10 || deg>170 )
-		vra = cross ( GsVec::j, va );
-	else
-		vra = cross ( GsVec::i, va );
+	float deg = GS_TODEG ( angle(GsVec::i,vaxis) );
+	bool alongx = deg<10||deg>170;
+	GsVec refaxis = alongx? GsVec::j : GsVec::i;
+	GsVec vra = cross ( refaxis, vaxis );
 	GsVec vrb(vra);
 	vra.len ( ra );
 	vrb.len ( rb );
 
 	// compute points of first face:
-	GsQuat rot ( va, dang );
+	GsQuat rot ( vaxis, dang );
 	GsPnt a1 = a+vra;
 	GsPnt b1 = b+vrb;
 	GsPnt a2 = a+rot.apply(vra);
@@ -85,10 +82,12 @@ void GsModel::make_tube ( const GsPnt& a, const GsPnt& b, float ra, float rb, in
 	do
 	{	if ( smooth )
 		{	if ( ra==rb )
-			{	N.push()=(a1-a)/ra; } // normalized normal
-			else // adjust normal for our cylinder with a "cone body"
+			{	N.push()=(a1-a)/ra; // normalized normal
+			}
+			else // adjust normal for our cylinder with a "cone body":
 			{	GsVec v = b1-a1;
-				N.push() = ::normalize ( cross ( v, cross(v,GsVec::j) ) );
+				v = ::normalize ( cross ( v, cross(v,vaxis) ) );
+				N.push() = rb>ra? v : -v; // needed to result in correct normal orientation
 			}
 		}
 		V.push()=a1; V.push()=b1;
@@ -280,12 +279,9 @@ void GsModel::make_cylinder ( const GsPnt& a, const GsPnt& b, float ra, float rb
 	make_tube ( a, b, ra, rb, nfaces, smooth );
 	name = "cylinder";
    
-	GsVec vaxis = b-a; 
-	GsVec va = vaxis; 
-	va.normalize(); // axial vector
-	GsVec minus_va = va * -1.0f;
-
 	// make top and bottom:
+	int nta = N.size();
+	int ntb = nta+1;
 	int i, i1, i2, i3, n=0;
 	int size = V.size();
 	for ( i=0; i<size; i+=2 )
@@ -297,8 +293,8 @@ void GsModel::make_cylinder ( const GsPnt& a, const GsPnt& b, float ra, float rb
 		F.push().set ( size+1, i1, i3 );
 
 		if ( smooth )
-		{	Fn.push().set ( N.size(), N.size(), N.size() );
-			Fn.push().set ( N.size()+1, N.size()+1, N.size()+1 );
+		{	Fn.push().set ( nta, nta, nta );
+			Fn.push().set ( ntb, ntb, ntb );
 			n++;
 		}
 	}
@@ -306,12 +302,13 @@ void GsModel::make_cylinder ( const GsPnt& a, const GsPnt& b, float ra, float rb
 	V.push(a);
 	V.push(b);
 	if ( smooth )
-	{	N.push()=minus_va;
-		N.push()=va;
+	{	GsVec vaxis = b-a; vaxis.normalize(); // axial vector 
+		N.push() = -vaxis; 
+		N.push() = vaxis;
 		_geomode=Hybrid;
 	}
-	else _geomode=Faces;
-
+	else
+	{	_geomode=Faces; }
 	compress ();
 }
 
