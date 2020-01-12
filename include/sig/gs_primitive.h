@@ -32,7 +32,9 @@ class GsPrimitive
 	gscenum type;		//!< its type
 	gscbool smooth;		//!< true if normals are to be generated for smooth surface, false for flat
 	gsint16 nfaces;		//!< how many faces to draw for each curved section (default:20)
-	float ra, rb, rc;	//!< dimensions
+	union { struct{float ra, rb, rc;}; //!< dimensions
+			float r[3];
+		  };
 	GsVec center;		//!< its center position
 	GsQuat orientation; //!< rotation around center
 	GsMaterial material; //!< primitive material

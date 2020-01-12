@@ -33,6 +33,7 @@ class UiSlider : public UiElement
    public :
 	UiSlider ( const char* l, int ev, int x=0, int y=0, int mw=120, int mh=0 );
 	float value () const; // returns value between min, max
+	int valuei () const; // returns value between min, max and rounded to an integer
 	float tvalue () const { return _t; } // return values between 0,1
 	void value ( float v ); // between min, max
 	void tvalue ( float t ); // between 0,1

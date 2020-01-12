@@ -12,7 +12,7 @@
 
 //============================== Static Data ====================================
 
-const GsQuat GsQuat::null ( 1.0f, 0, 0, 0 );
+const GsQuat GsQuat::null ( 1.0f, 0, 0, 0 ); // w=cos(0)=1, (0,0,0)=axis with len sin(0)
 
 //============================ public members ====================================
 
@@ -66,11 +66,8 @@ void GsQuat::set ( const GsVec& axis, float radians )
 
 	if ( f==0||radians==0 ) { *this=null; return; }
 
-	if ( f>0 )
-	{	f = sqrtf ( f );
-		x/=f; y/=f; z/=f;
-	}
-	
+	if ( f>0 ) { f=sqrtf(f); x/=f; y/=f; z/=f; }
+
 	// set the quaternion:
 	radians/=2;
 	f = sinf ( radians );
@@ -79,40 +76,42 @@ void GsQuat::set ( const GsVec& axis, float radians )
 }
 
 void GsQuat::set ( const GsVec& axisangle )
- { 
-   float ang;
+{
+	float ang;
 
-   // normalize axis ang extract angle:
-   x=axisangle.x; y=axisangle.y; z=axisangle.z;
-   ang = x*x + y*y + z*z;
-   if ( ang>0 )
-	{ ang = sqrtf ( ang );
-	  x/=ang; y/=ang; z/=ang;
+	// normalize axis ang extract angle:
+	x=axisangle.x; y=axisangle.y; z=axisangle.z;
+	ang = x*x + y*y + z*z;
+	if ( ang>0 )
+	{	ang = sqrtf ( ang );
+		x/=ang; y/=ang; z/=ang;
 	}
 
-   // set the quaternion:
-   ang/=2;
-   w = cosf ( ang );
-   ang = sinf ( ang );
-   x*=ang; y*=ang; z*=ang;
- }
+	// set the quaternion:
+	ang/=2;
+	w = cosf ( ang );
+	ang = sinf ( ang );
+	x*=ang; y*=ang; z*=ang;
+}
 
 void GsQuat::get ( GsVec& axis, float& radians ) const
- {
-   // if GsQuat==(1,0,0,0), the axis will be null, so we
-   // set the axis to (1,0,0) (GsVec::i); the angle will be 0.
-   // this is also done in GsQuat::axis()
-   axis.set ( x, y, z );
-   float n = axis.norm();
-   if ( n==0 ) axis=GsVec::i; else axis/=n;
-   radians = 2.0f * acosf ( w );
- }
+{
+	// if GsQuat==(1,0,0,0), the axis will be null, so we
+	// set the axis to (1,0,0) (GsVec::i); the angle will be 0.
+	// this is also done in GsQuat::axis()
+	axis.set ( x, y, z );
+	float n = axis.norm();
+	if ( n==0 ) { axis=GsVec::i; radians=0; return; }
+	axis/=n;
+	radians = w==1.0f? 0 : 2.0f * acosf ( w );
+	if ( radians>gspi ) { axis=-axis; radians-=gs2pi; }
+}
 
 void GsQuat::get ( GsVec& axisangle ) const
- {
-   axisangle.set ( x, y, z );
-   axisangle.len ( 2.0f * acosf ( w ) );
- }
+{
+	axisangle.set ( x, y, z );
+	axisangle.len ( 2.0f * acosf ( w ) );
+}
 
 void GsQuat::set ( const GsMat& m )
 {
@@ -125,27 +124,13 @@ GsMat& GsQuat::get ( GsMat& m ) const
 	return m;
 }
 
-GsVec GsQuat::axis () const
- {
-   GsVec axis ( x, y, z );
-   float n = axis.norm();
-   if ( n==0 ) axis=GsVec::i; else axis/=n;
-   return axis;
- }
-
-float GsQuat::angle () const
- {
-   return 2.0f * acosf ( w );
- }
-
 GsVec GsQuat::apply ( const GsVec &v ) const
- {
-   /* TO TEST:
-	  return (1-w*w)p + 2(dot(v,p))v + dot(2w,cross(v,p)) */
-   GsQuat qv ( 0, v.x, v.y, v.z );
-   qv = (*this) * qv * conjugate();
-   return GsVec ( qv.x, qv.y, qv.z );
- }
+{
+	// compare with: return (1-w*w)p + 2(dot(v,p))v + dot(2w,cross(v,p))
+	GsQuat qv ( 0, v.x, v.y, v.z );
+	qv = (*this) * qv * conjugate();
+	return GsVec ( qv.x, qv.y, qv.z );
+}
 
 //=================================== Friend Functions ===================================
 
@@ -232,23 +217,24 @@ void gslerp ( const float* q1const, const float* q2, float t, float* q )
  }
 
 GsOutput& operator<< ( GsOutput& out, const GsQuat& q )
- {
-   return out << "axis " << q.axis() << " ang " << GS_TODEG(q.angle());
- }
+{
+	GsVec axis; float ang; q.get(axis,ang);
+	return out << "axis " << axis << " ang " << GS_TODEG(ang);
+}
 
 GsInput& operator>> ( GsInput& in, GsQuat& q )
- {
-   enum Format { AA, XZY } fmt;
-   GsVec vec;
-   float ang;
+{
+	enum Format { AA, XZY } fmt;
+	GsVec vec;
+	float ang;
 
-   fmt = AA; // axis-angle is the default
-   if ( in.check()==GsInput::String )
-	{ in.get(); // "axis" or another supported keyword
-	  if ( in.ltoken()=="xzy" ) fmt=XZY;
+	fmt = AA; // axis-angle is the default
+	if ( in.check()==GsInput::String )
+	{	in.get(); // "axis" or another supported keyword
+		if ( in.ltoken()=="xzy" ) fmt=XZY;
 	}
 
-   switch (fmt)
+	switch (fmt)
 	{ case AA: { in >> vec;
 				 if ( in.check()==GsInput::String ) in.get(); // "ang"
 				 in >> ang;
@@ -267,8 +253,8 @@ GsInput& operator>> ( GsInput& in, GsQuat& q )
 	  default: q = GsQuat::null;
 	}
 
-   return in;
- }
+	return in;
+}
 
 //=============================== swing-twist conversions ======================================
 

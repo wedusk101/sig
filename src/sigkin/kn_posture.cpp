@@ -376,7 +376,7 @@ float dist ( KnPosture& p1, KnPosture& p2 )
 	return sqrtf(d);
 }
 
-void KnPosture::output ( GsOutput& out, bool channels, bool values, bool onelineval ) const
+void KnPosture::output ( GsOutput& out, bool channels, bool values, bool onelineval, bool name, bool onlycon ) const
 {
 	int i;
 
@@ -384,7 +384,7 @@ void KnPosture::output ( GsOutput& out, bool channels, bool values, bool oneline
 	{	out << (*_channels) << gsnl;
 	}
 	
-	if ( _name && _name[0] )
+	if ( _name && name && _name[0] )
 	{	out << "name " << GsSafeWrite(_name) << gspc;
 	}
 
@@ -394,9 +394,22 @@ void KnPosture::output ( GsOutput& out, bool channels, bool values, bool oneline
 	if ( values && _channels )
 	{	const float* fp = &KnPosture::values[0];
 		int chsize = _channels->size();
-		for ( i=0; i<chsize; i++ )
-		{	fp += _channels->cget(i).save(out,fp);
-			if ( i<chsize-1 ) out<<delim;
+		if ( onlycon )
+		{	for ( i=0; i<chsize; i++ )
+			{	const KnChannel& ch = _channels->cget(i);
+				if ( ch.status()==KnChannel::Disconnected )
+				{	fp += ch.size(); }
+				else
+				{	fp += ch.save(out,fp);
+					if ( i<chsize-1 ) out<<delim;
+				}
+			}
+		}
+		else
+		{	for ( i=0; i<chsize; i++ )
+			{	fp += _channels->cget(i).save(out,fp);
+				if ( i<chsize-1 ) out<<delim;
+			}
 		}
 	}
 

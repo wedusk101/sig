@@ -101,10 +101,10 @@ UiPanel* UiManager::add_panel ( const char* l, UiPanel::Format f, UiPanel::Dock 
 	return (UiPanel*)top();
 }
 
-void UiManager::add ( UiPanel* p )
+void UiManager::add ( UiPanel* p, bool astopsubmenu )
 {
 	GS_TRACE1 ( "add..." );
-	if ( _submenus==0 ) // usual case:
+	if ( _submenus==0 || astopsubmenu ) // usual case:
 	{	_panels.push ( p );
 		group()->add ( p->sngroup() );
 	}
@@ -242,7 +242,7 @@ void UiManager::open_submenu ( UiPanel* p )
 		send_to_top(p);
 	}
 	else
-	{	add(p);
+	{	add(p,true);
 		p->adjust_position(this,false);
 	}
 	_submenus++;
@@ -398,11 +398,11 @@ int UiManager::handle ( const GsEvent& e )
 			GsRect smr(sm->rect()); smr.grow(dw, dh);
 			int sh = 0;
 			if (smr.contains(e.mousex,e.lmousey)) // current top submenu panel contains mouse
-			{	GS_TRACE5("Top submenu has mouse...");
+			{	GS_TRACE5("Case 1: Top submenu has mouse...");
 				sh = sm->handle(e,this);
 			}
 			else if (b->rect().contains(e.mousex,e.lmousey,dw,dh)) // the parent button contains mouse
-			{	GS_TRACE5("Parent button has mouse...");
+			{	GS_TRACE5("Case 2: Parent button has mouse...");
 				sh = b->handle(e,this);
 			}
 			else // needs to close submenu(s)
@@ -411,7 +411,7 @@ int UiManager::handle ( const GsEvent& e )
 				_win->redraw();
 			}
 			if (sh) h=sh; // note that h may be 1 at this point
-			GS_TRACE5("handling submenus done.");
+			GS_TRACE5("submenus done.");
 		}
 	}
 

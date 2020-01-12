@@ -249,16 +249,15 @@ static GsModel* sReadModel ( GsInput& in, GsDirs& paths, GsMat* mat, GsModel* th
 	}
 
 	// if we are reading a same model again in the same joint, share it:
-	if ( theother )
-	if ( gs_comparecs(fname,theother->filename)==0 )
+	if ( theother && gs_comparecs(fname,theother->filename)==0 )
 	{	theother->ref();
 		return theother;
 	}
 
 	if ( igeo )
 	{	igeo->get(); // newgeo keyword
-		igeo->get();
-		if ( igeo->ltoken()!=fname ) gsout<<"sReadModel Error in "<<fname<<gsnl;
+		igeo->get(); // string with filename
+		if ( igeo->ltoken()!=fname ) gsout<<"sReadModel: name mismatch "<<igeo->ltoken()<<" : "<<fname<<gsnl;
 	}
 	else
 	{	if ( !paths.checkfull(fname) )
@@ -635,6 +634,7 @@ bool KnSkeleton::load ( GsInput& in, const char* basedir )
 			if ( paths.checkfull(fname) )
 			{	delete igeo; // in case several geofile keywords are there by mistake
 				igeo = new GsInput;
+				igeo->commentchar('#');
 				igeo->open ( fname );
 			}
 		}
@@ -718,56 +718,54 @@ bool KnSkeleton::load ( GsInput& in, const char* basedir )
 
 static void outgeo ( GsOutput& out, const char* s, KnJoint* j, const char* geopath,
 					 GsOutput* outg )
- {
-   // check if we should write a mesh primitive "inline"
-   // vis/col primitive meshes are never shared as they should have different resolutions
-   if ( !geopath && s[0] )
-	{ GsModel* m=0;
-	  if ( s[0]=='v' && j->visgeo()->primitive )
-	   { m = j->visgeo(); }
-	  else if ( s[0]=='c' && j->colgeo()->primitive )
-	   { m = j->colgeo(); }
-	  if ( m )
-	   { out.outm (); out << s << "geo primitive\n";
-		 out.incmargin(7);
-		 out << *(m->primitive) << gsnl;
-		 out.incmargin(-7);
-		 return; // processed as primitive
-	   }
+{
+	// check if we should write a mesh primitive "inline"
+	// vis/col primitive meshes are never shared as they should have different resolutions
+	if ( !geopath && s[0] )
+	{	GsModel* m=0;
+		if ( s[0]=='v' && j->visgeo()->primitive )
+		{	m = j->visgeo(); }
+		else if ( s[0]=='c' && j->colgeo()->primitive )
+		{	m = j->colgeo(); }
+		if ( m )
+		{	out.outm (); out << s << "geo primitive\n";
+			out.incmargin(7);
+			out << *(m->primitive) << gsnl;
+			out.incmargin(-7);
+			return; // processed as primitive
+		}
 	}
 
-   GsString name;
-   name << j->skeleton()->name() << '_' << j->name();
-   if ( s[0] ) name << '_' << s; // s will have "vis" or "col"
-   name << ".m";
-   name.lower ();
+	GsString name;
+	name << j->skeleton()->name() << '_' << j->name();
+	if ( s[0] ) name << '_' << s; // s will have "vis" or "col"
+	name << ".m";
+	name.lower ();
 
-   if ( s[0] ) // s will have "vis" or "col"
-	{ out.outm (); out << s << "geo \"" << name << "\"\n";
+	if ( s[0] ) // s will have "vis" or "col"
+	{	out.outm (); out << s << "geo \"" << name << "\"\n";
 	}
-   else // both visgeo and colgeo are the same:
-	{ out.outm (); out << "colgeo \"" << name << "\"\n";
-	  out.outm (); out << "visgeo \"" << name << "\"\n";
-	}
-
-   GsModel* model = s[0]=='v'? j->visgeo() : j->colgeo();
-
-   if ( outg )
-	if ( outg->valid() )
-	{
-	  *outg << "newgeo \"" << name << "\"\n\n";
-	  model->save ( *outg );
-	  *outg << "\nend\n\n";
-	  geopath = 0;
+	else // both visgeo and colgeo are the same:
+	{	out.outm (); out << "colgeo \"" << name << "\"\n";
+		out.outm (); out << "visgeo \"" << name << "\"\n";
 	}
 
-   if ( geopath ) // if geopath is given, save mesh file as well
-	{ GsString fullname(geopath);
-	  fullname.append ( name );
-	  GsOutput o ( fopen(fullname,"wt") );
-	  model->save(o);
+	GsModel* model = s[0]=='v'? j->visgeo() : j->colgeo();
+
+	if ( outg && outg->valid() ) // has external geometry file
+	{	*outg << "newgeo \"" << name << "\"\n\n";
+		model->save ( *outg, true ); // true: save only prim
+		*outg << "\nend\n\n";
+		geopath = 0;
 	}
- }
+
+	if ( geopath ) // if geopath is given, save mesh file as well
+	{	GsString fullname(geopath);
+		fullname.append ( name );
+		GsOutput o ( fopen(fullname,"wt") );
+		model->save(o);
+	}
+}
 
 // syntax: channel <XPos|YPos|ZPos/XRot|YRot|ZRot> <val> [free | <min><max> | lim <min><max>]
 static void outvlim ( GsOutput& out, const char* ctype, KnVecLimits* vl, int d )
@@ -903,59 +901,60 @@ static void write_joint ( GsOutput& out, KnJoint* j, int marg, const char* geopa
  }
 
 bool KnSkeleton::save ( const char* filename, bool exportgeo, bool singlegeo, bool extmtls )
- {
-   GsOutput out;
+{
+	GsOutput out;
 
-   GS_TRACE4 ( "Opening [" << filename << "]...\n" );
-   if ( !out.open(filename) ) return false;
+	GS_TRACE4 ( "Opening [" << filename << "]...\n" );
+	if ( !out.open(filename) ) return false;
    
-   GS_TRACE4("Saving...");
-   return save(out,exportgeo,singlegeo,extmtls);
- }
+	GS_TRACE4("Saving...");
+	return save(out,exportgeo,singlegeo,extmtls);
+}
 
 bool KnSkeleton::save ( GsOutput& out, bool exportgeo, bool singlegeo, bool extmtls )
- {
-   int i;
-   GsString s;
+{
+	int i;
+	GsString s;
 
-   // write header:
-   GS_TRACE4("Writing header...");
-   out << "# SIG Skeleton Definition\n\n";
-   out << "KnSkeleton\n\n";
+	// write header:
+	GS_TRACE4("Writing header...");
+	out << "# SIG Skeleton Definition\n\n";
+	out << "KnSkeleton\n\n";
 
-   if ( !_root ) return false;
+	if ( !_root ) return false;
 
-   out.margin_char ( gspc );
+	out.margin_char ( gspc );
    
-   // write name, if any:
-   GS_TRACE4("Writing name...");
-   if ( _name.len() ) out << "name " << GsSafeWrite(_name) << gsnl << gsnl;
+	// write name, if any:
+	GS_TRACE4("Writing name...");
+	if ( _name.len() ) out << "name " << GsSafeWrite(_name) << gsnl << gsnl;
 
-   // extract geometry path:
-   GsOutput* outgeo=0; // only used when singlegeo is true
-   GsString geopathst;
-   const char* geopath=0;
-   if ( exportgeo && out.filename() )
-	{ geopathst = out.filename();
-	  if ( singlegeo )
-	   { remove_extension ( geopathst );
-		 geopathst << ".m";
-		 outgeo = new GsOutput;
-		 outgeo->open ( geopathst );
-		 remove_path ( geopathst );
-		 out << "geofile \"" <<geopathst<< "\"\n\n"; // here
-	   }
-	  else
-	   { remove_filename ( geopathst );
-		 if ( validate_path(geopathst) ) geopath=geopathst; // just to be safe
-	   }
-	  geopath = geopathst;
+	// extract geometry path:
+	GsOutput* outgeo=0; // only used when singlegeo is true
+	GsString geopathst;
+	const char* geopath=0;
+	if ( exportgeo && out.filename() )
+	{	geopathst = out.filename();
+		if ( singlegeo )
+		{	remove_extension ( geopathst );
+			geopathst << ".m";
+			outgeo = new GsOutput;
+			outgeo->open ( geopathst );
+			remove_path ( geopathst );
+			out << "geofile \"" <<geopathst<< "\"\n\n"; // here
+		}
+		else
+		{	remove_filename ( geopathst );
+			if ( validate_path(geopathst) ) geopath=geopathst; // just to be safe
+		}
+		geopath = geopathst;
 	}
 
-   // save shared materials if it is the case:
-   if ( extmtls )
-	{ GS_TRACE4("Sharing materials...");
-	  /*TodoNote
+	// save shared materials if it is the case:
+	if ( extmtls )
+	{	GS_TRACE4("Sharing materials...");
+	  /*TodoNote: export external file with lists of joints sharing same material, then material,
+				  so it is easy to change group colors, then override visgeo colors at load time
 	  GsStrings libnames; GsArray<GsMaterial> libmtls;
 	  GsString path ( out.filename() );
 	  remove_filename ( path );
@@ -964,45 +963,45 @@ bool KnSkeleton::save ( GsOutput& out, bool exportgeo, bool singlegeo, bool extm
 		 if ( j->visgeo() ) j->visgeo()->share_materials ( path, libnames, libmtls );
 		 if ( j->colgeo() && j->colgeo()!=j->visgeo() ) j->colgeo()->share_materials ( path, libnames, libmtls );
 	   }*/
-	  GS_TRACE4("End of sharing materials.");
+		GS_TRACE4("End of sharing materials.");
 	}
 
-   // write the skeleton:
-   GS_TRACE4("Writing joints...");
-   out << "skeleton";
-   write_joint ( out, _root, 0, geopath, true, outgeo );
-   delete outgeo;
-   out << gsnl;
+	// write the skeleton:
+	GS_TRACE4("Writing joints...");
+	out << "skeleton";
+	write_joint ( out, _root, 0, geopath, true, outgeo );
+	delete outgeo;
+	out << gsnl;
 
-   // write dfjoints:
-   if ( _dfjoints )
-	{ out << "dist_func_joints ";
-	  _dfjoints->output ( out );
+	// write dfjoints:
+	if ( _dfjoints )
+	{	out << "dist_func_joints ";
+		_dfjoints->output ( out );
 	}
 
-   // write posture list:
-   if ( _postures.size()>0 )
-	{ for ( i=0; i<_postures.size(); i++ )
-	   { out << "add_posture ";
-		 if ( _channels==_postures[i]->channels() )
-		  _postures[i]->output(out,false,true);
-		 else
-		  _postures[i]->output(out,true,true);
-	   }
-	  out << gsnl;
+	// write posture list:
+	if ( _postures.size()>0 )
+	{	for ( i=0; i<_postures.size(); i++ )
+		{	out << "add_posture ";
+			if ( _channels==_postures[i]->channels() )
+				_postures[i]->output(out,false,true);
+			else
+				_postures[i]->output(out,true,true);
+		}
+		out << gsnl;
 	}
 
-   // write collision-free pairs list:
-   if ( _colfreepairs.size()>0 )
-	{ output_coldet_free_pairs ( out );
+	// write collision-free pairs list:
+	if ( _colfreepairs.size()>0 )
+	{	output_coldet_free_pairs ( out );
 	}
 
-   // write the (optional) end keyword:
-   out << "end\n";
+	// write the (optional) end keyword:
+	out << "end\n";
 
-   GS_TRACE4("End writing.");
-   return true;
- }
+	GS_TRACE4("End writing.");
+	return true;
+}
 
 void KnSkeleton::output_coldet_free_pairs ( GsOutput& out )
  {

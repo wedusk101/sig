@@ -7,9 +7,9 @@
 
 - replace: GsEvent type: Keyboard->KeyPress, WsViewer handle_keyboard()->handle_key_press()
 - Support for additional image maps: normals, specular, etc
-- Complete glfw integration
+- Implement improvement to cos of phong equation in shaders
 - Review file loading by GsModel and KnSkeleton
-- Review and complete example programs
+- Review and complete modelviewer
 
 ===== Searchable Labels Tracking Work in Progress =====
 

@@ -93,21 +93,29 @@ bool KnChannels::insert ( int pos, KnChannel::Type type )
 }
 
 KnSkeleton* KnChannels::skeleton () const
- {
-   if ( _channels.size()==0 ) return 0;
-   if ( _channels[0].status()!=KnChannel::JointConnection ) return 0;
-   return _channels[0].joint()->skeleton();
- }
+{
+	if ( _channels.size()==0 ) return 0;
+	if ( _channels[0].status()!=KnChannel::JointConnection ) return 0;
+	return _channels[0].joint()->skeleton();
+}
+
+int KnChannels::count_connected ()
+{
+	_floats = 0;
+	for ( int i=0, s=_channels.size(); i<s; i++ )
+	{	_floats += _channels[i].size();
+	}
+	return _floats;
+}
 
 int KnChannels::count_floats ()
- {
-   int i, csize = _channels.size();
-   _floats = 0;
-   for ( i=0; i<csize; i++ )
-	{ _floats += _channels[i].size();
+{
+	_floats = 0;
+	for ( int i=0, s=_channels.size(); i<s; i++ )
+	{	_floats += _channels[i].size();
 	}
-   return _floats;
- }
+	return _floats;
+}
 
 int KnChannels::floatpos ( int c ) const
 {
@@ -348,34 +356,32 @@ int KnChannels::connect_indices ( const KnPosture* p )
  }
 
 int KnChannels::count_connected () const
- {
-   int i, n, chsize=_channels.size();
-   for ( i=n=0; i<chsize; i++ )
-	{ if ( _channels[i].status()!=KnChannel::Disconnected )
-	   { n++;
-		 if ( _channels[i].buffer()==0 ) 
-		  { gsout.fatal("Null Connection Found: [%s]\n",(const char*)_channels[i].jname()); }
-	   }
-	}
-   return n;
- }
+{
+	int n=0;
+	for ( int i=0; i<size(); i++ )
+	{	if ( cget(i).status()!=KnChannel::Disconnected ) n++; }
+	return n;
+}
 
 int KnChannels::count_disconnected () const
- {
-   int i, n, chsize=_channels.size();
-   for ( i=n=0; i<chsize; i++ ) 
-	{ if ( _channels[i].status()==KnChannel::Disconnected ) n++;
-	   else if ( _channels[i].buffer()==0 ) 
-			  { gsout.fatal("Null Connection Found: [%s]\n",(const char*)_channels[i].jname()); }
+{
+	int i, n, chsize=_channels.size();
+	for ( i=n=0; i<chsize; i++ ) 
+	{	if ( _channels[i].status()==KnChannel::Disconnected )
+		{	n++; }
+		else
+		{	if ( _channels[i].buffer()==0 )
+			{	gsout.fatal("Null Connection Found: [%s]\n", (const char*)_channels[i].jname()); }
+		}
 	}
    return n;
- }
+}
 
 void KnChannels::disconnect ()
- {
-   int i, chsize=_channels.size();
-   for ( i=0; i<chsize; i++ ) _channels[i].disconnect();
- }
+{
+	int i, chsize=_channels.size();
+	for ( i=0; i<chsize; i++ ) _channels[i].disconnect();
+}
 
 void KnChannels::merge ( const KnChannels& ca )
  {
@@ -429,16 +435,22 @@ bool KnChannels::operator == ( const KnChannels& c )
    return true;
  }
 
-GsOutput& operator<< ( GsOutput& o, const KnChannels& c )
- {
-   int i;
-   o << "channels " << c.size() << gsnl;
-   for ( i=0; i<c.size(); i++ )
-	{ o << (const char*)c(i).jname() << gspc << c(i).type_name() << gsnl;
-	  //o << " status:"<<c(i).status()<<gsnl; // extra message for debug use only
+void KnChannels::save ( GsOutput& o, bool onlycon ) const
+{
+	o << "channels ";
+	if ( onlycon )
+	{	o << count_connected() << gsnl;
+		for ( int i=0; i<size(); i++ )
+		{	if ( cget(i).status()!=KnChannel::Disconnected )
+				o << (const char*)cget(i).jname() << gspc << cget(i).type_name() << gsnl;
+		}
 	}
-   return o;
- }
+	else
+	{	o << size() << gsnl;
+		for ( int i=0; i<size(); i++ )
+		{	o << (const char*)cget(i).jname() << gspc << cget(i).type_name() << gsnl; }
+	}
+}
  
 GsInput& operator>> ( GsInput& in, KnChannels& c )
  {
@@ -542,18 +554,18 @@ int KnChannels::HashTable::insert ( int jname, char ctype, gsuint16 pos )
  }
 
 void KnChannels::HashTable::out ( GsOutput& o )
- {
-   for ( int i=0; i<table.size(); i++ )
-	{ if ( table[i].jname_key<0 ) continue;
-	  o << i << ":";
-	  o << " name:"<<KnJointName::st(table[i].jname_key);
-	  o << " nameid:"<<table[i].jname_key;
-	  o << " type:"<<int(table[i].ctype_key);
-	  o << " pos:"<<int(table[i].pos_data);
-	  o << " nxt:"<<int(table[i].next);
-	  o << gsnl;
+{
+	for ( int i=0; i<table.size(); i++ )
+	{	if ( table[i].jname_key<0 ) continue;
+		o << i << ":";
+		o << " name:"<<KnJointName::st(table[i].jname_key);
+		o << " nameid:"<<table[i].jname_key;
+		o << " type:"<<int(table[i].ctype_key);
+		o << " pos:"<<int(table[i].pos_data);
+		o << " nxt:"<<int(table[i].next);
+		o << gsnl;
 	}
- }
+}
 
 //============================ End of File ============================
 

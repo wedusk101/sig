@@ -197,7 +197,7 @@ class KnPosture : public GsShareable
 	friend float dist ( KnPosture& p1, KnPosture& p2 );
 
 	/*! Custom output of posture data */
-	void output ( GsOutput& out, bool channels, bool values, bool onelineval=true ) const;
+	void output ( GsOutput& out, bool channels, bool values, bool onelineval=true, bool name=true, bool onlycon=false ) const;
 
 	/*! Write all data of the posture using output() (with all options to true) */
 	friend GsOutput& operator<< ( GsOutput& out, const KnPosture& p );

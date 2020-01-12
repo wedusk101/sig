@@ -35,10 +35,10 @@ float GsColor::Buffer[4] = {0,0,0,0}; // static buffer used for convertion opera
 void GsColor::set ( float x, float y, float z, float w )
 {
 	int i;
-	i=int(x*255.0f); r=(gsbyte)(GS_BOUND(i,0,255));
-	i=int(y*255.0f); g=(gsbyte)(GS_BOUND(i,0,255));
-	i=int(z*255.0f); b=(gsbyte)(GS_BOUND(i,0,255));
-	i=int(w*255.0f); a=(gsbyte)(GS_BOUND(i,0,255));
+	i=int(x*255.0f); r=(gsbyte)(GS_RETCLIP(i,0,255));
+	i=int(y*255.0f); g=(gsbyte)(GS_RETCLIP(i,0,255));
+	i=int(z*255.0f); b=(gsbyte)(GS_RETCLIP(i,0,255));
+	i=int(w*255.0f); a=(gsbyte)(GS_RETCLIP(i,0,255));
 }
 
 bool GsColor::set ( const char* s )

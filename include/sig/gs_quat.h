@@ -118,12 +118,6 @@ class GsQuat
 	/*! Returns the four GsQuat values in the given f buffer */
 	void get ( float* f ) const { f[0]=w; f[1]=x; f[2]=y; f[3]=z; }
 
-	/*! Returns the rotation axis. */
-	GsVec axis () const;
-
-	/*! Returns the angle in radians. */
-	float angle () const;
-
 	/*! Returns the result of applying the rotation in quaternion q to v, ie
 		in mathematical notation this is equivalent to q v q^-1 */
 	GsVec apply ( const GsVec &v ) const;

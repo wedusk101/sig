@@ -99,7 +99,7 @@ static void read_materials ( GsModel& model,
 		else if ( in.ltoken()=="d" || in.ltoken()=="Tr" )
 		{	int a = int(in.getf()*255.0f);
 			//if ( in.ltoken()[0]=='T' ) a=255-a;
-			M.top().diffuse.a = (gsbyte)(GS_BOUND(a,0,255));
+			M.top().diffuse.a = (gsbyte)(GS_RETCLIP(a,0,255));
 		}
 		else if ( in.ltoken()=="illum" )
 		{	int i = in.geti();

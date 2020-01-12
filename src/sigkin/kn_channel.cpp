@@ -455,91 +455,90 @@ KnChannel::Type KnChannel::type ( const char* s ) // static
  }
 
 static void printv ( GsOutput& o, float v ) // optimized print
- {
-   FILE* f = o.filept();
-   int i = int(v);
+{
+	FILE* f = o.filept();
+	int i = int(v);
 
-   if ( float(i)==v )
-	{ if (f) fprintf ( f, "%d", i ); else o<<i; }
-   else
-	{ if (f) fprintf ( f, "%f", v ); else o<<v; }
- }
+	if ( float(i)==v )
+	{	if (f) fprintf ( f, "%d", i ); else o<<i; }
+	else
+	{	if (f) fprintf ( f, "%f", v ); else o<<v; }
+}
  
 int KnChannel::save ( Type type, GsOutput& o, const float* v ) // static
- {
-   if ( type<=ZPos )
-	{ printv ( o, v[0] );
-	  return 1;
+{
+	if ( type<=ZPos )
+	{	printv ( o, v[0] );
+		return 1;
 	}
-   if ( type<=ZRot || type==Twist )
-	{ float ang = GS_TODEG(v[0]);
-	  printv ( o, ang );
-	  return 1;
+	if ( type<=ZRot || type==Twist )
+	{	float ang = GS_TODEG(v[0]);
+		printv ( o, ang );
+		return 1;
 	}
-   if ( type==Quat )
-	{ GsQuat q ( v[0], v[1], v[2], v[3] );
-	  GsVec axis = q.axis();
-	  float ang = q.angle();
-	  axis.len ( ang );
-	  printv ( o, axis.x ); o<<gspc;
-	  printv ( o, axis.y ); o<<gspc;
-	  printv ( o, axis.z );
-	  return 4; // the channel size is 4
+	if ( type==Quat )
+	{	GsQuat q ( v[0], v[1], v[2], v[3] );
+		GsVec axis; float ang; q.get(axis,ang);
+		axis.len ( ang );
+		printv ( o, axis.x ); o<<gspc;
+		printv ( o, axis.y ); o<<gspc;
+		printv ( o, axis.z );
+		return 4; // the channel size is 4
 	}
-   if ( type==IKPos )
-	{ printv ( o, v[0] ); o<<gspc;
-	  printv ( o, v[1] ); o<<gspc;
-	  printv ( o, v[2] );
-	  return 3;
+	if ( type==IKPos )
+	{	printv ( o, v[0] ); o<<gspc;
+		printv ( o, v[1] ); o<<gspc;
+		printv ( o, v[2] );
+		return 3;
 	}
-   if ( type==IKGoal )
-	{ save ( IKPos, o, v ); o<<gspc;
-	  save ( Quat, o, v+3 );
-	  return 7;
+	if ( type==IKGoal )
+	{	save ( IKPos, o, v ); o<<gspc;
+		save ( Quat, o, v+3 );
+		return 7;
 	}
-   if ( type==Swing )
-	{ printv ( o, v[0] ); o<<gspc;
-	  printv ( o, v[1] );
-	  return 2;
+	if ( type==Swing )
+	{	printv ( o, v[0] ); o<<gspc;
+		printv ( o, v[1] );
+		return 2;
 	}
-   return 0;
- }
+	return 0;
+}
 
 int KnChannel::load ( Type type, GsInput& in, float* v ) // static
- {
-   if ( type<=ZPos )
-	{ in >> v[0];
-	  return 1;
+{
+	if ( type<=ZPos )
+	{	in >> v[0];
+		return 1;
 	}
-   if ( type<=ZRot || type==Twist )
-	{ in >> v[0];
-	  v[0] = GS_TORAD(v[0]);
-	  return 1;
+	if ( type<=ZRot || type==Twist )
+	{	in >> v[0];
+		v[0] = GS_TORAD(v[0]);
+		return 1;
 	}
-   if ( type==Quat )
-	{ GsVec axisang;
-	  in >> axisang;
-	  GsQuat q ( axisang );
-	  v[0] = q.w;
-	  v[1] = q.x;
-	  v[2] = q.y;
-	  v[3] = q.z;
-	  return 4;
+	if ( type==Quat )
+	{	GsVec axisang;
+		in >> axisang;
+		GsQuat q ( axisang );
+		v[0] = q.w;
+		v[1] = q.x;
+		v[2] = q.y;
+		v[3] = q.z;
+		return 4;
 	}
-   if ( type==Swing )
-	{ in >> v[0] >> v[1];
-	  return 2;
+	if ( type==Swing )
+	{	in >> v[0] >> v[1];
+		return 2;
 	}
-   if ( type==IKPos )
-	{ in >> v[0] >> v[1] >> v[2];
-	  return 3;
+	if ( type==IKPos )
+	{	in >> v[0] >> v[1] >> v[2];
+		return 3;
 	}
-   if ( type==IKGoal )
-	{ load ( IKPos, in, v );
-	  load ( Quat, in, v+3 );
-	  return 7;
+	if ( type==IKGoal )
+	{	load ( IKPos, in, v );
+		load ( Quat, in, v+3 );
+		return 7;
 	}
-   return 0;
- }
+	return 0;
+}
 
 //============================ End of File ============================

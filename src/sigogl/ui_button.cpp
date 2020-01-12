@@ -151,7 +151,7 @@ int UiButton::handle ( const GsEvent& e, UiManager* uim )
 	GS_TRACE2("Button contains event");
 
 	if ( e.type==GsEvent::Move )
-	{	if (_submenu) { if (_submenu->hidden()) _opensub(this, uim); }
+	{	if (_submenu) { if (_submenu->hidden()) _opensub(this,uim); }
 		if (_selected!=1) { _selected=1; changed(NeedsRedraw); }
 	}
 	else if ( (e.type==GsEvent::Push||e.type==GsEvent::Drag) && e.button1 )

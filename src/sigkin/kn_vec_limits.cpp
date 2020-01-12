@@ -32,7 +32,7 @@ void KnVecLimits::init ( const KnVecLimits& v )
 
 bool KnVecLimits::value ( int d, float val )
 {
-	if ( _limits[d] ) { val = GS_BOUND(val,_lolim[d],_uplim[d]); }
+	if ( _limits[d] ) GS_CLIP(val,_lolim[d],_uplim[d]);
 	if ( val==_value[d] ) return false;
 	_value[d] = val;
 	return true;
@@ -40,9 +40,9 @@ bool KnVecLimits::value ( int d, float val )
 
 void KnVecLimits::value ( const GsVec& v )
 {
-	_value[0] = _limits[0]? GS_BOUND(v.x,_lolim[0],_uplim[0]) : v.x;
-	_value[1] = _limits[1]? GS_BOUND(v.y,_lolim[1],_uplim[1]) : v.y;
-	_value[2] = _limits[2]? GS_BOUND(v.z,_lolim[2],_uplim[2]) : v.z;
+	_value[0] = _limits[0]? GS_RETCLIP(v.x,_lolim[0],_uplim[0]) : v.x;
+	_value[1] = _limits[1]? GS_RETCLIP(v.y,_lolim[1],_uplim[1]) : v.y;
+	_value[2] = _limits[2]? GS_RETCLIP(v.z,_lolim[2],_uplim[2]) : v.z;
 }
 
 float KnVecLimits::random ( int d ) const

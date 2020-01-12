@@ -133,11 +133,11 @@ void GsGridBase::get_intersection ( GsPnt2 a, GsPnt2 b, GsArray<int>& cells ) co
    if ( b.x<=_axis[0].min || b.y<=_axis[1].min ) return;
 
    float f = _seglen[0]/2;
-   a.x = GS_BOUND ( a.x, _axis[0].min, _axis[0].max-f );
-   b.x = GS_BOUND ( b.x, _axis[0].min, _axis[0].max-f );
+   GS_CLIP ( a.x, _axis[0].min, _axis[0].max-f );
+   GS_CLIP ( b.x, _axis[0].min, _axis[0].max-f );
    f = _seglen[1]/2;
-   a.y = GS_BOUND ( a.y, _axis[1].min, _axis[1].max-f );
-   b.y = GS_BOUND ( b.y, _axis[1].min, _axis[1].max-f );
+   GS_CLIP ( a.y, _axis[1].min, _axis[1].max-f );
+   GS_CLIP ( b.y, _axis[1].min, _axis[1].max-f );
    
    int i1 = (int) ((a.x-_axis[0].min) / _seglen[0]);
    int j1 = (int) ((a.y-_axis[1].min) / _seglen[1]);
@@ -169,14 +169,14 @@ void GsGridBase::get_intersection ( GsPnt a, GsPnt b, GsArray<int>& cells ) cons
    if ( b.x<=_axis[0].min || b.y<=_axis[1].min || b.z<=_axis[2].min ) return;
 
    float f = _seglen[0]/2;
-   a.x = GS_BOUND ( a.x, _axis[0].min, _axis[0].max-f );
-   b.x = GS_BOUND ( b.x, _axis[0].min, _axis[0].max-f );
+   GS_CLIP ( a.x, _axis[0].min, _axis[0].max-f );
+   GS_CLIP ( b.x, _axis[0].min, _axis[0].max-f );
    f = _seglen[1]/2;
-   a.y = GS_BOUND ( a.y, _axis[1].min, _axis[1].max-f );
-   b.y = GS_BOUND ( b.y, _axis[1].min, _axis[1].max-f );
+   GS_CLIP ( a.y, _axis[1].min, _axis[1].max-f );
+   GS_CLIP ( b.y, _axis[1].min, _axis[1].max-f );
    f = _seglen[2]/2;
-   a.z = GS_BOUND ( a.z, _axis[2].min, _axis[2].max-f );
-   b.z = GS_BOUND ( b.z, _axis[2].min, _axis[2].max-f );
+   GS_CLIP ( a.z, _axis[2].min, _axis[2].max-f );
+   GS_CLIP ( b.z, _axis[2].min, _axis[2].max-f );
    
    int i1 = (int) ((a.x-_axis[0].min) / _seglen[0]);
    int j1 = (int) ((a.y-_axis[1].min) / _seglen[1]);
@@ -210,8 +210,8 @@ int GsGridBase::get_point_location ( GsPnt2 a ) const
    if ( a.x>=_axis[0].max || a.y>=_axis[1].max ) return -1;
    if ( a.x<=_axis[0].min || a.y<=_axis[1].min ) return -1;
 
-   a.x = GS_BOUND ( a.x, _axis[0].min, _axis[0].max-(_seglen[0]/2) );
-   a.y = GS_BOUND ( a.y, _axis[1].min, _axis[1].max-(_seglen[1]/2) );
+   GS_CLIP ( a.x, _axis[0].min, _axis[0].max-(_seglen[0]/2) );
+   GS_CLIP ( a.y, _axis[1].min, _axis[1].max-(_seglen[1]/2) );
    
    int i = (int) ((a.x-_axis[0].min) / _seglen[0]);
    int j = (int) ((a.y-_axis[1].min) / _seglen[1]);
@@ -226,9 +226,9 @@ int GsGridBase::get_point_location ( GsPnt a ) const
    if ( a.x>=_axis[0].max || a.y>=_axis[1].max || a.z>=_axis[2].max ) return -1;
    if ( a.x<=_axis[0].min || a.y<=_axis[1].min || a.z<=_axis[2].min ) return -1;
 
-   a.x = GS_BOUND ( a.x, _axis[0].min, _axis[0].max-(_seglen[0]/2) );
-   a.y = GS_BOUND ( a.y, _axis[1].min, _axis[1].max-(_seglen[1]/2) );
-   a.z = GS_BOUND ( a.z, _axis[2].min, _axis[2].max-(_seglen[2]/2) );
+   GS_CLIP ( a.x, _axis[0].min, _axis[0].max-(_seglen[0]/2) );
+   GS_CLIP ( a.y, _axis[1].min, _axis[1].max-(_seglen[1]/2) );
+   GS_CLIP ( a.z, _axis[2].min, _axis[2].max-(_seglen[2]/2) );
    
    int i = (int) ((a.x-_axis[0].min) / _seglen[0]);
    int j = (int) ((a.y-_axis[1].min) / _seglen[1]);

@@ -83,6 +83,9 @@ class KnChannels : public GsShareable
 		or null if there is no joint connected. */
 	KnSkeleton* skeleton () const;
 
+	/*! Counts how many channels are connected. */
+	int count_connected ();
+
 	/*! Recalculates and stores the number of floats required to store all the
 		channels. Note that it is invalidated each time a channel type is
 		changed without using the KnChannels methods. */
@@ -195,8 +198,11 @@ class KnChannels : public GsShareable
 	/*! Comparison operator checks if the channel names and types are the same. */
 	bool operator == ( const KnChannels& c );
 
+	/*! Save method with options */
+	void save ( GsOutput& o, bool onlycon=false ) const;
+
 	/*! Output operator */
-	friend GsOutput& operator<< ( GsOutput& o, const KnChannels& c );
+	friend GsOutput& operator<< ( GsOutput& o, const KnChannels& c ) { c.save(o); return o; }
 
 	/*! Input operator */
 	friend GsInput& operator>> ( GsInput& in, KnChannels& c );

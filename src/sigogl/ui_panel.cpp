@@ -34,6 +34,7 @@ void UiPanel::_init ( Format f, Dock d )
 	_gotprevev = 0;
 	_xclose = -1;  // <0: no close button, >0: contains x limit
 	_inxclose = 0; // tells if mouse is on top of X close button
+	_radiobutext = 0;
 	_uimparent = 0;
 	_sngroup = new SnGroup;
 	_sngroup->ref();

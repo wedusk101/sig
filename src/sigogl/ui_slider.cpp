@@ -33,15 +33,26 @@ float UiSlider::value () const
 	return GS_MIX(_min,_max,_t);
 }
 
+int UiSlider::valuei () const
+{
+	float v = GS_MIX(_min,_max,_t);
+	return GS_ROUND(v);
+}
+
 void UiSlider::value ( float v )
 {
-	tvalue ( (v-_min)/(_max-_min) );
+	if ( _max==_min )
+	{	tvalue (0); }
+	else
+	{	tvalue ( (v-_min)/(_max-_min) ); }
 }
 
 void UiSlider::tvalue ( float t )
 {
-	_t = t;
-	GS_CLIP(_t,0,1);
+	if ( _max==_min )
+	{	_t=0; }
+	else
+	{	_t = t;	GS_CLIP(_t,0,1); }
 	changed ( NeedsRedraw );
 }
 
@@ -105,7 +116,7 @@ int UiSlider::handle ( const GsEvent& e, UiManager* uim )
 	# define SET(t) t=float(e.mousex-_sr.x)/float(_sr.w); GS_CLIP(t,0,1)
 
 	if ( uim->focus()==this )
-	{	if ( e.type==GsEvent::Drag && e.button1 )
+	{	if ( e.type==GsEvent::Drag && e.button1 && _min<_max )
 		{	float ot=_t; SET(_t); if(_allev&&ot!=_t) uim->uievent(_event,this,false); changed(NeedsRedraw); }
 		else // end of focus
 		{	uim->uievent(_event,this,false); uim->focus(0); }
@@ -114,6 +125,7 @@ int UiSlider::handle ( const GsEvent& e, UiManager* uim )
 
 	bool contains = _rect.contains ( e.mousex, e.mousey );
 	if ( !contains ) { if (_inuse) { _inuse=0; changed(NeedsRedraw); } return 0; }
+	if ( _min==_max ) { if (_inuse!=1) _inuse=1; return 1; }
 
 	if ( e.type==GsEvent::Move )
 	{	if ( _inuse!=1 ) _inuse=1;

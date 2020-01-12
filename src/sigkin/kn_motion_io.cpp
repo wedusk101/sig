@@ -11,6 +11,7 @@
 # include <sig/gs_string.h>
 # include <sig/gs_euler.h>
 
+//# define GS_USE_TRACE1 // load
 //# define GS_USE_TRACE2 // save bvh
 //# define GS_USE_TRACE4 // save
 # include <sig/gs_trace.h>
@@ -160,137 +161,140 @@ bool KnMotion::load_bvh ( GsInput& in )
 //============================= load ============================
 
 bool KnMotion::load ( const char* filename )
- {
-   //GS_TRACE3("Load from file...");
-   GsInput in;
-   if ( !in.open(filename) ) return false;
-   if ( !load(in) ) return false;
-   return true;
- }
+{
+	GS_TRACE1 ( "Load from file..." );
+	GsInput in;
+	if ( !in.open(filename) ) return false;
+	if ( !load(in) ) return false;
+	return true;
+}
 
 bool KnMotion::load ( GsInput& in )
- {
-   in.lowercase ( false ); // string comparison remains case insensitive
-   in.commentchar ( '#' );
+{
+	in.lowercase ( false ); // string comparison remains case insensitive
+	in.commentchar ( '#' );
 
-   // init and set new filename
-   init ();
-   if ( in.filename() ) filename(in.filename());
+	// init and set new filename
+	init ();
+	if ( in.filename() ) filename(in.filename());
 
-   // 1. verify signature
-   in.get();
-   if ( in.ltoken()=="HIERARCHY" ) // bvh format
-	{ GsString s = in.filename();
-	  remove_path ( s );
-	  remove_extension ( s );
-	  name ( s );
-	  return load_bvh ( in );
+	// 1. verify signature
+	in.get();
+	if ( in.ltoken()=="HIERARCHY" ) // bvh format
+	{	GsString s = in.filename();
+		remove_path ( s );
+		remove_extension ( s );
+		name ( s );
+		return load_bvh ( in );
 	}
-   else if ( in.ltoken()!="KnMotion" && in.ltoken()!="KnMotion" )
-	{ return false;
-	}
-
-   // 2. read name if any:
-   in.get();
-   if ( in.ltoken()=="name" )
-	{ in.get(); name ( in.ltoken() ); }
-   else
-	in.unget();
-
-   // 3. read channels
-   KnChannels* chs = new KnChannels;
-   in >> *chs;
-
-   // 4. check if a start_kt is set
-   float startkt = -1.0f;
-   if ( in.check()==GsInput::String )
-	{ in.get();
-	  if ( in.ltoken()=="startkt" || in.ltoken()=="start_kt" )
-	   { in.get();
-		 startkt = in.ltoken().atof();
-	   }
-	  else in.unget();
+	else if ( in.ltoken()!="KnMotion" && in.ltoken()!="KnMotion" )
+	{	return false;
 	}
 
-   // 5. read number of frames, if specified
-   int numframes = -1;
-   in.get();
-   if ( in.ltoken()=="frames" )
-	{ in.get();
-	  numframes = in.ltoken().atoi();
-	  _frames.size ( numframes );
-	  _frames.size ( 0 );
-	}
-   else
-	in.unget();
+	// 2. read name if any:
+	in.get();
+	if ( in.ltoken()=="name" )
+	{	in.get(); name ( in.ltoken() ); }
+	else
+	{	in.unget(); }
 
-   // 6. read data
-   int f=0;
-   while ( !in.end() )
-	{ if ( in.get()==GsInput::End ) break; // kt
-	  if ( in.get()==GsInput::End ) break;
-	  insert_frame ( f, in.ltoken().atof(), new KnPosture(chs) );
-	  in.get(); // fr
-	  in >> (*_frames[f].posture);
-	  f++;
-	  if ( f==numframes ) break;
+	// 3. read channels
+	KnChannels* chs = new KnChannels;
+	in >> *chs;
+
+	// 4. check if a start_kt is set
+	float startkt = -1.0f;
+	if ( in.check()==GsInput::String )
+	{	in.get();
+		if ( in.ltoken()=="startkt" || in.ltoken()=="start_kt" )
+		{	in.get();
+			startkt = in.ltoken().atof();
+		}
+		else in.unget();
 	}
 
-   // 7. read user data, if specified
-   while( !in.end() )
-	{ if ( in.get()==GsInput::End ) break;
-	  if ( in.ltoken()=="userdata" ) in >> *_userdata;
+	// 5. read number of frames, if specified
+	int numframes = -1;
+	in.get();
+	if ( in.ltoken()=="frames" )
+	{	in.get();
+		numframes = in.ltoken().atoi();
+		_frames.size ( numframes );
+		_frames.size ( 0 );
+	}
+	else
+	{	in.unget(); }
+
+	// 6. read data
+	int f=0;
+	while ( !in.end() )
+	{	if ( in.get()==GsInput::End ) break; // kt
+		if ( in.get()==GsInput::End ) break;
+		insert_frame ( f, in.ltoken().atof(), new KnPosture(chs) );
+		in.get(); // fr
+		in >> (*_frames[f].posture);
+		f++;
+		if ( f==numframes ) break;
 	}
 
-   if ( startkt>-1 ) move_keytimes ( startkt );
+	// 7. read user data, if specified
+	while( !in.end() )
+	{	if ( in.get()==GsInput::End ) break;
+		if ( in.ltoken()=="userdata" ) in >> *_userdata;
+	}
 
-   compress ();
+	if ( startkt>-1 ) move_keytimes ( startkt );
 
-   return true;
- }
+	compress ();
+
+	return true;
+}
 
 //============================= save ============================
 
-bool KnMotion::save ( const char* filename )
- {
-   GsOutput out;
+bool KnMotion::save ( const char* filename, int fini, int fend, bool optimize )
+{
+	GsOutput out;
 
-   GS_TRACE4 ( "Opening [" << filename << "]...\n" );
-   if ( !out.open(filename) ) return false;
+	GS_TRACE4 ( "Opening [" << filename << "]...\n" );
+	if ( !out.open(filename) ) return false;
 
-   GS_TRACE4("Saving...");
-   return save(out);
- }
+	GS_TRACE4("Saving...");
+	return save(out,fini,fend,optimize);
+}
 
-bool KnMotion::save ( GsOutput& out )
- {
-   out << "KnMotion\n\n";
+bool KnMotion::save ( GsOutput& out, int fini, int fend, bool optimize )
+{
+	out << "KnMotion\n\n";
 
-   if ( _name )
-	{ out << "name " << GsSafeWrite(_name) << gsnl << gsnl;
+	if ( _name )
+	{	out << "name " << GsSafeWrite(_name) << gsnl << gsnl;
 	}
 
-   KnChannels* chs = channels();
-   if ( !chs ) return true;
+	KnChannels* chs = channels();
+	if ( !chs ) return true;
 
-   out<<"# Reminder: Quat channels are stored in axis-angle format\n\n";
+	out<<"# Reminder: Quat channels are stored as 3-valued axisangle format\n\n";
 
-   out << (*chs) << gsnl;
+	chs->save ( out, optimize ); out << gsnl;
 
-   out << "frames " << _frames.size() << gsnl;
+	out << "frames " << _frames.size() << gsnl;
+	int fmax=_frames.size()-1;
+	if ( fend<0 ) fend=fmax; else GS_CLIP ( fend, 0, fmax );
+	GS_CLIP ( fini, 0, fend );
 
-   int i;
-   /*chsize = */ chs->size();
-   for ( i=0; i<_frames.size(); i++ )
-	{ out << "kt " << _frames[i].keytime << " fr ";
-	  _frames[i].posture->output(out,false,true);
+	float ktadj = fini==0? 0 : _frames[fini].keytime;
+
+	for ( int i=fini; i<=fend; i++ )
+	{	out << "kt " << _frames[i].keytime-ktadj << " fr ";
+		_frames[i].posture->output(out,false,true,true,false,optimize); // channels, values, onelineval, name, onlycon
 	}
-   out << gsnl;
+	out << gsnl;
 
-   if ( _userdata ) out << "userdata" << gsnl << *_userdata << gsnl;
+	if ( _userdata ) out << "userdata" << gsnl << *_userdata << gsnl;
 
-   return true;
- }
+	return true;
+}
 
 /* MotionBuilder friendly level:
 // 0: not compatible; 1: omit channels for child-less joint; 2: also rename child-less joint to "End Site"
@@ -349,23 +353,19 @@ static void write_bvh_joint ( GsOutput &out, KnJoint *j, int marg, unsigned int 
 	out << '}' << gsnl;
 }
 
-
 // Added by David Huang, Apr 2010; modified on June 2012.
 bool KnMotion::save_bvh ( const char *filename, int fps, unsigned int MB_friendly )
 {
-	GS_TRACE2("Saving...");
+	GS_TRACE2("Saving as bvh file...");
 
 	KnSkeleton *sk = skeleton();
-
 	if (!sk)
-	{
-		gsout << "No skeleton is attached to this motion, aborting..."<<gsnl;
+	{	gsout << "No skeleton is attached to this motion, aborting..."<<gsnl;
 		return false;
 	}
 
 	KnChannels *chs = channels();
-	if (!chs || chs->size() == 0)
-		return false;
+	if ( !chs || chs->size()==0 ) return false;
 
 	GsOutput out;
 	out.fmtfloat("f");
@@ -397,7 +397,8 @@ bool KnMotion::save_bvh ( const char *filename, int fps, unsigned int MB_friendl
 	float x, y, z;
 	int i, k, jsize = _joints.size();
 
-	for (i = 0; (float)i/fps <= total_time; i++) {
+	for (i = 0; (float)i/fps <= total_time; i++)
+	{
 		this->apply((float)i/fps);
 
 		for(k=0; k<jsize; k++)
@@ -461,6 +462,5 @@ static bool hasTranslation(KnJoint *j)
 
 	return false;
 }
-
 
 //============================ End of File ===========================

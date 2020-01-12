@@ -39,6 +39,7 @@ class UiPanel : public UiElement
 	gscbool _gotprevev;
     gscbool _inxclose;	// if pointer in close button
 	gsint16 _xclose;	// <0: no close button, >0: contains x limit
+	gscbool _radiobutext;  // if parent panel extends list of radio buttons
 	GsColor _sepcolor;
 	UiManager* _uimparent; // uim pointer or null if not directly under a UiManager
 	SnPlanarObjects* _pobs;
@@ -108,6 +109,9 @@ class UiPanel : public UiElement
 	void set_style ( const UiStyle& s );
 
 	void rebuild () { changed(NeedsRebuild); build(); }
+
+	bool extended_radiobut_panel () { return _radiobutext; }
+	void extended_radiobut_panel ( bool b ) { _radiobutext=b; }
 
 	// Overriden virtual methods:
 	virtual void change_style ( const UiStyle& s ) override;

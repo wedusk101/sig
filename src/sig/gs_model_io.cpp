@@ -175,9 +175,9 @@ bool GsModel::load ( GsInput &in )
 	{	GsString* s = 0;
 		if ( V.size()==0 ) // note that make_primitive() calls init()
 		{	if ( name.len()>0 ) s = new GsString(name);
+			primitive = hasprim;
 			make_primitive ( *hasprim );
 			if ( s ) { name = *s; delete s; }
-			delete hasprim;
 		}
 		else
 		{	primitive = hasprim; }
@@ -204,7 +204,7 @@ bool GsModel::load ( GsInput &in )
 	return true;
 }
 
-bool GsModel::save ( const char* fname )
+bool GsModel::save ( const char* fname, bool onlyprim )
 {
 	filename = fname;
 
@@ -214,11 +214,11 @@ bool GsModel::save ( const char* fname )
 	else
 	{	GsOutput out;
 		if ( !out.open(fname) ) return false;
-		return save ( out );
+		return save ( out, onlyprim );
 	}
 }
 
-bool GsModel::save ( GsOutput &o ) const
+bool GsModel::save ( GsOutput &o, bool onlyprim ) const
 {
 	int i, s;
 
@@ -241,7 +241,10 @@ bool GsModel::save ( GsOutput &o ) const
 
 	// save primitive shape information
 	if ( primitive )
-	{	o << "primitive\n" << *primitive << gsnl; }
+	{	o << "primitive\n" << *primitive;
+		if ( onlyprim ) return true;
+		o << gsnl;
+	}
 
 	// save vertices (V)
 	if ( V.size() ) 

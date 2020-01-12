@@ -22,6 +22,7 @@ class UiRadioButton : public UiCheckButton
 	UiRadioButton ( const char* l, int ev, bool val=false, int x=0, int y=0, int mw=0, int mh=0 );
 	void set () { value(true); make_value_unique(); }
 	void make_value_unique ();
+	void clear_attached_panels ( UiPanel* p, int dir=0 );
 	virtual int handle ( const GsEvent& e, UiManager* uim ) override;
 };
 

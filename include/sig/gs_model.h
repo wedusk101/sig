@@ -325,11 +325,15 @@ class GsModel : public GsShareable
 
 	/*! If the extension in file name is "iv" the model is exported in 
 		.iv format, otherwise save the model in the .m format.
-		The given filename is stored with method filename() */
-	bool save ( const char* fname );
+		The given filename is stored with method filename().
+		If onlyprim is set to true and the model has primitve information,
+		only the primitive information is saved. */
+	bool save ( const char* fname, bool onlyprim=false );
 
-	/*! Save GsModel in the .m format.  */
-	bool save ( GsOutput& o ) const;
+	/*! Save GsModel in the .m format.
+		If onlyprim is set to true and the model has primitve information,
+		only the primitive information is saved. */
+	bool save ( GsOutput& o, bool onlyprim=false ) const;
 
 	/*! Export model in Open Inventor .iv format */
 	bool save_iv ( const char* file );

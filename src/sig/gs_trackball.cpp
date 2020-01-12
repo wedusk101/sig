@@ -56,7 +56,7 @@ void GsTrackball::get_spin_from_mouse_motion ( float p1x, float p1y, float p2x, 
 
 	d = p1-p2; // how much to rotate around axis
 	t = d.norm() / (2.0f*size);
-	t = GS_BOUND ( t, -1.0f, 1.0f ); // avoid problems with out-of-control values
+	GS_CLIP ( t, -1.0f, 1.0f ); // avoid problems with out-of-control values
 	float ang = 2.0f * asinf(t);
 
 	spin.set ( a, ang ); // a is normalized inside rot()

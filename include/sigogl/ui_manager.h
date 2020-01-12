@@ -74,7 +74,7 @@ class UiManager : public SnEditor
 	/*! Add ui panel to the manager. Label string l may be a null pointer indicating no label to be used. */
 	UiPanel* add_panel ( const char* l, UiPanel::Format f=UiPanel::Vertical, UiPanel::Dock d=UiPanel::Float, int x=0, int y=0 );
 	UiPanel* add_panel ( const char* l, UiPanel::Format f, int x, int y ) { return add_panel(l,f,UiPanel::Float,x,y); }
-	void add ( UiPanel* p );
+	void add ( UiPanel* p, bool astopsubmenu=false );
 
 	/*! Will set the top element, if a panel, to activate only in response to a right-button event.
 		If a previous rbutton panel already exists, it will be removed and unref() called. */

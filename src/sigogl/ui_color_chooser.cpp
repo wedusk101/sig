@@ -118,14 +118,14 @@ void UiColorChooser::_mouseev ( int mx, int my, UiManager* uim )
 {
 	if ( _state==2 ) // editing gray bar
 	{	float t = float(my-_rg.y)/float(_rg.h);
-		int i = 255-int( (GS_BOUND(t,0,1.0f))*255.0f );
+		int i = 255-int( (GS_RETCLIP(t,0,1.0f))*255.0f );
 		_center.set ( i, i, i );
 		_cvalue = mix ( _center, _c2, _c3, _w1, _w2, _w3 );
 	}
 	else if ( _state==1 ) // editing colored area
 	{	GsPnt2 g, y, r, o, c, b, p;
 		_getpoints ( g, y, r, o, c, b, p );
-		GsPnt2 m ( GS_BOUND(mx,g.x,r.x), GS_BOUND(my,g.y,c.y) );
+		GsPnt2 m ( GS_RETCLIP(mx,g.x,r.x), GS_RETCLIP(my,g.y,c.y) );
 		_pvalue.x = -999;
 		_haspoint ( o, y, g, _center, GsColor::yellow, GsColor::green, m );
 		_haspoint ( o, g, c, _center, GsColor::green, GsColor::cyan, m );

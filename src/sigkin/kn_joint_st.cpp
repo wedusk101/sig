@@ -81,8 +81,8 @@ float KnJointST::swingy ()
 
 void KnJointST::ellipse ( float rx, float ry )
 {
-	rx = GS_BOUND ( rx, 0.00001f, gspi );
-	ry = GS_BOUND ( ry, 0.00001f, gspi );
+	GS_CLIP ( rx, 0.00001f, gspi );
+	GS_CLIP ( ry, 0.00001f, gspi );
 	if ( rx==_ex && ry==_ey ) return; // no change
 	SYNC;
 	_ex = rx;
@@ -96,7 +96,7 @@ void KnJointST::twist ( float t )
 	if ( _twist==t && INSYNC ) return; // no change
    
 	if ( _limit_twist )
-		_twist = GS_BOUND(t,_lolim,_uplim);
+		_twist = GS_RETCLIP(t,_lolim,_uplim);
 	else
 		_twist = t;
 	NEWVAL;
@@ -115,7 +115,7 @@ void KnJointST::twist_limits ( float min, float max )
 	SYNC;
 	_lolim = min;
 	_uplim = max;
-	float t = GS_BOUND(_twist,_lolim,_uplim);
+	float t = GS_RETCLIP(_twist,_lolim,_uplim);
 	twist ( t );
 }
 

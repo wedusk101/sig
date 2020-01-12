@@ -303,8 +303,8 @@ void KnMotion::change_values ( int f1, int f2, int channel, float mfactor, const
 {
 	int frsize = _frames.size();
 	if ( frsize==0 ) return;
-	f2 = GS_BOUND(f2,0,(frsize-1));
-	f1 = GS_BOUND(f1,0,f2);
+	GS_CLIP(f2,0,(frsize-1));
+	GS_CLIP(f1,0,f2);
 	KnChannels* chs = channels();
 	KnChannel& ch = chs->get(channel);
 	int fp = chs->floatpos ( channel );

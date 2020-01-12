@@ -401,28 +401,25 @@ int gs_random ( int min, int max );
 # define GS_SWAP(a,b) { tmp=a; a=b; b=tmp; }
 
 /*! Macro that makes m to be x, if x is greater than m. */
-# define GS_UPDMAX(m,x) if((x)>(m)) m=x
+# define GS_UPDMAX(m,x) { if((x)>(m)) m=x; }
 
 /*! Macro that makes m to be x, if x is smaller than m. */
-# define GS_UPDMIN(m,x) if((x)<(m)) m=x
+# define GS_UPDMIN(m,x) { if((x)<(m)) m=x; }
 
 /*! Macro that tests if x is inside the interval [i,s]. */
-# define GS_BOUNDED(x,i,s) ((i)<=(x) && (x)<=(s))
-
-/*! Macro that tests if x is inside the interval [i,s] (same as GS_BOUNDED). */
 # define GS_INRANGE(x,i,s) ((i)<=(x) && (x)<=(s))
 
 /*! Macro that returns x clipped by the interval [i,s]. */
-# define GS_BOUND(x,i,s) (x)<(i)? (i): (x)>(s)? (s): (x)
+# define GS_RETCLIP(x,i,s) (x)<(i)? (i): (x)>(s)? (s): (x)
 
 /*! Macro that clips x to be inside the interval [i,s]. */
-# define GS_CLIP(x,i,s) if(x<i)x=i; else if(x>s)x=s
+# define GS_CLIP(x,i,s) { if(x<i)x=i; else if(x>s)x=s; }
 
 /*! Macro that forces a to be positive by negating it if it is negative. */
-# define GS_SETPOS(a) if((a)<0) a=-(a)
+# define GS_SETPOS(a) { if((a)<0) a=-(a); }
 
 /*! Macro that forces a to be negative by negating it if it is positive. */
-# define GS_SETNEG(a) if((a)>0) a=-(a)
+# define GS_SETNEG(a) { if((a)>0) a=-(a); }
 
 /*! Macro that returns -2t^3 +3t^2 */
 # define GS_CUBIC(t) (-(2.0f*((t)*(t)*(t))) + (3.0f*((t)*(t))))

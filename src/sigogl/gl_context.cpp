@@ -68,7 +68,7 @@ void GlContext::clear ()
 
 void GlContext::num_lights ( int n )
 {
-	_numl = GS_BOUND ( n, 1, GlContext::MaxLights );
+	_numl = GS_RETCLIP ( n, 1, GlContext::MaxLights );
 }
 
 void GlContext::clear_color ( const GsColor& c )

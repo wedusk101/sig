@@ -17,32 +17,22 @@ static SnGroup* get_skin_models ( KnFbxImporter& fbximp );
 
 int main ( int argc, char **argv )
 {
-	// Choose a skeleton to load:
-	const char* skfile;
-	GsStrings s;
-	s.push ( "=== load from disk ===" );	// 0
-	s.push ( "../data/arms/onearm.s" );		// 1
-	s.push ( "../data/arms/twoarm.s" );		// 2
-	s.push ( "../data/arms/twolinks.s" );	// 3
-	s.push ( "../data/arms/twolinks84.s" );	// 4
-	s.push ( "../data/arms/torso.s" );		// 5
-	int choice = -1; // change here to start with desired case
+	const char* skfile=0;
+	const char* skmotion=0;
 
-	if ( choice>0 )
-	{	choice=ui_choice ( "Select skeleton:", s );
-		if ( choice<0 )	return 1;
-	}
+	// Choose initial parameters:
+	//skfile = "../data/characters/tubeguy.s";
+	//skmotion = "../data/characters/walkfwd.sm";
+	bool viewskel = false;
+	bool viewfloor = false;
+	float floory = 0;
 
-	if ( choice<=0 ) // select file from disk
-		skfile = ui_select_file ( "Select skeleton file to load:", "../data/arms/", "*.s;*.bvh;*.fbx" );
-	else
-		skfile = s[choice];
-
-	// Create viewer:
+	// Select skeleton file from disk if not specified above:
+	if ( !skfile ) skfile = ui_select_file ( "Select skeleton file to load:", "../data/characters/", "*.s;*.bvh;*.fbx" );
 	if ( !skfile ) return 1;
-	KnSkeleton* sk = new KnSkeleton;
 
-	// load skeleton:
+	// Create and load skeleton:
+	KnSkeleton* sk = new KnSkeleton;
 	SnGroup* g=0;
 	if ( gs_compare(gs_extension(skfile),"fbx")==0 ) // import fbx
 	{	KnFbxImporter fbximp;
@@ -55,12 +45,15 @@ int main ( int argc, char **argv )
 	}
 
 	// Create viewer:
-	MySkelViewer* viewer = new MySkelViewer(sk,-1,-1,800,600,"SIG Skelviewer");
+	MySkelViewer* viewer = new MySkelViewer(sk,-1,-1,800,600,"SIG Skelviewer",viewskel,viewfloor,floory);
 	if ( g ) viewer->rootg()->add ( g );
+
+	// Motions and other settings have to be added after viewer is created:
+	if ( skmotion ) viewer->load_motion ( skmotion, 0 );
+
+	// Finalize and run:
 	viewer->view_all ();
 	viewer->show();
-
-	// let it run:
 	ws_run();
 
 	return 1;

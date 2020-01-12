@@ -646,7 +646,7 @@ int WsViewer::num_lights () const
 
 void WsViewer::num_lights ( int n )
 {
-	_data->numl = GS_BOUND ( n, 1, GlContext::MaxLights );
+	_data->numl = GS_RETCLIP ( n, 1, GlContext::MaxLights );
 }
 
 GsLight& WsViewer::light ( int i )
@@ -888,7 +888,7 @@ int WsViewer::handle_examiner_manipulation ( const GsEvent &e )
 
 	if ( e.type==GsEvent::Wheel ) // ZOOM
 	{ 	c.fovy *= 1 - float(e.wheelclicks)*_data->zoomfactor/100.0f;
-		c.fovy = GS_BOUND ( c.fovy, 0.001f, gspi );
+		GS_CLIP ( c.fovy, 0.001f, gspi );
 		redraw ();
 		return 1;
 	}
@@ -903,7 +903,7 @@ int WsViewer::handle_examiner_manipulation ( const GsEvent &e )
 			float len = e.mousedp().len() / factor; 
 			if ( dx+dy<0 ) len=-len;
 			c.fovy *= 1 - factor*(dx+dy);
-			c.fovy = GS_BOUND ( c.fovy, 0.001f, gspi );
+			GS_CLIP ( c.fovy, 0.001f, gspi );
 			_camcenter ( _data, e, 3 );
 		}
 		else if ( TRANSLATING(e) )
@@ -954,7 +954,7 @@ int WsViewer::handle_planar_manipulation ( const GsEvent& e )
 	{	const float factor = 0.0008f;
 		//gsout<<e.wheelclicks<<gsnl;
 		c.fovy *= 1 - float(e.wheelclicks)*factor;
-		c.fovy = GS_BOUND ( c.fovy, 0.0001f, gspi );
+		GS_CLIP ( c.fovy, 0.0001f, gspi );
 		_camcenter ( _data, e, 3 );
 	}
 	else if ( e.type==GsEvent::Drag )
@@ -962,7 +962,7 @@ int WsViewer::handle_planar_manipulation ( const GsEvent& e )
 		if ( ZOOMING(e) ) // scaling effect in planar mode
 		{	const float factor = 0.02f;
 			c.fovy *= 1 - factor*(e.mousedx()+e.mousedy());
-			c.fovy = GS_BOUND ( c.fovy, 0.0001f, gspi );
+			GS_CLIP ( c.fovy, 0.0001f, gspi );
 			_camcenter ( _data, e, 3 );
 		}
 		else if ( TRANSLATING(e) ) // this will translate in planar mode

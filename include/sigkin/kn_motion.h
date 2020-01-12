@@ -71,19 +71,21 @@ class KnMotion : public GsShareable
 	bool load_bvh ( GsInput& in );
 
 	/*! Save the motion to a file and returns true if no errors. */
-	bool save ( const char* filename );
+	bool save ( const char* filename, int fini=0, int fend=-1, bool optimize=false );
 
-	/*! Save the motion to a file and returns true if no errors */
-	bool save ( GsOutput& out );
+	/*! Save the motion to a file and returns true if no errors.
+		If optimize is set to true, only connected channels are saved. */
+	bool save ( GsOutput& out, int fini=0, int fend=-1, bool optimize=false );
 
 	/*! Save the motion to a file in BVH format and returns true if no errors.
-		Channels to be saved are get from the skeleton channel definitioin.
-		A skeleton has to be attached to the motion as bvh contains skeleton definition.
+		Channels to be saved are taken from the skeleton channel definitions.
+		A skeleton has to be attached to the motion as it contains the skeleton definitions.
 		False is returned if the file could not be written or if there is no skeleton attached.
-		note: bvh frames are interpolated at each key time defined by fps.
+		The bvh frames are interpolated at each key time defined by fps.
 		MotionBuider friendly level: 0: not friendly;
 									 1: omit channels for child-less joint;
-									 2: also rename child-less joints to "End Site". */
+									 2: also rename child-less joints to "End Site".
+		(Original author: David Huang, change history maintained in cpp.) */
 	bool save_bvh ( const char* filename, int fps=30, unsigned int MB_friendly=0 );
 
 	/*! Clears frame data, creating a motion with the given keytimes and postures.
