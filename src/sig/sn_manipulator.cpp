@@ -259,7 +259,7 @@ int SnManipulator::handle_event ( const GsEvent &e, float t )
 		return 1;
 	}
 
-	if ( _mode==ModeTranslating && e.type==GsEvent::Keyboard )
+	if ( _mode==ModeTranslating && e.type==GsEvent::KeyPress )
 	{	GS_TRACE1 ( "ROTATION BY KEY" );
 		if ( e.key=='p' ) gsout<<mat()<<gsnl;
 		if ( e.key=='x' ) 

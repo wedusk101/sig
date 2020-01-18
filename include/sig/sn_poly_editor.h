@@ -151,7 +151,7 @@ class SnPolyEditor : public SnEditor
 	void rotate_polygon ( int i, const GsVec2& lp, const GsVec2& p );
 
 	virtual int handle_only_move_event ( const GsEvent& e, const GsVec2& p, const GsVec2& lp );
-	virtual int handle_keyboard ( const GsEvent& e );
+	virtual int handle_key_press ( const GsEvent& e );
 	virtual int handle_event ( const GsEvent &e, float t ) override;
 	virtual int check_event ( const GsEvent& e, float& t ) override;
 };

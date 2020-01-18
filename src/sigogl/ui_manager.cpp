@@ -344,14 +344,14 @@ int UiManager::handle ( const GsEvent& e )
 	if ( _panels.empty() ) return 0;
 
 	if (!_display)
-	{	if ( e.type==GsEvent::Keyboard && e.key=='/' )
+	{	if ( e.type==GsEvent::KeyPress && e.key=='/' )
 		{	_display=true; _win->redraw(); return 1; }
 		return 0;
 	}
 
 	int h=0; // 0 means event has not been handled
 
-	if ( e.type==GsEvent::Keyboard && _cmdkeys.size() )
+	if ( e.type==GsEvent::KeyPress && _cmdkeys.size() )
 	{	for ( int i=0, s=_cmdkeys.size(); i<s; i++ )
 		{	CmdKey& ck=_cmdkeys[i];
 			if ( (ck.key==e.key && ck.alt==e.alt && ck.ctrl==e.ctrl && ck.shift==e.shift) && 
@@ -377,7 +377,7 @@ int UiManager::handle ( const GsEvent& e )
 	else // handle elements
 	{ if ( _submenus==0 ) // handle regular elements, which may add submenus
 		{	GS_TRACE5("handling elements...");
-			if ( e.type==GsEvent::Keyboard && e.key=='/' )
+			if ( e.type==GsEvent::KeyPress && e.key=='/' )
 			{	_display=false; h=1; _win->redraw(); 
 			}
 			else // handle top-level panels
@@ -436,7 +436,7 @@ int UiManager::handle ( const GsEvent& e )
 		}
 		else // panel active
 		{	if (e.type == GsEvent::Push || // this prevents elements from catching a push event
-			   (e.type == GsEvent::Keyboard&&e.key==GsEvent::KeyEsc) ) // close panel
+			   (e.type == GsEvent::KeyPress&&e.key==GsEvent::KeyEsc) ) // close panel
 			{	hide_rbutton_panel();
 				_rbpanelsubs.init();
 				_rbmx = _rbmy = -1;

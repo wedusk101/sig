@@ -137,15 +137,15 @@ class GsPolygon : public GsArray<GsPnt2>
 	/*! Compute the convex hull and return it in hull, uses the gift-wrapping algorithm */
 	void convex_hull ( GsPolygon& hull ) const;
 
-	/*! Returns the index of the vertex which is closer to p and within
-		an epsilon distance of p, or -1 if there is not such a vertex.
-		However if parameter stopatfirst is true the first epsilon-close
-		vertex is returned, or -1 if no epsilon-close vertex exists. */
-	int pick_vertex ( const GsPnt2& p, float epsilon, bool first=false ) const;
+	/*! Returns the index of the vertex which is the closest to p among all
+		vertices within	epsilon distance to p, or -1 if there is not such a vertex.
+		However if parameter stopatfirst is true the first epsilon-close vertex
+		that is found is returned, or -1 if no epsilon-close vertex exists. */
+	int pick_vertex ( const GsPnt2& p, float epsilon, bool stopatfirst=false ) const;
 
-	/*! Returns the index i of the edge (i,i+1) that is the closer edge
-		to p, and within a distance of epsilon to p. The square of that
-		distance is returned in dist2. -1 is returned if no edges are found */
+	/*! Returns the index i of the edge (i,i+1) that is the closest edge to p
+		among all edges within a distance of epsilon to p. The square of that
+		distance is returned in dist2. -1 is returned if no edges are found. */
 	int pick_edge ( const GsPnt2& p, float epsilon, float& dist2 ) const;
 
 	/*! Divides the polygon in triangles defined by indices to the vertices.

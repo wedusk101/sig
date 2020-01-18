@@ -113,7 +113,7 @@ void ScnViewer::update_cam ( const GsCamera& cam )
 
 int ScnViewer::handle ( const GsEvent& e )
 {
-	if ( e.type==GsEvent::Keyboard )
+	if ( e.type==GsEvent::KeyPress )
 	{ 
 		if ( e.key==GsEvent::KeyEsc ) ws_exit();
 	}
@@ -144,7 +144,7 @@ void CamViewer::draw ( GlRenderer* wr )
 
 int CamViewer::handle ( const GsEvent& e )
 {
-	if ( e.type==GsEvent::Keyboard )
+	if ( e.type==GsEvent::KeyPress )
 	{ 
 		if ( e.key==GsEvent::KeyEsc ) ws_exit();
 

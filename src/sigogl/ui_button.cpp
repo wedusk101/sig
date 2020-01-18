@@ -129,7 +129,7 @@ int UiButton::handle ( const GsEvent& e, UiManager* uim )
 {
 	GS_TRACE2("Button [" << _label.text() << "] handling...");
 
-	if ( e.type==GsEvent::Keyboard ) // keyboard check when not in focus
+	if ( e.type==GsEvent::KeyPress ) // keyboard check when not in focus
 	{	if ( e.key==_accel1 || e.key==_accel2 || (e.alt&&e.key==label().accelchar()) )
 		{	if (_submenu)
 			{	if (_submenu->state()==Hidden) _opensub(this, uim);
@@ -161,7 +161,7 @@ int UiButton::handle ( const GsEvent& e, UiManager* uim )
 	else if ( e.type==GsEvent::Release && e.button==1 && !_submenu ) // generate event
 	{	uim->uievent(_event,this); _selected=0; changed(NeedsRedraw);
 	}
-	else if ( e.type==GsEvent::Keyboard && !_submenu ) // only gets here when mouse is inside button
+	else if ( e.type==GsEvent::KeyPress && !_submenu ) // only gets here when mouse is inside button
 	{	if ( e.key==' ' )
 		{	uim->uievent(_event,this,false);
 		}

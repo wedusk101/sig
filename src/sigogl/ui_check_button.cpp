@@ -49,7 +49,7 @@ int UiCheckButton::handle ( const GsEvent& e, UiManager* uim )
 		{	if ( _type==CheckButton || _value==0 ) // this test is needed for UiRadioButton to work
 			{	_value=_value?0:1; uim->uievent(_event,this); _selected=0; changed(NeedsRedraw); return 1; }
 		}
-		else if ( e.type==GsEvent::Keyboard && e.key==' ' )
+		else if ( e.type==GsEvent::KeyPress && e.key==' ' )
 		{	if ( _type==CheckButton || _value==0 ) // this test is needed for UiRadioButton to work
 			{	_value=_value?0:1; uim->uievent(_event,this,false); changed(NeedsRedraw); return 1; }
 		}

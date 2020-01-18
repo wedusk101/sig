@@ -60,6 +60,6 @@ class MySkelViewer : public WsViewer
 	void apply_motion ( KnMotion* m, int n, float t );
 	void load_motion ( const char* mfile=0, int applyfr=-1 );
 	virtual int uievent ( int e ) override;
-	virtual int handle_keyboard ( const GsEvent& e ) override;
+	virtual int handle_key_press ( const GsEvent& e ) override;
 };
 

@@ -274,7 +274,7 @@ class WsViewer : public WsWindow
 		if crtl+shift+x to exit the application, 
 		if crtl+shift+e to call the eps export action;
 		and otherwise it will instead send the event to the scene graph. */
-	virtual int handle_keyboard ( const GsEvent& e );
+	virtual int handle_key_press ( const GsEvent& e );
 
 	/*! All key release events are passed to this method.
 		Currently the WsViewer implementation is empty and always returns 0. */

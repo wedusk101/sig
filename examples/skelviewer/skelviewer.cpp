@@ -464,7 +464,7 @@ int MySkelViewer::uievent ( int e )
 	return WsViewer::uievent(e);
 }
 
-int MySkelViewer::handle_keyboard ( const GsEvent& e )
+int MySkelViewer::handle_key_press ( const GsEvent& e )
 {
 	switch ( e.key )
 	{	
@@ -500,5 +500,5 @@ int MySkelViewer::handle_keyboard ( const GsEvent& e )
 		} return 1;
 	}
 
-	return WsViewer::handle_keyboard(e);
+	return WsViewer::handle_key_press(e);
 }

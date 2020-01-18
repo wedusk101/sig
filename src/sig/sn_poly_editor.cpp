@@ -371,7 +371,7 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 
 	_precision = e.pixelsize*_precision_in_pixels;
 
-	if ( e.type==GsEvent::Keyboard ) return handle_keyboard(e);
+	if ( e.type==GsEvent::KeyPress ) return handle_key_press(e);
 	const GsPlane& plane = GsPlane::XY;
 	GsPnt2 p ( e.ray.p1*(1.0f-t) + e.ray.p2*t );
 	GsPnt2 lp ( plane.intersect ( e.lray.p1, e.lray.p2 ).e );
@@ -522,9 +522,9 @@ int SnPolyEditor::handle_only_move_event ( const GsEvent& e, const GsVec2& p, co
 	return 0; // event not used
 }
 
-int SnPolyEditor::handle_keyboard ( const GsEvent& e )
+int SnPolyEditor::handle_key_press ( const GsEvent& e )
 {
-	GS_TRACE1 ( "SnPolyEditor handle_keyboard: "<<(int)e.key );
+	GS_TRACE1 ( "SnPolyEditor handle_key_press: "<<(int)e.key );
 
 	if ( e.key=='o' && _selpol>=0 )
 	{	GsPolygon& p = _polygons->get(_selpol);

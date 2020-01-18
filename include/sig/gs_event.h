@@ -24,14 +24,14 @@
 class GsEvent 
 {  public :
 	/*! Enumerators for the type of event. */
-	enum Type { None,		//!< No event occured.
-				Push,		//!< A mouse button was pushed.
-				Release,	//!< A mouse button was released.
-				Drag,		//!< The mouse moved with a button down.
-				Move,		//!< The mouse moved without a button down.
-				Wheel,		//!< The mouse wheel rotated.
-				Keyboard,	//!< A key was pressed.
-				KeyRelease	//!< A key was released.
+	enum Type { None,		//!< No event occured
+				Push,		//!< A mouse button was pushed
+				Release,	//!< A mouse button was released
+				Drag,		//!< The mouse moved with a button down
+				Move,		//!< The mouse moved without a button down
+				Wheel,		//!< The mouse wheel rotated
+				KeyPress,	//!< A key was pressed
+				KeyRelease	//!< A key was released
 			  };
 
 	/*! Enumerators with codes for special keys. */

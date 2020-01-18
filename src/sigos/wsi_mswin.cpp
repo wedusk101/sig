@@ -484,7 +484,7 @@ static LRESULT CALLBACK WndProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			setstate ( e );
 			setkeycode ( e, wParam );
 			if ( e.key==0 ) return DefWindowProc ( hWnd, uMsg, wParam, lParam );
-			e.type = GsEvent::Keyboard;
+			e.type = GsEvent::KeyPress;
 			break;
 
 		case WM_KEYUP  :

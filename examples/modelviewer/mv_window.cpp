@@ -228,9 +228,9 @@ int MvWindow::uievent ( int cmd )
 	return 1; // since uievent() is not overriden it is ok to always return 1 here
 }
 
-int MvWindow::handle_keyboard ( const GsEvent& e )
+int MvWindow::handle_key_press ( const GsEvent& e )
 {
-	return WsViewer::handle_keyboard(e);
+	return WsViewer::handle_key_press(e);
 }
 
 int MvWindow::handle_scene_event ( const GsEvent& e )

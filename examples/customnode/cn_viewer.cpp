@@ -43,9 +43,9 @@ void CnViewer::add_circle ( int n )
 	}
 }
 
-int CnViewer::handle_keyboard ( const GsEvent &e )
+int CnViewer::handle_key_press ( const GsEvent &e )
 {
-	int ret = WsViewer::handle_keyboard ( e ); // 1st let system check events
+	int ret = WsViewer::handle_key_press ( e ); // 1st let system check events
 	if ( ret ) return ret;
 
 	switch ( e.key )

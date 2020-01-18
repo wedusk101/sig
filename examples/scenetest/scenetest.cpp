@@ -30,7 +30,7 @@ class PrimViewer : public WsViewer
 	void add_model ( SnShape* s, GsVec p, SnNode* n=0 );
 	void build_scene ();
 	void show_normals ( bool b );
-	virtual int handle_keyboard ( const GsEvent &e ) override;
+	virtual int handle_key_press ( const GsEvent &e ) override;
 	virtual int uievent ( int e ) override;
 	virtual int timer ( int e ) override;
 };
@@ -162,9 +162,9 @@ void PrimViewer::build_scene ()
 	}
 }
 
-int PrimViewer::handle_keyboard ( const GsEvent &e )
+int PrimViewer::handle_key_press ( const GsEvent &e )
 {
-	int ret = WsViewer::handle_keyboard ( e ); // 1st let system check events
+	int ret = WsViewer::handle_key_press ( e ); // 1st let system check events
 	if ( ret ) return ret;
 
 	switch ( e.key )

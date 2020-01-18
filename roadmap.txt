@@ -5,7 +5,7 @@
 
 ===== Todo =====
 
-- replace: GsEvent type: Keyboard->KeyPress, WsViewer handle_keyboard()->handle_key_press()
+- replace: GsEvent type: Keyboard->KeyPress, WsViewer handle_key_press()->handle_key_press()
 - Support for additional image maps: normals, specular, etc
 - Implement improvement to cos of phong equation in shaders
 - Review file loading by GsModel and KnSkeleton

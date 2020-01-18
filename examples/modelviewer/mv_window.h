@@ -47,7 +47,7 @@ class MvWindow : public WsViewer
    public :
    public :
 	virtual int uievent ( int cmd ) override;
-	virtual int handle_keyboard ( const GsEvent& e ) override;
+	virtual int handle_key_press ( const GsEvent& e ) override;
 	virtual int handle_scene_event ( const GsEvent& e ) override;
 };
 

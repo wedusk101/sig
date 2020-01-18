@@ -289,9 +289,9 @@ int ShapeViewer::uievent ( int e )
 	return WsViewer::uievent(e);
 }
 
-int ShapeViewer::handle_keyboard ( const GsEvent &e )
+int ShapeViewer::handle_key_press ( const GsEvent &e )
 {
-	int ret = WsViewer::handle_keyboard ( e ); // 1st let system check events
+	int ret = WsViewer::handle_key_press ( e ); // 1st let system check events
 	if ( ret ) return ret;
 
 	if ( e.key>='0' && e.key<='8' )

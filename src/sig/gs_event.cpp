@@ -48,7 +48,7 @@ GsOutput& operator<< ( GsOutput& out, const GsEvent& e )
 {
 	out << e.type_name();
 
-	if ( e.type==GsEvent::Keyboard || e.type==GsEvent::KeyRelease ) 
+	if ( e.type==GsEvent::KeyPress || e.type==GsEvent::KeyRelease ) 
 	{	if ( e.key>=1 && e.key<=12 ) out << " [F" << (int)e.key << ']';
 		else if ( e.key>12 && e.key<255 ) out << " [" << char(e.key) << ':' << (int)e.key << ']';
 		else out << " [" << (int)e.key << ']';

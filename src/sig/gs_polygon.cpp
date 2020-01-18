@@ -445,7 +445,7 @@ int GsPolygon::pick_vertex ( const GsPnt2& p, float epsilon, bool stopatfirst ) 
 int GsPolygon::pick_edge ( const GsPnt2& p, float epsilon, float& dist2 ) const
 { 
 	int i, i2, iresult;
-	double d, t;
+	double d2, t;
 
 	iresult=-1;
 	dist2=-1;
@@ -454,10 +454,10 @@ int GsPolygon::pick_edge ( const GsPnt2& p, float epsilon, float& dist2 ) const
 	for ( i=0; i<s; i++ )
 	{	i2 = (i+1)%s;
 		if ( i2==0 && open() ) break;
-		if ( in_segment(cget(i),cget(i2),p,epsilon,d,t) )
-		{	if ( dist2<0 || d<dist2 )
+		if ( in_segment(cget(i),cget(i2),p,epsilon,d2,t) )
+		{	if ( d2<dist2 || dist2<0 )
 			{	iresult = i;
-				dist2 = (float)d;
+				dist2 = (float)d2;
 			}
 		}
 	}

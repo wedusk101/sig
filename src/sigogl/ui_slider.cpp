@@ -138,7 +138,7 @@ int UiSlider::handle ( const GsEvent& e, UiManager* uim )
 			SET(_t);
 		}
 	}
-	else if ( e.type==GsEvent::Keyboard )
+	else if ( e.type==GsEvent::KeyPress )
 	{	float t = _t;
 		switch ( e.key )
 		{	case GsEvent::KeyLeft:  _t-=_inc; if(_t<0)_t=0; break;

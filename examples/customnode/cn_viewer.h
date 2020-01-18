@@ -21,7 +21,7 @@ class CnViewer : public WsViewer
 	CnViewer ( int x, int y, int w, int h, const char* l );
 	void add_ui ();
 	void add_circle ( int n );
-	virtual int handle_keyboard ( const GsEvent &e ) override;
+	virtual int handle_key_press ( const GsEvent &e ) override;
 	virtual int uievent ( int e ) override;
 };
 

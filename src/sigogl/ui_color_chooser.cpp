@@ -144,7 +144,7 @@ int UiColorChooser::handle ( const GsEvent& e, UiManager* uim )
 	if ( _state>=1 && _state<=2 )
 	{	if ( e.type==GsEvent::Drag && e.button1 )
 		{ _mouseev ( e.mousex, e.mousey, uim ); return 1; }
-		else if ( e.type==GsEvent::Keyboard && e.key==' ' )
+		else if ( e.type==GsEvent::KeyPress && e.key==' ' )
 		{ _centervalue(); if(_allev)uim->uievent(_event,this); changed(NeedsRedraw); return 1; }
 		else
 		{ _state=0; uim->focus(0); return 1; }

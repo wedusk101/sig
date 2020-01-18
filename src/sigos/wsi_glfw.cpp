@@ -372,7 +372,7 @@ static void key_cb ( GLFWwindow* gwin, int key, int scancode, int action, int mo
 	OsWin* ow = (OsWin*)glfwGetWindowUserPointer(gwin);
 	GsEvent& e = ow->event;
 	if ( key>=GLFW_KEY_LEFT_SHIFT && action==GLFW_REPEAT ) return; // do not send repeated modifier event
-	e.type = action==GLFW_RELEASE? GsEvent::KeyRelease : GsEvent::Keyboard;
+	e.type = action==GLFW_RELEASE? GsEvent::KeyRelease : GsEvent::KeyPress;
 	e.wheelclicks = 0; 
 	e.button = 0;
 	setkeycode ( e, key );

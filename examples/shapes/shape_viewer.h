@@ -25,6 +25,6 @@ class ShapeViewer : public WsViewer
 	void new_triangles ();
 	void new_polygons ();
 	void new_colorsurf ();
-	virtual int handle_keyboard ( const GsEvent &e ) override;
+	virtual int handle_key_press ( const GsEvent &e ) override;
 	virtual int uievent ( int e ) override;
 };

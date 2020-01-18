@@ -840,8 +840,8 @@ int WsViewer::handle ( const GsEvent &e )
 	//			result = handle_planar_manipulation(e);
 	//	}
 	}
-	else if ( e.type==GsEvent::Keyboard )
-	{	result = handle_keyboard(e);
+	else if ( e.type==GsEvent::KeyPress )
+	{	result = handle_key_press(e);
 	}
 	else if ( e.type==GsEvent::KeyRelease )
 	{	result = handle_key_release(e);
@@ -1072,7 +1072,7 @@ int WsViewer::key_cmd ( char c )
 	return 0;
 }
 
-int WsViewer::handle_keyboard ( const GsEvent& e )
+int WsViewer::handle_key_press ( const GsEvent& e )
 {
 	int result = e.ctrl && e.shift? key_cmd ( e.key ) : 0;
 	if ( result==0 ) result=handle_scene_event(e);

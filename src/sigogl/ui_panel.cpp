@@ -505,7 +505,7 @@ int UiPanel::handle ( const GsEvent& e, UiManager* uim )
 	}
 
 	// Process mouse events (could do this only for dialogs)
-	if ( e.type!=GsEvent::Keyboard ) //|| (_uimparent&&_uimparent->dialog()==this) )
+	if ( e.type!=GsEvent::KeyPress ) //|| (_uimparent&&_uimparent->dialog()==this) )
 	{	
 		// 2. If event not inside panel:
 		bool contains = _rect.contains(e.mousex, e.mousey);

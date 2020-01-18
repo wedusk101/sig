@@ -96,7 +96,7 @@ int UiInput::handle ( const GsEvent& e, UiManager* uim )
 	GS_TRACE1 ( "handle");
 	if ( uim->focus()==this ) // edition mode
 	{	char delc=0;
-		if ( e.type==GsEvent::Keyboard )
+		if ( e.type==GsEvent::KeyPress )
 		{	switch (e.key)
 			{ case GsEvent::KeyLeft:  if (_cursor>0) _cursor--; if (_cursor<_curini)_curini--; break;
 			  case GsEvent::KeyRight: if (_cursor<_text.len()) _cursor++; break;
