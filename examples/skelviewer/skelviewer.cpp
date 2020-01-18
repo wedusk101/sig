@@ -199,11 +199,24 @@ void rot_sliders_set ( UiSlider* s[4], GsQuat q )
 
 void rot_sliders_get ( UiSlider* s[4], GsQuat& q )
 {
+	GsVec axis ( s[0]->value(),s[1]->value(),s[2]->value() );
 	float ang = s[3]->value();
+
+	// if rot axis is almost null assume intent is null rotation:
+	if ( axis.len()<=0.15f )
+	{	ang = 0;
+		s[3]->value(ang);
+	}
+	// if one rot axis coordinate is >1 assume intent is unit axis:
+	else for ( int i=0; i<3; i++ )
+	{	if ( s[i]->changed() && GS_ABS(axis.e[i])>=1 )
+		{	for ( int j=0; j<3; j++ ) if ( j!=i ) s[j]->value(0); }
+	}
+
 	if ( ang==0 )
 		q = GsQuat::null;
 	else
-		q.set ( GsVec(s[0]->value(),s[1]->value(),s[2]->value()), ang );
+		q.set ( axis, ang );
 }
 
 void MySkelViewer::build_values_panel ( int jid )
