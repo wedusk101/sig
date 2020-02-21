@@ -71,7 +71,8 @@ class SnPolyEditor : public SnEditor
 	/*! Determines if vertices can be added to polygons or not */
 	void allow_adding_vertices ( bool b ) { _addvertices=(gscbool)b; }
 
-	/*! Determines if vertices can be added to polygons or not */
+	/*! Turns on key controls for split (s), join (j), ccw enforcement (c), and 
+		vertex selection change next (n) and prior (p) */
 	void advanced_editing ( bool b ) { _adved=(gscbool)b; }
 
 	/*! Set type of the selection marker: the polygon, the convex hull, or the bounding box */
@@ -102,7 +103,7 @@ class SnPolyEditor : public SnEditor
 	/*! Limits the maximum allowed number of polygons to be created, if -1 is given no limit is used. */
 	void max_polygons ( int i ) { _max_polys = i; }
 	
-	/*! Limits the maximum allowed number of polygons to be created, if -1 is given no limit is used. */
+	/*! When polyline mode is set to true only open polygons are created. Default is false. */
 	void polyline_mode ( bool b ) { _polylinemode = b==true; }
 
 	SnPolygons* snpolygons () const { return _polygons; }
