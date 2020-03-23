@@ -32,32 +32,58 @@ void GlTexture::init ()
 	width = height = 0;
 }
 
-void GlTexture::data ( const GsImage* img, Settings s )
+static void set_params ( GlTexture::Settings s )
 {
-	if ( id==0 ) glGenTextures ( 1, &id );
-	glBindTexture ( GL_TEXTURE_2D, id ); 
-
-	width = img->w();
-	height = img->h();
-
-	// Parameters: ( target, level, internalFormat, width, height, border, format, type, data )
-	glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGBA, img->w(), img->h(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img->cdata() );
-
 	// ImprNote: starting at 4.5 glTextureParameter() should replace glTexParameter(),
 	//			 here could test which function version was loaded and call the correct one.
 
 	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // If the u,v coordinates overflow the range 0,1 the image is repeated
 	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	if ( s==Filtered )
-	{	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // linear takes average of nearby texels
-		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	switch (s)
+	{	case GlTexture::Nearest:
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); // linear takes average of nearby texels
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			break;
+		case GlTexture::Linear:
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // linear takes average of nearby texels
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			break;
+		case GlTexture::NearestMipMapped:
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_NEAREST);
+			glGenerateMipmap (GL_TEXTURE_2D);
+			break;
+		case GlTexture::LinearMipMapped:
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+			glGenerateMipmap (GL_TEXTURE_2D);
+			break;
+		case GlTexture::NearestMipMapLinear:
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
+			glGenerateMipmap (GL_TEXTURE_2D);
+			break;
+		case GlTexture::LinearMipMapLinear:
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+			glGenerateMipmap (GL_TEXTURE_2D);
+			break;
 	}
-	else if ( s==MipMapped )
-	{	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
-		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
-		glGenerateMipmap (GL_TEXTURE_2D);
-	}
+}
+
+void GlTexture::data ( const GsImage* img, Settings s )
+{
+	if ( id==0 ) glGenTextures ( 1, &id );
+
+	width = img->w();
+	height = img->h();
+
+	glBindTexture ( GL_TEXTURE_2D, id ); 
+
+	// Parameters: ( target, level, internalFormat, width, height, border, format, type, data )
+	glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGBA, img->w(), img->h(), 0, GL_RGBA, GL_UNSIGNED_BYTE, img->cdata() );
+	set_params ( s );
 
 	glBindTexture ( GL_TEXTURE_2D, 0 );
 }
@@ -66,26 +92,29 @@ void GlTexture::data ( const GsBytemap* bmp, Settings s )
 {
 	if ( id==0 ) glGenTextures ( 1, &id );
 
-	glBindTexture ( GL_TEXTURE_2D, id ); 
-
 	width = bmp->w();
 	height = bmp->h();
 
+	glBindTexture ( GL_TEXTURE_2D, id ); 
+
 	// Parameters: ( target, level, internalFormat, width, height, border, format, type, data )
 	glTexImage2D ( GL_TEXTURE_2D, 0, GL_RED, bmp->w(), bmp->h(), 0, GL_RED, GL_UNSIGNED_BYTE, bmp->cdata() );
+	set_params ( s );
 
-	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); // If the u,v coordinates overflow the range 0,1 the image is repeated
-	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glBindTexture ( GL_TEXTURE_2D, 0 );
+}
 
-	if ( s==Filtered )
-	{	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); // linear takes average of nearby texels
-		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	}
-	else if ( s==MipMapped )
-	{	glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
-		glTexParameterf (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST); 
-		glGenerateMipmap (GL_TEXTURE_2D);
-	}
+void GlTexture::data ( const float* img, int w, int h, Settings s )
+{
+	if ( id==0 ) glGenTextures ( 1, &id ); // gsout<<"GlTexture id="<<id<<gsnl;
+	width = w;
+	height = h;
+
+	glBindTexture ( GL_TEXTURE_2D, id ); 
+
+	// Parameters: ( target, level, internalFormat, width, height, border, format, type, data )
+	glTexImage2D ( GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_FLOAT, img );
+	set_params ( s );
 
 	glBindTexture ( GL_TEXTURE_2D, 0 );
 }

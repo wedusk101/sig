@@ -2,21 +2,30 @@
 # Convert shader files to static string definitions
 
 import os
-
-out = open('gl_predef_shaders.inc', 'w')
-
-header = ( "//\n"
-           "// Default sig shaders - (c) Marcelo Kallmann 2016-2019\n"
-           "//\n\n" )
-
-out.writelines ( header )
+import sys
 
 shfolder = "../shaders/"
-files = os.listdir(shfolder)
+outfile = "gl_predef_shaders.inc"
+
+numargs = len(sys.argv)
+
+if numargs==2:
+	shfolder = sys.argv[1]
+elif numargs>2:
+	shfolder = sys.argv[1]
+	outfile = sys.argv[2]
+
+files = os.listdir(shfolder) # get names before creating new files
+
+out = open(outfile, 'w')
+header = ( "//\n"
+           "// Generated with SIG genpredefinedshaders.py - (c) Marcelo Kallmann 2016-2020\n"
+           "//\n\n" )
+out.writelines ( header )
 
 for filename in files:
 	shname = filename
-	if shname.find(".txt")>=0 or shname.find("notused")>=0:
+	if shname.find(".txt")>=0 or shname.find(".bat")>=0 or shname.find(".inc")>=0 or shname.find("notused")>=0:
 		print ( shname + " - skipped" )
 		continue
 	print ( shname + "..." )

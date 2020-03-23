@@ -43,12 +43,14 @@ void GlrPlanarObjects::init ( SnShape* s )
 
 void GlrPlanarObjects::render ( SnShape* s, GlContext* c )
 {
-	GS_TRACE2("GL4 Render " << s->instance_name());
 	SnPlanarObjects& o = *((SnPlanarObjects*)s);
+
+	GS_TRACE2("GL4 Render " << s->instance_name() << " P.size()="<<o.P.size() << " T.size()="<<o.T.size() );
 
 	// 2. Set buffer data if node has been changed:
 	if ( s->changed()&SnShape::Changed ) // flags are: Unchanged, RenderModeChanged, MaterialChanged, ResolutionChanged, Changed
-	{	_esize = o.I.size() / 3;
+	{	GS_TRACE2 ( "GlrPlanarObjects changed: sending arrays T.size()="<<o.T.size() );
+		_esize = o.I.size() / 3;
 		glBindVertexArray(_glo.va[0]);
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, _glo.buf[0]);

@@ -94,6 +94,9 @@ class GsPolygon : public GsArray<GsPnt2>
 	/*! Makes the polygon be a square with given center and radius. */
 	void square ( const GsPnt2& center, float radius );
 
+	/*! Makes the polygon be a rectangle with given min,max coordinates. */
+	void rectangle ( float minx, float miny, float maxx, float maxy );
+
 	/*! Calculates the total length along edges */
 	float perimeter () const;
 

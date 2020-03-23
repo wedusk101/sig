@@ -73,6 +73,7 @@ class WsViewerData
 	WsViewer::ViewMode viewmode;	// viewer mode, initially Examiner
 	WsViewer::RenderMode rendermode; // render mode
 	GlRenderer* vr;					// renderer used for the scene
+	SaEvent eventa;					// scene action event used to send events to the scene
 
 	gscbool iconized;		// to stop processing while the window is iconized
 	gscbool allowspinanim;	// allows spin animation or not
@@ -791,7 +792,7 @@ int WsViewer::handle ( const GsEvent &e )
 	if ( CAMCENTER->visible() ) { CAMCENTER->visible(false); redraw(); }
 
 	// First handle ui managed by WsWindow:
-	if ( WsWindow::handle(e) ) { e.lmouse=e.mouse; return 1; }
+	if ( WsWindow::handle(e) ) return 1;
 
 	// Set mouse to normalized coordinates in [-1,1] and center (0,0) for the derived class to handle it:
 	e.normalize_coordinates ( w(), h() );
@@ -828,17 +829,6 @@ int WsViewer::handle ( const GsEvent &e )
 
 	if ( e.mouse_event() )
 	{	result = handle_mouse(e);
-	//bool camevent = (e.ctrl||e.shift) || e.type==GsEvent::Wheel;
-	//	if ( !camevent )
-	//	{	result = handle_scene_event(e);
-	//		if ( !result && e.alt ) camevent=true;
-	//	}
-	//	if ( camevent )
-	//	{	if ( _data->viewmode==ModeExaminer )
-	//			result = handle_examiner_manipulation(e);
-	//		else if ( _data->viewmode==ModePlanar )
-	//			result = handle_planar_manipulation(e);
-	//	}
 	}
 	else if ( e.type==GsEvent::KeyPress )
 	{	result = handle_key_press(e);
@@ -847,7 +837,6 @@ int WsViewer::handle ( const GsEvent &e )
 	{	result = handle_key_release(e);
 	}
 
-	e.lmouse=e.mouse;
 	return result;
 }
 
@@ -990,7 +979,8 @@ int WsViewer::handle_planar_manipulation ( const GsEvent& e )
 
 int WsViewer::handle_scene_event ( const GsEvent& e )
 {
-	SaEvent ea(e);
+	SaEvent& ea = _data->eventa;
+	ea.set ( e );
 	ea.apply ( _data->uroot );
 	int used = ea.result();
 	if ( used ) render();

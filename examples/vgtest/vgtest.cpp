@@ -39,7 +39,7 @@ static void my_polyed_callback ( SnPolyEditor* pe, SnPolyEditor::Event e, int pi
 	if ( e==SnPolyEditor::PostMovement || e==SnPolyEditor::PostEdition || e==SnPolyEditor::PostInsertion )
 	{	v->build_vg ();
 		v->build_scene ();
-	}
+ 	}
 }
 
 VgViewer::VgViewer ( int x, int y, int w, int h, const char* l ) : WsViewer(x,y,w,h,l)
@@ -87,7 +87,7 @@ void VgViewer::build_ui ()
 		p->add ( _abbut=new UiCheckButton ( "auto build", EvAutoBuild ) ); p->top()->separate();
 	}
 
-	p->add ( new UiButton ( "exit", EvExit ) );
+	p->add ( new UiButton ( "exit", EvExit ) ); p->top()->separate();
 }
 
 void VgViewer::build_vg ()

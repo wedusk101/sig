@@ -54,7 +54,7 @@ SnPolyEditor::SnPolyEditor ()
 	_precision_in_pixels = 5.0f;
 	_precision = 0.05f;
 	_selpol = _selvtx = -1;
-	_max_polys = -1;
+	_maxpolys = _minpolys = -1;
 	_genevnotused = 0;
 	_edjuststarted = 0;
 	_addvertices = 1;
@@ -149,7 +149,7 @@ void SnPolyEditor::mode ( SnPolyEditor::Mode m )
 	// Validate mode:
 	GsPolygons& p = *_polygons->polygons();
 	if ( m==ModeEdit && p.size()==0 ) m=ModeAdd;
-	if ( m==ModeAdd && p.size()==_max_polys ) m=ModeEdit;
+	if ( m==ModeAdd && p.size()==_maxpolys ) m=ModeEdit;
 	GS_TRACE3 ( "Mode: "<<(m==ModeEdit?"Edit":m==ModeAdd?"Add":m==ModeMove?"Move":"Other") );
 
 	if ( m==ModeNoEdition )
@@ -309,22 +309,25 @@ static bool inlimits ( const GsPolygon& pol, const GsVec2& t, const GsVec2& min,
 	return true;
 }
 
-void SnPolyEditor::translate_polygon ( int i, const GsVec2& lp, const GsVec2& p )
+void SnPolyEditor::translate_polygon ( int i, GsVec2 lp, GsVec2 p )
 {
 	GsPolygon& pol = _polygons->get(i);
-
 	GsVec2 tv(p-lp);
+
+	GS_TRACE2 ( "Polygon "<<i<<" being translated by "<<tv );
+
 	if ( _max.x>_min.x && _max.y>_min.y )
 	{	if ( !inlimits(pol,tv,_min,_max) ) return; }
 
 	if ( _user_cb ) _user_cb ( this, PreMovement, i );
 	if ( _stopop ) { _stopop=0; return; }
 
-	pol.translate ( p-lp );
+	pol.translate ( tv );
+
 	if ( _user_cb ) _user_cb ( this, PostMovement, i );
 }
 
-void SnPolyEditor::rotate_polygon ( int i, const GsVec2& lp, const GsVec2& p )
+void SnPolyEditor::rotate_polygon ( int i, GsVec2 lp, GsVec2 p )
 {
 	GsPolygon& pol = _polygons->get(i);
 	GsVec2 cent = pol.centroid();
@@ -350,11 +353,13 @@ void SnPolyEditor::rotate_polygon ( int i, const GsVec2& lp, const GsVec2& p )
 void SnPolyEditor::remove_selected_polygon ()
 {
 	_selection->init ();
+	if ( _polygons->size()<=_minpolys ) return;
 	if ( _selpol<0 ) return;
 	if ( _user_cb ) _user_cb ( this, PreRemoval, _selpol );
 	if ( _stopop ) { _stopop=0; _selpol=-1; return; }
 	if ( _polygons->has_colors_per_polygon() ) _polygons->colors().remove(_selpol);
 	_polygons->polygons()->remove(_selpol);
+	if ( _user_cb ) _user_cb ( this, PostRemoval, _selpol );
 	_selpol=_selvtx=-1;
 	if ( _polygons->size()==0 ) mode(ModeAdd);
 }
@@ -371,7 +376,8 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 
 	_precision = e.pixelsize*_precision_in_pixels;
 
-	if ( e.type==GsEvent::KeyPress ) return handle_key_press(e);
+	GsEvent::Type evtype = e.type;
+	if ( evtype==GsEvent::KeyPress ) return handle_key_press(e);
 	const GsPlane& plane = GsPlane::XY;
 	GsPnt2 p ( e.ray.p1*(1.0f-t) + e.ray.p2*t );
 	GsPnt2 lp ( plane.intersect ( e.lray.p1, e.lray.p2 ).e );
@@ -387,9 +393,9 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 	switch ( _mode )
 	{	case ModeAdd:
 		{	SnLines2& cr = *_creation;
-			if ( e.type==GsEvent::Push )
+			if ( evtype==GsEvent::Push )
 			{	int size = cr.V.size();
-				if ( polys.size()==_max_polys )
+				if ( polys.size()==_maxpolys )
 				{	mode ( ModeEdit ); }
 				else if ( size==0 && !_edjuststarted )
 				{	create_vertex_selection ( p );
@@ -413,7 +419,7 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 		} return 1; // event considered taken while adding a polygon
 
 		case ModeEdit:
-		{	if ( e.type==GsEvent::Push )
+		{	if ( evtype==GsEvent::Push )
 			{	GsPolygon* pol=0;
 				int selp=_selpol, selv=_selvtx; // save initial state
 				if ( _selpol>=0 ) pol = &polygon(_selpol);
@@ -441,7 +447,7 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 				}
 				return 1;
 			}
-			else if ( e.type==GsEvent::Drag && _selvtx>=0 )
+			else if ( evtype==GsEvent::Drag && _selvtx>=0 )
 			{	GS_TRACE1 ( "Drag event pol:"<<_selpol << " vtx:"<<_selvtx ); 
 				if ( _user_cb ) _user_cb ( this, PreEditionDrag, _selpol );
 				if ( _stopop ) { _stopop=0; _selvtx=-1; return 0; }
@@ -454,7 +460,7 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 
 		case ModeMove: // case when a polygon has been selected
 		{	GS_TRACE1 ( "Move mode" ); 
-			if ( e.type==GsEvent::Push )
+			if ( evtype==GsEvent::Push )
 			{	if ( _selpol>=0 && _selvtx==-2 ) // dragging a segment
 				{	}
 				else if ( pick_polygon_vertex(p) )
@@ -472,14 +478,14 @@ int SnPolyEditor::handle_event ( const GsEvent &e, float t )
 				{	mode(ModeEdit); break; }
 				return 1;
 			}
-			else if ( e.type==GsEvent::Drag && _selvtx>=0 )
+			else if ( evtype==GsEvent::Drag && _selvtx>=0 )
 			{	rotate_polygon ( _selpol, lp, p );
 				create_vertex_selection ( _selpol, _selvtx );
 				add_polygon_selection ( _selpol );
 				add_centroid_selection ( _selpol );
 				return 1;
 			}
-			else if ( e.type==GsEvent::Drag && _selpol>=0 )
+			else if ( evtype==GsEvent::Drag && _selpol>=0 )
 			{	translate_polygon ( _selpol, lp, p );
 				create_polygon_selection ( _selpol );
 				return 1;
@@ -497,7 +503,8 @@ int SnPolyEditor::handle_only_move_event ( const GsEvent& e, const GsVec2& p, co
 { 
 	GS_TRACE1 ( "SnPolyEditor handle_only_move_event: "<< p );
 
-	if ( e.type==GsEvent::Push )
+	GsEvent::Type evtype = e.type;
+	if ( evtype==GsEvent::Push )
 	{	if ( pick_polygon_vertex(p) )
 		{	add_polygon_selection ( _selpol );
 			add_centroid_selection ( _selpol );
@@ -506,14 +513,14 @@ int SnPolyEditor::handle_only_move_event ( const GsEvent& e, const GsVec2& p, co
 		else if ( pick_polygon(p) )
 		{	return 1; }
 	}
-	else if ( e.type==GsEvent::Drag && _selvtx>=0 )
+	else if ( evtype==GsEvent::Drag && _selvtx>=0 )
 	{	rotate_polygon ( _selpol, lp, p );
 		create_vertex_selection ( _selpol, _selvtx );
 		add_polygon_selection ( _selpol );
 		add_centroid_selection ( _selpol );
 		return 1;
 	}
-	else if ( e.type==GsEvent::Drag && _selpol>-1 )
+	else if ( evtype==GsEvent::Drag && _selpol>-1 )
 	{	translate_polygon ( _selpol, lp, p );
 		create_polygon_selection ( _selpol );
 		return 1;
@@ -669,7 +676,7 @@ int SnPolyEditor::handle_key_press ( const GsEvent& e )
 		case ModeMove:
 		{	if ( e.key==GsEvent::KeyEsc ) { mode(ModeEdit); return 1; }
 			if ( e.key==GsEvent::KeyDel && _selpol>-1 )
-			{	remove_selected_polygon ();
+			{	remove_selected_polygon();
 				return 1;
 			}
 			if ( e.key==GsEvent::KeyEnd && _selpol>-1 && _polygons->size()>1 )
@@ -695,6 +702,9 @@ int SnPolyEditor::handle_key_press ( const GsEvent& e )
 int SnPolyEditor::check_event ( const GsEvent& e, float& t )
 {
 	GS_TRACE1 ( "SnPolyEditor check_event: "<<(int)e.key );
+
+	// Test if active
+	if ( _mode==ModeNoEdition ) return 0;
 
 	// Project
 	GsPnt2 p ( GsPlane::XY.intersect ( e.ray.p1, e.ray.p2, &t ) );

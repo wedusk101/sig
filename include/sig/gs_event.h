@@ -78,6 +78,9 @@ class GsEvent
 	/*! Initialize as a None event type, by calling init(). */
 	GsEvent ();
 
+	/*! Copy constructor. */
+	GsEvent ( const GsEvent& e ) { *this=e; }
+
 	/*! Makes the event to be of None type, stores mouse in lmouse variables, 
 		and initializes the event-related data members. */
 	void init ();
@@ -110,4 +113,3 @@ class GsEvent
 //================================ End of File =================================================
 
 # endif // GS_EVENT_H
-

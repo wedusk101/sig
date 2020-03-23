@@ -60,10 +60,7 @@ void SnPlanarObjects::compress ()
 	G.compress();
 }
 
-// Comment: groups are needed to ensure drawing order by calling separate drawing calls;
-// this can be optimized to a single draw call by using depth buffer to sort primitives,
-// and using white point in shared texture in order to remove the need to change shader 
-// uniform mode value between calls. This would however make this class rather specific.
+// Comment: groups are needed to ensure drawing order by calling separate drawing calls
 
 # define GSET(g,t,ti,i) g.type=t; g.texid=ti; g.ind=i
 
@@ -72,7 +69,7 @@ void SnPlanarObjects::start_group ( GroupType t, gsuint tid, bool forcenew )
 	if ( G.size() && G.top().ind==(gsuint)I.size() ) G.pop(); // previous group is empty
 
 	if ( forcenew ) // force ensures drawing order among subsequent groups of same type
-	{ G.push(); GSET(G.top(),t,tid,I.size());
+	{	G.push(); GSET(G.top(),t,tid,I.size());
 	}
 	else if ( t==Colored )
 	{	if ( G.size() )
@@ -80,7 +77,7 @@ void SnPlanarObjects::start_group ( GroupType t, gsuint tid, bool forcenew )
 			{	G.push(); GSET(G.top(),t,tid,I.size());	}
 		}
 	}
-	else if (I.empty()) // starting first group
+	else if ( I.empty() ) // starting first group
 	{	G.size(1); GSET(G.top(),t,tid,I.size());
 	}
 	else

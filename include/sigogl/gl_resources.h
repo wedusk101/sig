@@ -15,6 +15,7 @@
 # include <sigogl/gl_types.h>
 
 class GsVar;
+class GsVars;
 class GsDirs;
 class GlProgram;
 class GlShader;
@@ -124,6 +125,8 @@ class GlResources
 	/*! Get access to the parameters loaded from the configuration file.
 		Returns null if varname is not found. */
 	static GsVar* configuration ( const char* varname );
+
+	static GsVars* configuration ();
 
 	/*! Declares all the default shaders.
 		This is automatically called when the first window is opened. */

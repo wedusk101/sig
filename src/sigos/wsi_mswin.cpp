@@ -299,8 +299,7 @@ void wsi_win_redraw ( void* win )
 	if ( ow->redrawcalled ) return; // already invalidated
 	InvalidateRect ( ow->window, NULL, TRUE );
 	ow->redrawcalled = 1;
-	// Recall this function if drawing before emptying events is needed at some point:
-	// UpdateWindow (ow->window); // sends a WM_PAINT msg bypassing the application queue (if update region not empty)
+	// Related functions: UpdateWindow (ow->window); RedrawWindow(ow->window,NULL,NULL,RDW_INVALIDATE|RDW_UPDATENOW);
 }
 
 void wsi_win_setoglcontext ( void* win, bool b )
@@ -497,37 +496,35 @@ static LRESULT CALLBACK WndProc ( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lP
 			break;
 
 		// we call setstate below to have correct events in all cases with multiple windows
-		# define SETLMOUSE e.lmousex=e.mousex; e.lmousey=e.mousey; e.mousex=LOWORD(lParam); e.mousey=HIWORD(lParam);
-		# define MOUSEEV(t,i,but,bs) e.type=t; e.button=i; e.but=bs; SETLMOUSE; setstate(e)
+		# define SETLMOUSE e.lmousex=e.mousex; e.lmousey=e.mousey; e.mousex=LOWORD(lParam); e.mousey=HIWORD(lParam); e.lmouse=e.mouse;
+		# define MOUSEEV(t) setstate(e); e.type=t; SETLMOUSE;
 		case WM_LBUTTONDOWN :
 			GS_TRACE5 ( "WM_LBUTTONDOWN..." );
-			MOUSEEV ( GsEvent::Push, 1, button1, 1 );
-			break;
-		case WM_MBUTTONDOWN :
-			GS_TRACE5 ( "WM_MBUTTONDOWN..." );
-			MOUSEEV ( GsEvent::Push, 2, button2, 1 );
-			break;
-		case WM_RBUTTONDOWN :
-			GS_TRACE5 ( "WM_RBUTTONDOWN..." );
-			MOUSEEV ( GsEvent::Push, 3, button3, 1 );
+			MOUSEEV ( GsEvent::Push ); e.button=1; e.button1=1;
 			break;
 		case WM_LBUTTONUP :
 			GS_TRACE5 ( "WM_LBUTTONUP..." );
-			MOUSEEV ( GsEvent::Release, 1, button1, 0 );
+			MOUSEEV ( GsEvent::Release ); e.button=1; e.button1=0;
+			break;
+		case WM_MBUTTONDOWN :
+			GS_TRACE5 ( "WM_MBUTTONDOWN..." );
+			MOUSEEV ( GsEvent::Push ); e.button=2; e.button2=1;
 			break;
 		case WM_MBUTTONUP :
 			GS_TRACE5 ( "WM_MBUTTONUP..." );
-			MOUSEEV ( GsEvent::Release, 2, button2, 0 );
+			MOUSEEV ( GsEvent::Release ); e.button=2; e.button2=0;
+			break;
+		case WM_RBUTTONDOWN :
+			GS_TRACE5 ( "WM_RBUTTONDOWN..." );
+			MOUSEEV ( GsEvent::Push ); e.button=3; e.button3=1;
 			break;
 		case WM_RBUTTONUP :
 			GS_TRACE5 ( "WM_RBUTTONUP..." );
-			MOUSEEV ( GsEvent::Release, 3, button3, 0 );
+			MOUSEEV ( GsEvent::Release ); e.button=3; e.button3=0;
 			break;
 		case WM_MOUSEMOVE :
-			GS_TRACE7 ( "WM_MOUSEMOVE..." );
-			setstate(e);
-			e.type = e.button1||e.button3? GsEvent::Drag : GsEvent::Move;
-			SETLMOUSE;
+			MOUSEEV ( e.button1||e.button2||e.button3? GsEvent::Drag : GsEvent::Move );
+			GS_TRACE7 ( "WM_MOUSEMOVE... " << e.type_name() );
 			if ( GetFocus()!=hWnd ) SetFocus ( hWnd );
 			break;
 		# undef MOUSEEV

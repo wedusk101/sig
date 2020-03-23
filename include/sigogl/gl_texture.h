@@ -18,7 +18,7 @@ class GlTextureDecl;
 
 class GlTexture
 {  public :
-	enum Settings { Filtered, MipMapped, Plain };
+	enum Settings { Nearest, Linear, NearestMipMapped, LinearMipMapped, NearestMipMapLinear, LinearMipMapLinear };
 	GLuint id;
 	gsuint16 width, height;
    private : // resource management information
@@ -29,8 +29,9 @@ class GlTexture
    ~GlTexture (); // delete OGL id if it is >0
 	void init (); // initialize and delete OGL id if it is >0
 	bool valid () const { return id>0; }
-	void data ( const GsImage* img, Settings s=Filtered );
-	void data ( const GsBytemap* bmp, Settings s=Filtered );
+	void data ( const GsImage* img, Settings s=LinearMipMapped );
+	void data ( const GsBytemap* bmp, Settings s=LinearMipMapped );
+	void data ( const float* img, int w, int h, Settings s=LinearMipMapped ); // img has to have rgba data
 };
 
 //================================= End of File ===============================

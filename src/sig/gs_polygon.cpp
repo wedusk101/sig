@@ -164,11 +164,20 @@ void GsPolygon::circle_approximation ( const GsPnt2& center, float radius, int n
 
 void GsPolygon::square ( const GsPnt2& center, float radius )
 {
-	size(0);
-	push().set ( center.x-radius, center.y-radius );
-	push().set ( center.x+radius, center.y-radius );
-	push().set ( center.x+radius, center.y+radius );
-	push().set ( center.x-radius, center.y+radius );
+	size(4);
+	get(0).set ( center.x-radius, center.y-radius );
+	get(1).set ( center.x+radius, center.y-radius );
+	get(2).set ( center.x+radius, center.y+radius );
+	get(3).set ( center.x-radius, center.y+radius );
+}
+
+void GsPolygon::rectangle ( float minx, float miny, float maxx, float maxy )
+{
+	size(4);
+	get(0).set ( minx, miny );
+	get(1).set ( maxx, miny );
+	get(2).set ( maxx, maxy );
+	get(3).set ( minx, maxy );
 }
 
 float GsPolygon::perimeter () const

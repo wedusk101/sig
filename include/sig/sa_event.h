@@ -27,7 +27,9 @@ class SaEvent : public SaAction
 	GsArray<Hit> _hits;
 
    public :
-	SaEvent ( const GsEvent& e ) { _ev=e; _result=0; }
+	SaEvent () { _result=0; }
+	SaEvent ( const GsEvent& e ) : _ev(e) { _result=0; }
+	void set ( const GsEvent& e ) { _ev=e; _result=0; }
 	GsEvent& get () { return _ev; }
 	int result () const { return _result; }
 	void apply ( SnNode* n );

@@ -68,10 +68,19 @@ void SnPolygons::zcoordinate ( float z )
 	touch();
 }
 
-void SnPolygons::color ( GsColor ci  )
+void SnPolygons::color ( GsColor c )
 {
-	triangles()->color(ci); 
-	touch();
+	triangles()->color(c); touch();
+}
+
+void SnPolygons::ecolor ( GsColor c )
+{
+	lines()->color(c); touch();
+}
+
+void SnPolygons::vcolor ( GsColor c )
+{
+	points()->color(c); touch();
 }
 
 void SnPolygons::color ( GsColor ci, GsColor ce, GsColor cp  )

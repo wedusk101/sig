@@ -307,7 +307,7 @@ const GlTexture* GlResources::get_texture ( int txid )
 		}
 		GS_TRACE1 ( "texture ["<<fname<<"] size:"<<img->w()<<'x'<<img->h() );
 		if ( !gl_loaded() ) Error("get_texture called before OpenGL loaded",fname);
-		t->data ( img, GlTexture::Filtered );
+		t->data ( img );
 		img->unref();
 		if ( FreeDeclInfo ) { delete td; t->_decl=0; }
 	}
@@ -538,6 +538,11 @@ void GlResources::load_configuration_file ()
 GsVar* GlResources::configuration ( const char* varname )
 { 
 	return Vars.get(varname); 
+}
+
+GsVars* GlResources::configuration ()
+{ 
+	return &Vars;
 }
 
 // === Default Shaders ===

@@ -55,8 +55,8 @@ class SnPolygons : public SnGroup
 	void touch ();
 
 	/*! Set if polygons should appear solid and if the vertices should appear as points. 
-		Values for parameter solid can be 0(draw edges), 1(draw interior), 2(draw both);
-		and for vertices: 0(do not draw vertices), 1(draw vertices). A value of -1 can
+		Values for parameter solid can be 0 (draw edges), 1 (draw interior), 2 (draw both);
+		and for vertices: 0 (do not draw vertices), 1 (draw vertices). A value of -1 can
 		be given to any parameter meaning no mode change. */
 	void draw_mode ( int solid, int vertices );
 
@@ -65,6 +65,12 @@ class SnPolygons : public SnGroup
 
 	/*! Set color of the polygon interior. Default is blue. */
 	void color ( GsColor c );
+
+	/*! Set color of the polygon edges. */
+	void ecolor ( GsColor c );
+
+	/*! Set color of the polygon vertices. */
+	void vcolor ( GsColor c );
 
 	/*! Set colors for the polygon interior, edges and points, in that order */
 	void color ( GsColor ci, GsColor ce, GsColor cp );

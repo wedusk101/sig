@@ -67,7 +67,7 @@ class SnPlanarObjects : public SnShape
 		If no group is defined G will remain empty and the considered type will be Colored. */
 	void start_group ( GroupType t, gsuint tid=0, bool forcenew=false );
 
-	/*! Access the current index servinf as "zero index" of the current group */
+	/*! Access the current index serving as "zero index" of the current group */
 	int get_zero_index () const { return _zi; }
 
 	/*! Set a specific reference zero index to define objects */

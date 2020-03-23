@@ -25,15 +25,15 @@
 class SnPolyEditor : public SnEditor
 {  public :
 	enum Mode { ModeAdd, ModeEdit, ModeMove, ModeOnlyMove, ModeNoEdition };
-	enum Event { PreMovement, PostMovement, PreEditionIns, PreEditionRem, PreEditionDrag, PostEdition,
-				 PreRemoval, PostInsertion, PolygonSelected, EventNotUsed };
+	enum Event { PreMovement, PostMovement, PreEditionIns, PreEditionRem, PreEditionDrag,
+				 PostEdition, PreRemoval, PostRemoval, PostInsertion, PolygonSelected, EventNotUsed };
 	enum SelType { Polygon, Hull, Box };
 	static const char* class_name; //<! Contains string SnPolyEditor
 
    private :
 	float _precision;
 	float _precision_in_pixels;
-	int _selpol, _selvtx, _max_polys;
+	int _selpol, _selvtx, _maxpolys, _minpolys;
 	GsColor _creation_color;
 	GsColor _edition_color;
 	GsColor _selection_color;
@@ -101,8 +101,12 @@ class SnPolyEditor : public SnEditor
 	void set_limits ( float xmin, float xmax, float ymin, float ymax ) { _min.set(xmin,ymin); _max.set(xmax,ymax); }
 
 	/*! Limits the maximum allowed number of polygons to be created, if -1 is given no limit is used. */
-	void max_polygons ( int i ) { _max_polys = i; }
+	void max_polygons ( int i ) { _maxpolys=i; }
 	
+	/*! Limits the minimum number of polygons to exist, if -1 is given no limit is used.
+		This is useful to define initial polygons which cannot be deleted by the user. */
+	void min_polygons ( int i ) { _minpolys=i; }
+
 	/*! When polyline mode is set to true only open polygons are created. Default is false. */
 	void polyline_mode ( bool b ) { _polylinemode = b==true; }
 
@@ -148,12 +152,12 @@ class SnPolyEditor : public SnEditor
 	void add_polygon_selection ( int i );
 	void create_polygon_selection ( int i );
 	void add_centroid_selection ( int i );
-	void translate_polygon ( int i, const GsVec2& lp, const GsVec2& p );
-	void rotate_polygon ( int i, const GsVec2& lp, const GsVec2& p );
+	void translate_polygon ( int i, GsVec2 lp, GsVec2 p );
+	void rotate_polygon ( int i, GsVec2 lp, GsVec2 p );
 
+	virtual int handle_event ( const GsEvent &e, float t ) override;
 	virtual int handle_only_move_event ( const GsEvent& e, const GsVec2& p, const GsVec2& lp );
 	virtual int handle_key_press ( const GsEvent& e );
-	virtual int handle_event ( const GsEvent &e, float t ) override;
 	virtual int check_event ( const GsEvent& e, float& t ) override;
 };
 
