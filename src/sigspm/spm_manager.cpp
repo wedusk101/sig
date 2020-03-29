@@ -93,7 +93,7 @@ bool ShortestPathMapManager::SaveSPM( int i, const std::string& spmPath, const s
 }
 
 //SpmTodo: fix problem when there are no obstacles
-//SpmTodo: interface to change the WxH frame buffer resolution
+//SpmTodo: add method to change the WxH frame buffer resolution
 
 ShortestPathMap* ShortestPathMapManager::Compute( GlContext* context, ShortestPathMap* spm )
 {
