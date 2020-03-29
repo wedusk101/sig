@@ -1,7 +1,7 @@
 =============================================================================
 
            Standalone Interactive Graphics (SIG) Toolkit
-               Copyright (c) 2018-2019 Marcelo Kallmann
+      Copyright (c) 2018-2020 Marcelo Kallmann and Contributors
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use SIG except in compliance with the License.
