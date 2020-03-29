@@ -1,0 +1,133 @@
+/*=======================================================================
+   Copyright (c) 2020 Renato Farias.
+   This software is distributed under the Apache License, Version 2.0.
+   All copies must contain the full copyright notice licence.txt located
+   at the base folder of the distribution. 
+  =======================================================================*/
+
+#pragma once
+
+#include <sig/gs_polygons.h>
+#include <sig/gs_camera.h>
+#include <sig/gs_model.h>
+#include <sig/gs_mat.h>
+#include <sig/gs_vec.h>
+#include <sigogl/gl_context.h>
+#include <vector>
+
+#include "spm_shader_program.h"
+#include "spm_vbo.h"
+
+//---------------------------------------------------------------------------------------------
+//	HELPFUL STRUCTS
+//---------------------------------------------------------------------------------------------
+struct SpmVertexPos {
+	float XYZW[4];
+};
+
+struct SpmVertexColor {
+	float RGBA[4];
+};
+
+struct SpmVertex {
+	float XYZW[4];
+	float RGBA[4];
+};
+
+struct SpmFullVertex {
+	float XYZW[4];
+	float RGBA[4];
+	float N[4];
+};
+
+const size_t SpmVertexSize     = sizeof( SpmVertex );
+const size_t SpmFullVertexSize = sizeof( SpmFullVertex );
+const size_t SpmRgbaOffset     = sizeof( decltype( SpmVertex::XYZW ) );
+const size_t SpmNormalOffset   = sizeof( decltype( SpmFullVertex::XYZW ) ) + sizeof( decltype( SpmFullVertex::RGBA ) );
+const size_t SpmVertexPosSize  = sizeof( SpmVertexPos );
+
+//---------------------------------------------------------------------------------------------
+
+class ShortestPathMap
+{
+public:
+	ShortestPathMap();
+   ~ShortestPathMap();
+
+public:
+	//---------------------------------------------------------------------------------------------
+	//	DATA
+	//---------------------------------------------------------------------------------------------
+
+	void SetName( const std::string& );
+	const std::string& GetName() const;
+
+	void SetBufferDimensions( int w, int h );
+	void SetOrthoProjectionMatrix( const GsMat& mat );
+
+	//---------------------------------------------------------------------------------------------
+	//	RESULT ARRAY
+	//---------------------------------------------------------------------------------------------
+
+	// Return a reference to the ResultArray
+	const std::vector< SpmVertexPos >& GetResultArray() const;
+
+	// Load the ResultArray from the shader storage buffer object
+	void LoadResultArrayFromGPU( size_t n, bool print_info = false );
+
+	// Load a saved ResultArray from a file
+	bool LoadResultArrayFromFile( const std::string& filepath );
+
+	// Save the ResultArray to a file
+	bool SaveResultArrayToFile( const std::string& filepath ) const;
+
+	//---------------------------------------------------------------------------------------------
+	//	MAP
+	//---------------------------------------------------------------------------------------------
+
+	// Return a reference to the SPM's map
+	const std::vector< float >& GetMap() const;
+
+	// Load SPM from the GPU
+	void LoadMapFromGPU( GLuint framebufferId, GLenum readbufferId );
+
+	// Load SPM from an image file
+	bool LoadMapFromImageFile( const std::string& filepath );
+
+	// Save SPM to a GsImage in memory by taking a snapshot of the buffer
+	void SaveMapToGsImage( GsImage& img ) const;
+
+	// Save SPM to an image file
+	bool SaveMapToImageFile( const std::string& filepath ) const;
+
+	//---------------------------------------------------------------------------------------------
+	//	ACCESS
+	//---------------------------------------------------------------------------------------------
+
+	// Return a pointer to the spm buffer
+	const float* GetMapBuffer () const { return &(Map[0]); }
+
+	// Return the map width
+	int Width () const { return bufferWidth; }
+
+	// Return the map height
+	int Height () const { return bufferHeight; }
+
+	// Find the closest (parent) point of the point whose 1d coordinate in the map is 'pos'
+	int FindClosestPoint( int pos ) const;
+
+	// Find the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
+	bool GetShortestPath( float _x, float _y, std::vector< GsVec >& path ) const;
+
+	// Find the next direction on the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
+	// Parent points that are closer than threshold will be skipped
+	bool GetNextDirection( float _x, float _y, GsVec& dir, float threshold = 0.01f ) const;
+
+private:
+	std::vector< float > Map;
+	std::vector< SpmVertexPos > ResultArray;
+
+	std::string Name;
+	int bufferWidth, bufferHeight;
+	GsMat OrthoProjectionCompleteMatrix;
+};

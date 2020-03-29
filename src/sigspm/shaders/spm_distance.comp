@@ -1,0 +1,136 @@
+#version 430
+
+layout( local_size_x = 1 ) in;
+
+layout( std430, binding=0 ) buffer VertexData
+{
+	vec4 Vert[];
+};
+
+uniform sampler2DRect texId;
+uniform ivec2 window;
+uniform bool prec;
+uniform int arrayLeap;
+uniform int numLeaps;
+
+uniform mat4 projectionMatrix;
+uniform mat4 viewMatrix;
+uniform mat4 modelMatrix;
+
+void main()
+{
+	int id = ( int( gl_GlobalInvocationID.x ) + 1 ) * 2;
+
+	// only update scene points here, sources never have depth other than 0
+	if( Vert[id].w != 1.0 )
+		return;
+
+	// current generator
+	vec4 posp = projectionMatrix * viewMatrix * modelMatrix * vec4( Vert[id  ].xy, 0.0, 1.0 );
+	vec4 poso = projectionMatrix * viewMatrix * modelMatrix * vec4( Vert[id+1].xy, 0.0, 1.0 );
+
+	vec2 sposp = ( posp.xy + 1.0 ) / 2.0;
+	vec2 sposo = ( poso.xy + 1.0 ) / 2.0;
+
+	// point to be potentially updated
+	vec4 gen0 = projectionMatrix * viewMatrix * modelMatrix * vec4( Vert[0].xy, 0.0, 1.0 );
+	vec4 gen1 = projectionMatrix * viewMatrix * modelMatrix * vec4( Vert[1].xy, 0.0, 1.0 );
+
+	vec2 sgen0 = ( gen0.xy + 1.0 ) / 2.0;
+	vec2 sgen1 = ( gen1.xy + 1.0 ) / 2.0;
+
+	float dist;
+
+	// distance for line segment source
+	if( Vert[0].w == 2.0 )
+	{
+		float len = length( sgen1 - sgen0 ) * length( sgen1 - sgen0 );
+
+		if( len == 0.0 )
+			dist = distance( sposo.xy, sgen0.xy );
+		else
+		{
+			float d = dot( sposo - sgen0, sgen1 - sgen0 ) / len;
+			if( d < 0.0 )
+				dist = distance( sposo, sgen0 );
+			else if( d > 1.0 )
+				dist = distance( sposo, sgen1 );
+			else
+			{
+				vec2 proj = sgen0 + d * ( sgen1 - sgen0 );
+				dist = distance( sposo, proj );
+			}
+		}
+	}
+	// distance for source point
+	else
+		dist = distance( sposo.xy, sgen1.xy );
+
+	//float depth = dist + Vert[0].z;
+	float depth = ( dist * Vert[1].z ) + Vert[0].z;
+
+	// shadow test
+	ivec2 frag  = ivec2( sposp.x * window.x, sposp.y * window.y );
+
+	vec4 tex_value;
+	vec4 tex_value0, tex_value1, tex_value2, tex_value3;
+
+	if( prec == false )
+	{
+		tex_value = texelFetch( texId, ivec2( frag.xy ) );
+	}
+	else
+	{
+		ivec2 frag0 = ivec2( frag.x + 1, frag.y + 1 );
+		ivec2 frag1 = ivec2( frag.x - 1, frag.y + 1 );
+		ivec2 frag2 = ivec2( frag.x + 1, frag.y - 1 );
+		ivec2 frag3 = ivec2( frag.x - 1, frag.y - 1 );
+
+		tex_value0 = texelFetch( texId, ivec2( frag0.xy ) );
+		tex_value1 = texelFetch( texId, ivec2( frag1.xy ) );
+		tex_value2 = texelFetch( texId, ivec2( frag2.xy ) );
+		tex_value3 = texelFetch( texId, ivec2( frag3.xy ) );
+	}
+
+	// update if not in shadow and dist is smaller
+	if( ( prec == false && tex_value.w == 0.0 ) ||
+	    ( prec == true && ( tex_value0.w == 0.0 || tex_value1.w == 0.0 || tex_value2.w == 0.0 || tex_value3.w == 0.0 ) ) )
+	{
+		if( Vert[id].z == 0.0 || depth < Vert[id].z )
+		{
+			Vert[id  ].z = depth;
+			Vert[id+1].w = Vert[1].w;
+
+			// propagates faster speeds
+			if( Vert[id+1].z > Vert[1].z )
+				Vert[id+1].z = Vert[1].z;
+		}
+		else
+		{
+			for( int i = 1; i <= numLeaps; ++i )
+			{
+				int jumpID = id + ( arrayLeap * i );
+
+				if( Vert[ jumpID + 1 ].z == Vert[1].z )
+				{
+					if( Vert[ jumpID ].z == 0.0 || depth < Vert[ jumpID ].z )
+					{
+						Vert[ jumpID     ].z = depth;
+						Vert[ jumpID     ].w = 1.0;
+						Vert[ jumpID + 1 ].w = Vert[1].w;
+					}
+				}
+			}
+		}
+		/*else if( Vert[id+33].z == Vert[1].z )
+		{
+			if( Vert[id+32].z == 0.0 || depth < Vert[id+32].z )
+			{
+				Vert[id+32].z = depth;
+				Vert[id+32].w = 1.0;
+				Vert[id+33].w = Vert[1].w;
+			}
+		}*/
+	}
+}
+
