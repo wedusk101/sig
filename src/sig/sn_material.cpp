@@ -19,14 +19,15 @@ SnMaterial::SnMaterial ()
 		    :SnNode ( SnNode::TypeMaterial, SnMaterial::class_name )
 {
 	GS_TRACE1 ( "Constructor" );
-	init ();
+	init ( 1, false );
 }
 
-SnMaterial::SnMaterial ( const GsMaterial& m )
+SnMaterial::SnMaterial ( const GsMaterial& m, gsuint n, bool r )
 		   :SnNode ( SnNode::TypeMaterial, SnMaterial::class_name )
 {
 	GS_TRACE1 ( "Constructor from GsMaterial" );
-	init ();
+	_material = m;
+	init ( n, r );
 }
 
 SnMaterial::~SnMaterial ()

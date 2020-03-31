@@ -11,6 +11,7 @@
 # include <sig/sa_action.h>
 
 //# define GS_USE_TRACE1  // Const/Dest
+//# define GS_USE_TRACE2  // material override
 # include <sig/gs_trace.h>
 
 void SnShapeRenderer::instantiator_error ( const char* cname ) // static
@@ -98,11 +99,13 @@ bool SnShape::prep_render ( SaAction* a )
 
 	// 3. Check (and process it) if there is an active SnMaterial:
 	if ( a->_curmaterialn>0 )
-	{	if ( !_material_is_overriden ) // overriden matrial has priority
+	{	GS_TRACE2 ( "Material override counter:"<<a->_curmaterialn<<", overriden:"<<_material_is_overriden );
+		if ( !_material_is_overriden ) // overriden material has priority
 		{	if ( a->_curmaterial->restore() )
 			{	_overriden_material = _material;
 				_material_is_overriden = 2;
 			}
+			GS_TRACE2 ( "Old: " << _material.diffuse << " New: " << a->_curmaterial->cmaterial().diffuse );
 			_material = a->_curmaterial->cmaterial(); // override
 		}
 		a->_curmaterialn--; // decrement counter

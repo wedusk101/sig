@@ -22,7 +22,7 @@
 
 	SnMaterial stores material information to be used by the next n shape nodes, allowing
 	different materials to be used by a same shared SnShape during rendering traversal.
-	Note: only when shapes use the SnShape::material information that they will be affected. */
+	Note: only when shapes use the default SnShape::material information that they will be affected. */
 class SnMaterial : public SnNode
  { private :
 	GsMaterial _material;
@@ -36,14 +36,14 @@ class SnMaterial : public SnNode
 	virtual ~SnMaterial ();
 
    public :
-	/*! Default constructor will set to affect 1 shape with restore(false) */
+	/*! Default constructor will set to affect 1 shape with restoration mode false */
 	SnMaterial ();
 
-	/*! Constructor receiving a material */
-	SnMaterial ( const GsMaterial& m );
+	/*! Constructor receiving a material and optionally number of shapes affected and restoration mode */
+	SnMaterial ( const GsMaterial& m, gsuint n=1, bool r=false );
 
-	/*! Sets to affect 1 shape and without original material restoration */
-	void init() { _n=1; _restore=false; }
+	/*! Sets to affect n shapes and with the given restoration mode */
+	void init ( gsuint n=1, bool r=false ) { _n=n; _restore=r; }
 
 	/*! Sets the material to be used for the shape */
 	void material ( const GsMaterial& m, gsuint n=1 ) { _material=m; _n=n; }
