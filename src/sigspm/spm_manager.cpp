@@ -658,13 +658,13 @@ void ShortestPathMapManager::CreateSceneVbo( void )
 
 			if( v > 0 )
 			{
-				PolyIndices.push_back( SceneVertices.size() - 2 );
-				PolyIndices.push_back( SceneVertices.size() - 1 );
+				PolyIndices.push_back( (unsigned int)SceneVertices.size() - 2 );
+				PolyIndices.push_back( (unsigned int)SceneVertices.size() - 1 );
 			}
 		}
 
-		PolyIndices.push_back( SceneVertices.size() - 1 );
-		PolyIndices.push_back( SceneVertices.size() - region.size() );
+		PolyIndices.push_back( (unsigned int)SceneVertices.size() - 1 );
+		PolyIndices.push_back( (unsigned int)SceneVertices.size() - region.size() );
 
 		if( region.ccw() )
 			SceneIndices.insert( SceneIndices.begin(), PolyIndices.begin(), PolyIndices.end() );

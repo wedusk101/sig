@@ -124,7 +124,7 @@ void SpmVertexBufferObject::GenVertexBuffer( GLsizeiptr size, const GLvoid* data
 	glBindBuffer( GL_ARRAY_BUFFER, VertexBufferID );
 	glBufferData( GL_ARRAY_BUFFER, size, data, usage );
 
-	VerticesSize = size;
+	VerticesSize = (GLsizei)size;
 }
 
 void SpmVertexBufferObject::GenIndexBuffer( GLsizeiptr size, const GLvoid* data, GLenum usage )
@@ -140,7 +140,7 @@ void SpmVertexBufferObject::GenIndexBuffer( GLsizeiptr size, const GLvoid* data,
 	glBindBuffer( GL_ELEMENT_ARRAY_BUFFER, IndexBufferID );
 	glBufferData( GL_ELEMENT_ARRAY_BUFFER, size, data, usage );
 
-	IndicesSize = size;
+	IndicesSize = (GLsizei)size;
 }
 
 /*=================================================================================================

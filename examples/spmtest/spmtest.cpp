@@ -133,7 +133,7 @@ void SpmViewer::get_path ( float x, float y )
 	_path->line_width ( 2.0f );
 	_path->color ( GsColor::red );
 	_path->begin_polyline();
-	for ( int i=0, s=SpmPath.size(); i<s; i++ ) _path->push(SpmPath[i]);
+	for ( size_t i=0, s=SpmPath.size(); i<s; i++ ) _path->push(SpmPath[i]);
 	_path->end_polyline();
 }
 
