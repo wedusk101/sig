@@ -39,7 +39,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{0B3454F0-B23E-4D11-B000-2F1313C59F3E}</ProjectGuid>
     <ProjectName>fontgen</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'" Label="Configuration">

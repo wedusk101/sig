@@ -49,7 +49,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{7277853F-ADCE-46A3-ADDA-5A7D3C7EF8F1}</ProjectGuid>
     <ProjectName>gstests</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'" Label="Configuration">

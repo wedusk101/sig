@@ -36,7 +36,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{6C359BCB-BC43-44C6-A664-BAD94CFC3292}</ProjectGuid>
     <ProjectName>shapes</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'" Label="Configuration">

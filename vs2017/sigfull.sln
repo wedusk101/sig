@@ -110,6 +110,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vgtest", "vgtest.vcxproj", 
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsigspm", "libsigspm.vcxproj", "{1208CB4F-7C1D-44D3-B8C9-0B67AFEA8886}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A93CE437-94D0-49F6-B9C7-15B20EB33736} = {A93CE437-94D0-49F6-B9C7-15B20EB33736}
+		{FFD591E4-0A07-4D79-95BC-8D567204FD10} = {FFD591E4-0A07-4D79-95BC-8D567204FD10}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spmtest", "spmtest.vcxproj", "{12665153-E02B-4E6C-872C-0BE55E875FBB}"
 	ProjectSection(ProjectDependencies) = postProject
