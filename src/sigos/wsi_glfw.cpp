@@ -398,7 +398,7 @@ static void setmouseev ( GLFWwindow* gwin, GsEvent& e, GsEvent::Type t )
 
 static void setmousepos ( GsEvent& e, gsint16 x, gsint16 y )
 {
-	e.lmousex=e.mousex;	e.lmousey=e.mousey;
+	e.lmousex=e.mousex;	e.lmousey=e.mousey; e.lmouse=e.mouse;
 	e.mousex=x;	e.mousey=y;
 }
 

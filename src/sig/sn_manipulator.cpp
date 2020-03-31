@@ -34,8 +34,6 @@ SnManipulator::SnManipulator ()
 
 	_precision_in_pixels = 6;
 
-//	_rx = _ry = _rz = 0;
-
 	_usercb = 0;
 	_userdata = 0;
    
@@ -190,7 +188,10 @@ int SnManipulator::check_event ( const GsEvent& e, float& t )
 		{	GS_TRACE1 ( "CHECKING PUSH" );
 			float t1, t2;
 			int k = e.ray.intersects_box ( _box, t1, t2, _bside );
-			if ( k>0 ) { t=t1; return 1; }
+			if ( k>0 )
+			{	GS_TRACE1 ( "Found intersections at "<<t1<<" and "<<t2 );
+				t=t1; return 1;
+			}
 		}
 		t = -1; // tell that t has not been computed
 		return 0;

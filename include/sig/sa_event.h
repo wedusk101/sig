@@ -29,7 +29,7 @@ class SaEvent : public SaAction
    public :
 	SaEvent () { _result=0; }
 	SaEvent ( const GsEvent& e ) : _ev(e) { _result=0; }
-	void set ( const GsEvent& e ) { _ev=e; _result=0; }
+	void init ( const GsEvent& e ) { SaAction::init(); _ev=e; _result=0; _hits.size(0); }
 	GsEvent& get () { return _ev; }
 	int result () const { return _result; }
 	void apply ( SnNode* n );
