@@ -245,7 +245,7 @@ void GsModel::validate ()
 void GsModel::add_model ( const GsModel& m )
 {
 	if ( _mtlmode!=NoMtl && _mtlmode!=PerGroupMtl && m.mtlmode()!=NoMtl && m.mtlmode()!=PerGroupMtl )
-		gsout.fatal("incompatible modes add_model()!");
+		gsout.fatal("Incompatible m mode in add_model()!");
 
 	// data: M, V, N, T, F, Fn, Ft, G
 	int origm = M.size();
