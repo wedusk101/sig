@@ -61,55 +61,55 @@ float GsVec::normax () const
 }
 
 void GsVec::cross ( const GsVec& v1, const GsVec& v2 )
- {
-   x = v1.y*v2.z - v1.z*v2.y;
-   y = v1.z*v2.x - v1.x*v2.z;
-   z = v1.x*v2.y - v1.y*v2.x;
- }
+{
+	x = v1.y*v2.z - v1.z*v2.y;
+	y = v1.z*v2.x - v1.x*v2.z;
+	z = v1.x*v2.y - v1.y*v2.x;
+}
 
 //=================================== Friend Functions ===================================
 
 GsVec cross ( const GsVec& v1, const GsVec& v2 )
- {
-   return GsVec ( v1.y*v2.z - v1.z*v2.y,
-				  v1.z*v2.x - v1.x*v2.z,
-				  v1.x*v2.y - v1.y*v2.x  );
- }
+{
+	return GsVec ( v1.y*v2.z - v1.z*v2.y,
+				   v1.z*v2.x - v1.x*v2.z,
+				   v1.x*v2.y - v1.y*v2.x );
+}
 
 void swap ( GsVec& v1, GsVec& v2 )
- {
-   float tmp;
-   GS_SWAP(v1.x,v2.x);
-   GS_SWAP(v1.y,v2.y);
-   GS_SWAP(v1.z,v2.z);
- }
+{
+	float tmp;
+	GS_SWAP(v1.x,v2.x);
+	GS_SWAP(v1.y,v2.y);
+	GS_SWAP(v1.z,v2.z);
+}
 
 float distmax ( const GsVec& v1, const GsVec& v2 )
- {
-   float a = v1.x-v2.x;
-   float b = v1.y-v2.y;
-   float c = v1.z-v2.z;
-   a = GS_ABS(a);
-   b = GS_ABS(b);
-   c = GS_ABS(c);
-   return a>b? (a>c? a:c) : (b>c? b:c);
- }
+{
+	float a = v1.x-v2.x;
+	float b = v1.y-v2.y;
+	float c = v1.z-v2.z;
+	a = GS_ABS(a);
+	b = GS_ABS(b);
+	c = GS_ABS(c);
+	return a>b? (a>c? a:c) : (b>c? b:c);
+}
 
 float dist ( const GsVec& v1, const GsVec& v2 )
- {
-   float a = v1.x-v2.x;
-   float b = v1.y-v2.y;
-   float c = v1.z-v2.z;
-   return sqrtf (a*a + b*b + c*c);
- }
+{
+	float a = v1.x-v2.x;
+	float b = v1.y-v2.y;
+	float c = v1.z-v2.z;
+	return sqrtf (a*a + b*b + c*c);
+}
 
 float dist2 ( const GsVec& v1, const GsVec& v2 )
- {
-   float a = v1.x-v2.x;
-   float b = v1.y-v2.y;
-   float c = v1.z-v2.z;
-   return a*a + b*b + c*c;
- }
+{
+	float a = v1.x-v2.x;
+	float b = v1.y-v2.y;
+	float c = v1.z-v2.z;
+	return a*a + b*b + c*c;
+}
 
 float angle ( const GsVec& v1, const GsVec& v2 )
  {
@@ -133,12 +133,11 @@ float anglenorm ( const GsVec& v1, const GsVec& v2 )
  }
 
 GsVec normal ( const GsPnt& a, const GsPnt& b, const GsPnt& c )
- { 
-   GsVec n; 
-   n.cross ( b-a, c-a ); 
-   n.normalize(); 
-   return n; 
- }
+{ 
+	GsVec n ( cross ( b-a, c-a ) );
+	n.normalize();
+	return n;
+}
 
 GsVec barycentric ( const GsPnt& a, const GsPnt& b, const GsPnt& c, const GsVec &p )
  {

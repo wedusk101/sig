@@ -700,7 +700,7 @@ GsArray<GsModel::Face>* GsModel::get_edges_per_vertex()
 	int fsize = F.size();
 
 	// Allocate array per vertex:
-	GsArray<Face>* va = new GsArray<Face>[V.size()];
+	GsArray<Face>* va = new GsArray<Face>[vsize];
 
 	// Get slight improvements by reducing re-allocations per vertex:
 	for ( i=0; i<vsize; i++ ) va[i].capacity(8);
