@@ -181,8 +181,11 @@ ShortestPathMap* ShortestPathMapManager::Compute( GlContext* context, ShortestPa
 		glDrawBuffers( 1, &colorAttachments[ StencilTexId ] );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-		SPM2_ShadowShader.Use();
-		SceneVbo.BindDrawElementsUnbind();
+		if( envObstacles->empty() == false )
+		{
+			SPM2_ShadowShader.Use();
+			SceneVbo.BindDrawElementsUnbind();
+		}
 
 		// Draw the cone
 		SPM2_ConeShader.Use();
