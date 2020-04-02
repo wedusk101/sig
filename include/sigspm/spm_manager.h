@@ -56,6 +56,12 @@ public:
 	// Returns a reference to the list of SPMs currently stored in the manager
 	std::vector< ShortestPathMap* >& GetSPMs();
 
+	// Returns the Id of the framebuffer the SPM manager is using
+	GLuint GetFramebufferId();
+
+	// Returns the texture Id where the last draw call was executed (where the SPM is stored)
+	GLuint GetDrawTexId();
+
 private:
 	void Initialize(); // called once the first time an SPM is computed
 
@@ -119,10 +125,10 @@ private:
 	int numTextures = 4;
 
 	// Explicitly assigning roles to each of the color attachments
-	int DrawTexId    = 0; // This variable will hold the id of the texture buffer where the last draw ocurred
-	int DrawTexIdA   = 0;
-	int DrawTexIdB   = 1;
-	int StencilTexId = 2;
+	GLuint DrawTexId    = 0; // This variable will hold the id of the texture buffer where the last draw ocurred
+	GLuint DrawTexIdA   = 0;
+	GLuint DrawTexIdB   = 1;
+	GLuint StencilTexId = 2;
 
 	// Buffer IDs
 	GLuint framebufferId, renderbufferId, stencilbufferId, shaderStorageBufferId;

@@ -554,6 +554,16 @@ void ShortestPathMapManager::ComputeCriticalPointsForSourceLines( void )
 	}
 }
 
+GLuint ShortestPathMapManager::GetFramebufferId()
+{
+	return framebufferId;
+}
+
+GLuint ShortestPathMapManager::GetDrawTexId()
+{
+	return textureId[ DrawTexId ];
+}
+
 /*=================================================================================================
 	BUFFERS
 =================================================================================================*/
