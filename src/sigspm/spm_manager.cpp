@@ -181,7 +181,7 @@ ShortestPathMap* ShortestPathMapManager::Compute( GlContext* context, ShortestPa
 		glDrawBuffers( 1, &colorAttachments[ StencilTexId ] );
 		glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
-		if( envObstacles->empty() == false )
+		if( envObstacles->size()>0 )
 		{
 			SPM2_ShadowShader.Use();
 			SceneVbo.BindDrawElementsUnbind();
