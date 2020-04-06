@@ -112,25 +112,25 @@ float dist2 ( const GsVec& v1, const GsVec& v2 )
 }
 
 float angle ( const GsVec& v1, const GsVec& v2 )
- {
-   double n = sqrt(v1.x*v1.x+v1.y*v1.y+v1.z*v1.z) * sqrt(v2.x*v2.x+v2.y*v2.y+v2.z*v2.z);
-   // n will be 0 if a given vector is null, so check that here:
-   if ( n==0 ) return 0;
-   // get the cosine of the angle:
-   n = double(v1.x*v2.x + v1.y*v2.y + v1.z*v2.z) / n;
-   // n has to be in [-1,1] and numerical aproximations may result in values
-   // slightly outside the interval; so the test below is really needed:
-   if ( n<-1.0 ) n=-1.0; else if ( n>1.0 ) n=1.0;
-   return (float) acos ( n );
- }
+{
+	double n = sqrt(v1.x*v1.x+v1.y*v1.y+v1.z*v1.z) * sqrt(v2.x*v2.x+v2.y*v2.y+v2.z*v2.z);
+	// n will be 0 if a given vector is null, so check that here:
+	if ( n==0 ) return 0;
+	// get the cosine of the angle:
+	n = double(v1.x*v2.x + v1.y*v2.y + v1.z*v2.z) / n;
+	// n has to be in [-1,1] and numerical aproximations may result in values
+	// slightly outside the interval; so the test below is really needed:
+	if ( n<-1.0 ) n=-1.0; else if ( n>1.0 ) n=1.0;
+	return (float) acos ( n );
+}
 
 float anglenorm ( const GsVec& v1, const GsVec& v2 )
- {
-   return acosf ( dot(v1,v2) );
-   double n = double(v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
-   if ( n<-1.0 ) n=-1.0; else if ( n>1.0 ) n=1.0;
-   return (float) acos ( n );
- }
+{
+	return acosf ( dot(v1,v2) );
+	double n = double(v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
+	if ( n<-1.0 ) n=-1.0; else if ( n>1.0 ) n=1.0;
+	return (float) acos ( n );
+}
 
 GsVec normal ( const GsPnt& a, const GsPnt& b, const GsPnt& c )
 { 
@@ -140,27 +140,27 @@ GsVec normal ( const GsPnt& a, const GsPnt& b, const GsPnt& c )
 }
 
 GsVec barycentric ( const GsPnt& a, const GsPnt& b, const GsPnt& c, const GsVec &p )
- {
-   GsVec u = cross ( c-a, b-a );
-   float ulen = u.len(); // 2 * triangle {a, b, c} area
-   GsVec ua = cross ( c-p, b-p ); 
-   GsVec ub = cross ( a-p, c-p ); 
-   GsVec uc = cross ( b-p, a-p ); 
-   GsVec bc ( ua.len()/ulen, ub.len()/ulen, uc.len()/ulen );
-   if ( dot(u,ua)<0 ) bc.x = -bc.x;
-   if ( dot(u,ub)<0 ) bc.y = -bc.y;
-   if ( dot(u,uc)<0 ) bc.z = -bc.z;
-   return bc;
- }
+{
+	GsVec u = cross ( c-a, b-a );
+	float ulen = u.len(); // 2 * triangle {a, b, c} area
+	GsVec ua = cross ( c-p, b-p ); 
+	GsVec ub = cross ( a-p, c-p ); 
+	GsVec uc = cross ( b-p, a-p ); 
+	GsVec bc ( ua.len()/ulen, ub.len()/ulen, uc.len()/ulen );
+	if ( dot(u,ua)<0 ) bc.x = -bc.x;
+	if ( dot(u,ub)<0 ) bc.y = -bc.y;
+	if ( dot(u,uc)<0 ) bc.z = -bc.z;
+	return bc;
+}
 
 void transbarycentric ( GsPnt& a, GsPnt& b, GsPnt& c, const GsVec &k, const GsVec& v )
- {
-   float k2 = k.x*k.x + k.y*k.y + k.z*k.z;
+{
+	float k2 = k.x*k.x + k.y*k.y + k.z*k.z;
 
-   a += (k.x+1.0f-k2)*v;
-   b += (k.y+1.0f-k2)*v;
-   c += (k.z+1.0f-k2)*v;
- }
+	a += (k.x+1.0f-k2)*v;
+	b += (k.y+1.0f-k2)*v;
+	c += (k.z+1.0f-k2)*v;
+}
 
 int GsVec::compare ( const GsVec& v1, const GsVec& v2 )
 {
@@ -174,4 +174,3 @@ int GsVec::compare ( const GsVec& v1, const GsVec& v2 )
 }
 
 //================================== End of File ===========================================
-

@@ -16,20 +16,6 @@ const GsPlane GsPlane::XY ( GsPnt(0,0,0), GsVec(0,0,1) );
 const GsPlane GsPlane::XZ ( GsPnt(0,0,0), GsVec(0,1,0) );
 const GsPlane GsPlane::YZ ( GsPnt(0,0,0), GsVec(1,0,0) );
 
-GsPlane::GsPlane () : coords ( GsVec::k ), coordsw(0)
-{
-}
-
-GsPlane::GsPlane ( const GsVec& center, const GsVec& normal )
-{
-	set ( center, normal );
-}
-
-GsPlane::GsPlane ( const GsVec& p1, const GsVec& p2, const GsVec& p3 )
-{
-	set ( p1, p2, p3 );
-}
-
 bool GsPlane::set ( const GsVec& center, const GsVec& normal )
 {
 	coords = normal;
