@@ -234,6 +234,7 @@ ShortestPathMap* ShortestPathMapManager::Compute( GlContext* context, ShortestPa
 	if( spm == nullptr )
 		spm = CreateSPM();
 
+	spm->SetBufferDimensions( bufferWidth, bufferHeight );
 	spm->LoadResultArrayFromGPU( ShaderStorageArray.size() );
 	spm->LoadMapFromGPU( framebufferId, colorAttachments[ DrawTexId ] );
 
@@ -617,6 +618,25 @@ void ShortestPathMapManager::DeleteBuffers( void )
 	glDeleteRenderbuffers( 1, &renderbufferId );
 	glDeleteFramebuffers( 1, &framebufferId );
 	glDeleteBuffers( 1, &shaderStorageBufferId );
+}
+
+void ShortestPathMapManager::SetBufferDimensions( int width, int height )
+{
+	bufferWidth = width;
+	bufferHeight = height;
+
+	DeleteBuffers();
+	CreateBuffers();
+}
+
+int ShortestPathMapManager::GetBufferWidth()
+{
+	return bufferWidth;
+}
+
+int ShortestPathMapManager::GetBufferHeight()
+{
+	return bufferHeight;
 }
 
 /*=================================================================================================

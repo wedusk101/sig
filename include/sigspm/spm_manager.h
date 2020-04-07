@@ -62,6 +62,13 @@ public:
 	// Returns the texture Id where the last draw call was executed (where the SPM is stored)
 	GLuint GetDrawTexId();
 
+	// Sets the dimensions of the GPU buffers and updates them
+	void SetBufferDimensions( int width, int height );
+
+	// Returns the current dimensions of the GPU buffers
+	int GetBufferWidth();
+	int GetBufferHeight();
+
 private:
 	void Initialize(); // called once the first time an SPM is computed
 
