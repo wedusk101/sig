@@ -29,64 +29,64 @@
 //=========================== GsImageBase ============================
 
 GsImageBase::GsImageBase ()
- {
-   GS_TRACE1 ("Default Constructor");
-   _w = _h = 0;
-   _img = 0;
- }
+{
+	GS_TRACE1 ("Default Constructor");
+	_w = _h = 0;
+	_img = 0;
+}
 
 GsImageBase::~GsImageBase ()
- {
-   GS_TRACE1 ("Destructor");
-   if (_img) stbi_image_free ( _img );
- }
+{
+	GS_TRACE1 ("Destructor");
+	if (_img) stbi_image_free ( _img );
+}
 
 GsImageBase::GsImageBase ( int w, int h, unsigned sizeofx )
- {
-   GS_TRACE1 ("Constructor");
-   _w = _h = 0;
-   _img = 0;
-   if ( w>0 && h>0 )
-	{ _w = w; 
-	  _h = h;
-	  _img = (gsbyte*) stbi__malloc(w*h*sizeofx);
+{
+	GS_TRACE1 ("Constructor");
+	_w = _h = 0;
+	_img = 0;
+	if ( w>0 && h>0 )
+	{	_w = w; 
+		_h = h;
+		_img = (gsbyte*) stbi__malloc(w*h*sizeofx);
 	}
- }
+}
 
 void GsImageBase::init ( int w, int h, unsigned sizeofx )
- {
-   if ( w==_w && h==_h ) return;
+{
+	if ( w==_w && h==_h ) return;
 
-   if ( _img ) stbi_image_free ( (void*)_img );
+	if ( _img ) stbi_image_free ( (void*)_img );
 
-   if ( w<=0 || h<=0 )
-	{ _w = _h = 0; 
-	  _img = 0;
+	if ( w<=0 || h<=0 )
+	{	_w = _h = 0; 
+		_img = 0;
 	}
-   else
-	{ _w = w; 
-	  _h = h;
-	  _img = stbi__malloc(w*h*sizeofx);
+	else
+	{	_w = w; 
+		_h = h;
+		_img = stbi__malloc(w*h*sizeofx);
 	}
- }
+}
 
 void GsImageBase::vertical_mirror ( unsigned sizeofx )
- {
-   int i, ie, mid;
-   mid = _h/2;
+{
+	int i, ie, mid;
+	mid = _h/2;
  
-   GsBuffer<gsbyte> linebuf(_w*sizeofx);
-   gsbyte* buf = &linebuf[0];
-   int lsize = _w*sizeofx;
+	GsBuffer<gsbyte> linebuf(_w*sizeofx);
+	gsbyte* buf = &linebuf[0];
+	int lsize = _w*sizeofx;
 
-   # define LINE(l) ((gsbyte*)_img)+(l*_w*sizeofx)
-   for ( i=0,ie=_h-1; i<mid; i++,ie-- )
-	{ memcpy ( buf,	  LINE(i),  lsize );
-	  memcpy ( LINE(i),  LINE(ie), lsize );
-	  memcpy ( LINE(ie), buf,	  lsize );
+	# define LINE(l) ((gsbyte*)_img)+(l*_w*sizeofx)
+	for ( i=0,ie=_h-1; i<mid; i++,ie-- )
+	{	memcpy ( buf, LINE(i), lsize );
+		memcpy ( LINE(i), LINE(ie), lsize );
+		memcpy ( LINE(ie), buf, lsize );
 	}
-   # undef LINE
- }
+	# undef LINE
+}
 
 bool GsImageBase::save ( const char* filename,  unsigned sizeofx )
 {
@@ -178,18 +178,18 @@ bool GsImageBase::load ( const char* filename, unsigned sizeofx )
 }
 
 bool GsImageBase::load_from_memory ( const gsbyte* buffer, unsigned buflen, unsigned sizeofx )
- {
-   GS_TRACE2 ( "Loading from Memory: "<<buflen<<" bytes" );
+{
+	GS_TRACE2 ( "Loading from Memory: "<<buflen<<" bytes" );
 
-   init(0,0,sizeofx);
+	init(0,0,sizeofx);
 
-   int w, h, d; // d = number of 8-bit components per pixel
-   _img = stbi_load_from_memory ( buffer, buflen, &w, &h, &d, sizeofx );
+	int w, h, d; // d = number of 8-bit components per pixel
+	_img = stbi_load_from_memory ( buffer, buflen, &w, &h, &d, sizeofx );
 
-   GS_TRACE2 ( "depth:" << d << ", size:" << w << "x" << h << ", bitsperpixel:"<<d );
+	GS_TRACE2 ( "depth:" << d << ", size:" << w << "x" << h << ", bitsperpixel:"<<d );
 
-   if ( !_img ) 
-	{ GS_TRACE2("Error!"); return false; }
-   else
-	{ GS_TRACE2("Loaded."); _w=w; _h=h; return true; }
- }
+	if ( !_img ) 
+	{	GS_TRACE2("Error!"); return false; }
+	else
+	{	GS_TRACE2("Loaded."); _w=w; _h=h; return true; }
+}

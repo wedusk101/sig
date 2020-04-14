@@ -92,11 +92,11 @@ class GsGraphNode : public GsListNode
 	/*! Remove all links going out of, and coming to, this node */
 	void unlink ();
 
-	/*! Remove link of index li, with a fast remove: the order in the
-		links array is not mantained */
+	/*! Removes link index li with a fast removal by replacing it with the last	element
+		of the array of links. The order in the links array is thus not mantained */
 	void unlink ( int li );
 
-	/*! Remove the link pointing to n. Should be called ONLY when it is
+	/*! Removes the link pointing to n. Should be called ONLY when it is
 		guaranteed that the link to n really exists! Uses method unlink(ni) */
 	void unlink ( GsGraphNode* n ) { unlink ( search_link(n) ); }
 

@@ -13,6 +13,9 @@
     <Filter Include="graphics and system">
       <UniqueIdentifier>{1e326d16-e0ee-4039-a603-32eb6f38a792}</UniqueIdentifier>
     </Filter>
+    <Filter Include="containers">
+      <UniqueIdentifier>{2fad6a46-9553-4d1d-9016-49a75f967168}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\sig\cd_implementation.cpp">
@@ -28,9 +31,6 @@
       <Filter>graphics and system</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sig\gs_color.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_dirs.cpp">
       <Filter>graphics and system</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sig\gs_euler.cpp">
@@ -183,9 +183,6 @@
     <ClCompile Include="..\src\sig\gs_geo2.cpp">
       <Filter>graphics and system</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sig\gs_shareable.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sig\gs_stroke_font.cpp">
       <Filter>graphics and system</Filter>
     </ClCompile>
@@ -207,53 +204,59 @@
     <ClCompile Include="..\src\sig\gs_camera.cpp">
       <Filter>graphics and system</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\sig\gs_array.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_buffer.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_graph.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_grid.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_list.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_list_node.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_slot_map.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_string.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_strings.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_table.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_tree.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_val.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_var.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\sig\gs_vars.cpp">
-      <Filter>graphics and system</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\sig\sn_material.cpp">
       <Filter>scene nodes</Filter>
     </ClCompile>
     <ClCompile Include="..\src\sig\gs_vis_graph.cpp">
       <Filter>graphics and system</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_array.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_buffer.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_graph.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_grid.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_list.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_list_node.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_slot_map.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_tree.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_val.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_var.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_vars.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_dirs.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_shareable.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_string.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_strings.cpp">
+      <Filter>containers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_table.cpp">
+      <Filter>containers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -272,9 +275,6 @@
     <ClInclude Include="..\include\sig\gs_color.h">
       <Filter>graphics and system</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\sig\gs_dirs.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\sig\gs_euler.h">
       <Filter>graphics and system</Filter>
     </ClInclude>
@@ -291,9 +291,6 @@
       <Filter>graphics and system</Filter>
     </ClInclude>
     <ClInclude Include="..\include\sig\gs_line.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_manager.h">
       <Filter>graphics and system</Filter>
     </ClInclude>
     <ClInclude Include="..\include\sig\gs_mat.h">
@@ -422,12 +419,6 @@
     <ClInclude Include="..\include\sig\sn_planar_objects.h">
       <Filter>scene nodes</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\sig\gs_heap.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_shareable.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\sig\gs_stroke_font.h">
       <Filter>graphics and system</Filter>
     </ClInclude>
@@ -449,51 +440,6 @@
     <ClInclude Include="..\include\sig\gs_camera.h">
       <Filter>graphics and system</Filter>
     </ClInclude>
-    <ClInclude Include="..\include\sig\gs_array.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_buffer.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_graph.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_grid.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_list.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_list_node.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_queue.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_slot_map.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_string.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_strings.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_table.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_tree.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_val.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_var.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
-    <ClInclude Include="..\include\sig\gs_vars.h">
-      <Filter>graphics and system</Filter>
-    </ClInclude>
     <ClInclude Include="..\include\sig\gs_geo2.h">
       <Filter>graphics and system</Filter>
     </ClInclude>
@@ -502,6 +448,63 @@
     </ClInclude>
     <ClInclude Include="..\include\sig\gs_vis_graph.h">
       <Filter>graphics and system</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_array.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_buffer.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_graph.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_grid.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_heap.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_list.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_list_node.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_manager.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_queue.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_slot_map.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_tree.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_val.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_var.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_vars.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_dirs.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_shareable.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_string.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_strings.h">
+      <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_table.h">
+      <Filter>containers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

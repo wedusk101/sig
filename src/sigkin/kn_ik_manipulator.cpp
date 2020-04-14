@@ -169,11 +169,6 @@ const GsMat& KnIkManipulator::cmat() const
 	return _manip->mat();
 }
 
-GsMat& KnIkManipulator::mat()
-{
-	return _manip->mat();
-}
-
 //-------------- virtuals -----------------------
 
 KnIk::Result KnIkManipulator::iksolve ()

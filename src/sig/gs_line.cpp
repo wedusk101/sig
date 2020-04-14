@@ -22,35 +22,27 @@ const GsLine GsLine::z ( GsPnt(0,0,0), GsVec(0,0,1) );
 
 //============================== GsLine ====================================
 
-#define EPSILON 0.00001 // floats have 7 decimals
-
 bool GsLine::intersects_triangle ( const GsPnt &v0, const GsPnt &v1, const GsPnt &v2,
 								   float &t, float &u, float &v ) const
 {
-	GsVec dir, edge1, edge2, tvec, pvec, qvec;
-	float det, inv_det;
+	GsVec dir (p2 - p1 );
+	GsVec edge1 (v1 - v0);
+	GsVec edge2 (v2 - v0);
+	GsVec pvec ( cross ( dir, edge2 ) );
+	float det = dot ( edge1, pvec );
 
-	dir   = p2 - p1;
-	edge1 = v1 - v0;					  // find vectors for two edges sharing v0 
-	edge2 = v2 - v0;
-	pvec  = cross ( dir, edge2 );		 // begin calculating determinant - also used to calculate U parameter 
-	det   = dot ( edge1, pvec );		  // if determinant is near zero, ray lies in plane of triangle 
+	if ( GS_NEXTZ(det,gstiny) ) return false;
+	float inv_det = 1.0f / det;
 
-	if ( GS_NEXTZ(det,EPSILON) )
-	{	//gsout.warning("det in ray_triangle fails => %f",(float)det);
-		return false;
-	}
-	inv_det = 1.0f / det;
-
-	tvec = p1 - v0;					   // calculate distance from v0 to ray origin 
-	u = dot(tvec, pvec) * inv_det;		// calculate U parameter and test bounds 
+	GsVec tvec ( p1 - v0 );
+	u = dot(tvec, pvec) * inv_det;
 	if ( u<0.0 || u>1.0 ) return false;
 
-	qvec = cross ( tvec, edge1 );		 // prepare to test V parameter 
-	v = dot(dir, qvec) * inv_det;		 // calculate V parameter and test bounds 
+	GsVec qvec ( cross ( tvec, edge1 ) );
+	v = dot(dir, qvec) * inv_det;
 	if ( v<0.0 || u+v>1.0 ) return false;
-	t = dot(edge2,qvec) * inv_det;		// calculate t, ray intersects triangle 
 
+	t = dot(edge2,qvec) * inv_det;
 	return true;
 }
 
@@ -71,20 +63,12 @@ int GsLine::intersects_box ( const GsBox& box, float& t1, float& t2, GsPnt* vp )
 	int tsize=0;
 
 	# define INTERSECT(s) if ( intersects_square(p1,p2,p3,p4,t[tsize]) ) { side[tsize]=s; tsize++; }
-
-	box.get_side ( p1, p2, p3, p4, 0 );
-	INTERSECT(0);
-	box.get_side ( p1, p2, p3, p4, 1 );
-	INTERSECT(1);
-	box.get_side ( p1, p2, p3, p4, 2 );
-	INTERSECT(2);
-	box.get_side ( p1, p2, p3, p4, 3 );
-	INTERSECT(3);
-	box.get_side ( p1, p2, p3, p4, 4 );
-	INTERSECT(4);
-	box.get_side ( p1, p2, p3, p4, 5 );
-	INTERSECT(5);
-
+	box.get_side ( p1, p2, p3, p4, 0 );	INTERSECT(0);
+	box.get_side ( p1, p2, p3, p4, 1 );	INTERSECT(1);
+	box.get_side ( p1, p2, p3, p4, 2 );	INTERSECT(2);
+	box.get_side ( p1, p2, p3, p4, 3 );	INTERSECT(3);
+	box.get_side ( p1, p2, p3, p4, 4 );	INTERSECT(4);
+	box.get_side ( p1, p2, p3, p4, 5 );	INTERSECT(5);
 	# undef INTERSECT
 
 	if ( tsize==0 )

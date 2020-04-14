@@ -120,8 +120,8 @@ class KnIkManipulator : public SnGroup
 	/*! Returns the current goal matrix in the manipulator */
 	const GsMat& cmat () const;
 
-	/*! This one can only be called after initialization!  */
-	GsMat& mat ();
+	/*! This one can only be called after initialization! */
+	GsMat& mat () { return mat(); }
 
 	/*! This method either calls the associated callback, if any, or proceed
 		and solve the IK according to the specified solve method.

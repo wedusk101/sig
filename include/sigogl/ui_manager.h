@@ -102,9 +102,9 @@ class UiManager : public SnEditor
 	/*! Access to top-level panels */
 	UiPanel* top () { return _panels.top(); }
 	UiPanel* get ( int i ) { return _panels.get(i); }
-	int search ( UiPanel* p ) { return _panels.lsearch(p); }
+	int search ( UiPanel* p ) { return _panels.lsearch(p); } // returns -1 if not found
 	int panels () const { return _panels.size(); }
-	void remove ( int pos );
+	void remove ( int pos ); // no effect is pos <0 or out of range
 
 	/*! Removes the top element. The removal honors the ref/unref method of the
 		element's GsShareable base class and the element may self-destroy during the removal process */

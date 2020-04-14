@@ -111,8 +111,10 @@ class GsPolygons : public GsShareable
 		If no vertices exist, false is returned. */
 	bool pick_vertex ( const GsVec2& p, float epsilon, int& pid, int& vid ) const;
 
-	/*! Returns the index of the first polygon containing p, or -1 if not found */
-	int pick_polygon ( const GsVec2& p ) const;
+	/*! Returns the index of the first polygon containing p, or -1 if not found.
+		If start is >=0 the order is from index start to size-1, otherwise from
+		|start| down to 0 (reverse order); start is clipped to valid range. */
+	int pick_polygon ( const GsVec2& p, int start=0 ) const;
 
 	/*! Returns true if there is an edge closer to p than epsilon. In this case
 		the indices of the first vertex of the closest edge are returned in pid and vid.

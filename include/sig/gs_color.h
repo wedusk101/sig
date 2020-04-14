@@ -116,7 +116,7 @@ class GsColor
 	operator const gsbyte* () const { return e; }
 
 	/*! Set random values in r g b components; to avoid sampling colors which are
-		to similar to each other, 255/quant slots are created per r,g,b component */
+		too similar to each other, 255/quant slots are created per r,g,b component. */
 	void setrandom ( int quant=5 );
 
 	/*! Returns the HSV components of the color: 

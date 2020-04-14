@@ -548,7 +548,7 @@ void GsGraphBase::get_disconnected_components ( GsArray<int>& components, GsArra
 
 	GsArray<GsGraphNode*>& stack = _buffer;
 	stack.size ( 0 );
-   
+
 	GsGraphNode* n;
 	GsListIterator<GsGraphNode> it(_nodes);
 
