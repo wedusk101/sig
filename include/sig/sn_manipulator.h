@@ -69,14 +69,23 @@ class SnManipulator : public SnEditor
 	/*! Template version of child() with typecast to given type */
 	template <class Node> Node* child () { return (Node*)SnEditor::child(); }
 
-	/*! Get a reference to the manipulator matrix. */
-	GsMat& mat () { return SnEditor::mat(); }
+	/*! Get a reference to the manipulator matrix */
+	const GsMat& mat () { return SnEditor::mat(); }
+
+	/*! To be called whenever the initial mat is directly manipulated */
+	void initial_mat_changed ();
 
 	/*! Set a initial matrix to the manipulator. This matrix will be saved
 		and all manipulations performed will be combined to it. 
 		All other transformations are set to identity.
 		Note: the final transformation is obtained with mat() */
-	void initial_mat ( const GsMat& m );
+	void initial_mat ( const GsMat& m ) { _initmat=m; initial_mat_changed(); }
+
+	/*! Set the initial matrix to be a translation matrix by t */
+	void initial_mat ( const GsVec& t ) { _initmat.translation(t); initial_mat_changed(); }
+
+	/*! Returns access to the initial */
+	GsMat& initial_mat () { return _initmat; }
 
 	/*! Put into waiting mode, ie, no selections appearing */
 	void init ();

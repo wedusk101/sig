@@ -53,15 +53,13 @@ void SnManipulator::child ( SnNode *sn )
 	_snbox->touch(); // this will trigger bounding box update at rendering time
 }
 
-void SnManipulator::initial_mat ( const GsMat& m )
+void SnManipulator::initial_mat_changed ()
 {
-	SnEditor::mat ( m );
+	SnEditor::mat ( _initmat );
 	_translation = GsVec::null;
 	_rotation = GsQuat::null;
-	_initmat = m;
 	_mode = ModeIdle;
 	_firstp = GsPnt::null;
-	_transform ( GsPnt::null, GsVec::null, 'I' );
 }
 
 void SnManipulator::init ()
@@ -69,13 +67,10 @@ void SnManipulator::init ()
 	_dragsel->init();
 	_mode = ModeIdle;
 	_corner = -1;
-
 	if ( SnEditor::child() )
-	{	if ( _drawbox ) _snbox->visible ( true );
-	}
+	{	if ( _drawbox ) _snbox->visible ( true ); }
 	else
-	{	_snbox->visible ( false );
-	}
+	{	_snbox->visible ( false ); }
 }
 
 void SnManipulator::update ()
@@ -106,7 +101,6 @@ void SnManipulator::translation ( const GsVec& t )
 {
 	_translation = t;
 	_mode = ModeIdle;
-	_firstp = GsPnt::null;
 	_transform ( GsPnt::null, GsVec::null, 'I' );
 }
 
@@ -134,10 +128,7 @@ void SnManipulator::_transform ( const GsPnt& p, const GsVec& r, char type )
 	else if ( type=='V' )
 	{	dq.set(r,p);
 	}
-	else // 'I'
-	{	SnEditor::mat ( _initmat );
-		return;
-	}
+	//else 'I'
 
 	GsMat R;
 	_rotation = _rotation * dq;
