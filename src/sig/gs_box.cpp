@@ -103,15 +103,13 @@ bool GsBox::contains ( const GsPnt& p ) const
 
 bool GsBox::intersects ( const GsBox& box ) const
 {
-	if ( box.contains(a) ) return true;
-	if ( box.contains(b) ) return true;
-	GsVec x(a.x,a.y,b.z); if ( box.contains(x) ) return true;
-	x.set (a.x,b.y,a.z); if ( box.contains(x) ) return true;
-	x.set (b.x,a.y,a.z); if ( box.contains(x) ) return true;
-	x.set (b.x,b.y,a.z); if ( box.contains(x) ) return true;
-	x.set (b.x,a.y,b.z); if ( box.contains(x) ) return true;
-	x.set (a.x,b.y,b.z); if ( box.contains(x) ) return true;
-	return false;
+	# define OVERLAP(a1,b1,a2,b2) ( b1>=a2 && a1<=b2 )
+
+	return	OVERLAP ( a.x, b.x, box.a.x, box.b.x ) &&
+			OVERLAP ( a.y, b.y, box.a.y, box.b.y ) &&
+			OVERLAP ( a.z, b.z, box.a.z, box.b.z );
+
+	# undef OVERLAP
 }
 
 void GsBox::get_side ( GsPnt& p1, GsPnt& p2, GsPnt& p3, GsPnt& p4, int s ) const
