@@ -121,10 +121,14 @@ bool GsPolygons::pick_vertex ( const GsVec2& p, float epsilon, int& pid, int& vi
 		return false;
 }
 
-int GsPolygons::pick_polygon ( const GsVec2& p ) const
+int GsPolygons::pick_polygon ( const GsVec2& p, int start ) const
 {
-	for ( int i=0; i<size(); i++ )
-		if ( cget(i).contains(p) ) return i;
+	if ( start>=0 )
+	{	for ( int i=start, s=size(); i<s; i++ ) { if ( cget(i).contains(p) ) return i; } }
+	else
+	{	int i = -start;
+		if ( i>=size() ) i=size()-1;
+		for ( ; i>=0; i-- ) { if ( cget(i).contains(p) ) return i; } }
 	return -1;
 }
 
