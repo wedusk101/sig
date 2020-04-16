@@ -114,6 +114,7 @@ class SnPolyEditor : public SnEditor
 	const GsPolygon& cpolygon ( int i ) const { return _polygons->cpolygons()->cget(i); }
 	GsPolygon& polygon ( int i ) { return _polygons->polygons()->get(i); }
 	const GsPolygons* cpolygons () const { return _polygons->cpolygons(); }
+	int num_polygons () const { return _polygons->polygons()->size(); }
 
 	/*! Get a pointer to the used GsPolygons, which is a shared pointer */
 	GsPolygons* polygons () { return _polygons->polygons(); }
