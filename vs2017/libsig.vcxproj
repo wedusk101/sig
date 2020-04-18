@@ -110,7 +110,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile />
       <MinimalRebuild>false</MinimalRebuild>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -139,7 +139,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -279,21 +279,9 @@
     <ClCompile Include="..\src\sig\gs_dirs.cpp" />
     <ClCompile Include="..\src\sig\gs_euler.cpp" />
     <ClCompile Include="..\src\sig\gs_event.cpp" />
-    <ClCompile Include="..\src\sig\gs_stroke_font.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_stroke_font.cpp" />
     <ClCompile Include="..\src\sig\gs_font.cpp" />
-    <ClCompile Include="..\src\sig\gs_geo2.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_geo2.cpp" />
     <ClCompile Include="..\src\sig\gs_graph.cpp" />
     <ClCompile Include="..\src\sig\gs_grid.cpp" />
     <ClCompile Include="..\src\sig\gs_image.cpp" />
@@ -302,10 +290,7 @@
     <ClCompile Include="..\src\sig\gs_line.cpp" />
     <ClCompile Include="..\src\sig\gs_list.cpp" />
     <ClCompile Include="..\src\sig\gs_list_node.cpp" />
-    <ClCompile Include="..\src\sig\gs_cfg.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\src\sig\gs_cfg.cpp" />
     <ClCompile Include="..\src\sig\gs_mat.cpp" />
     <ClCompile Include="..\src\sig\gs_material.cpp" />
     <ClCompile Include="..\src\sig\gs_math.cpp" />
@@ -377,21 +362,9 @@
     <ClInclude Include="..\include\sig\gs_dirs.h" />
     <ClInclude Include="..\include\sig\gs_euler.h" />
     <ClInclude Include="..\include\sig\gs_event.h" />
-    <ClInclude Include="..\include\sig\gs_stroke_font.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_stroke_font.h" />
     <ClInclude Include="..\include\sig\gs_font.h" />
-    <ClInclude Include="..\include\sig\gs_geo2.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_geo2.h" />
     <ClInclude Include="..\include\sig\gs_graph.h" />
     <ClInclude Include="..\include\sig\gs_grid.h" />
     <ClInclude Include="..\include\sig\gs_heap.h" />
@@ -401,10 +374,7 @@
     <ClInclude Include="..\include\sig\gs_line.h" />
     <ClInclude Include="..\include\sig\gs_list.h" />
     <ClInclude Include="..\include\sig\gs_list_node.h" />
-    <ClInclude Include="..\include\sig\gs_cfg.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_cfg.h" />
     <ClInclude Include="..\include\sig\gs_manager.h" />
     <ClInclude Include="..\include\sig\gs_mat.h" />
     <ClInclude Include="..\include\sig\gs_material.h" />

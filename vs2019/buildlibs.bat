@@ -1,5 +1,5 @@
 @echo off
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
+call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\Common7\Tools\VsDevCmd.bat"
 
 rem Set compilation parameters:
 set "PARAMS=/m /nr:false /nologo /verbosity:q /t:Build" REM q:quiet m:minimum n:normal

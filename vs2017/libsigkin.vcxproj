@@ -35,22 +35,10 @@
     <ClInclude Include="..\include\sigkin\kn_ct_posture.h" />
     <ClInclude Include="..\include\sigkin\kn_ct_scheduler.h" />
     <ClInclude Include="..\include\sigkin\kn_fbx_importer.h" />
-    <ClInclude Include="..\include\sigkin\kn_ik.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\include\sigkin\kn_ik_body.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\include\sigkin\kn_ik_manipulator.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="..\include\sigkin\kn_ik_solver.h">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="..\include\sigkin\kn_ik.h" />
+    <ClInclude Include="..\include\sigkin\kn_ik_body.h" />
+    <ClInclude Include="..\include\sigkin\kn_ik_manipulator.h" />
+    <ClInclude Include="..\include\sigkin\kn_ik_solver.h" />
     <ClInclude Include="..\include\sigkin\kn_joint.h" />
     <ClInclude Include="..\include\sigkin\kn_joint_euler.h" />
     <ClInclude Include="..\include\sigkin\kn_joint_name.h" />
@@ -75,24 +63,10 @@
     <ClCompile Include="..\src\sigkin\kn_ct_posture.cpp" />
     <ClCompile Include="..\src\sigkin\kn_ct_scheduler.cpp" />
     <ClCompile Include="..\src\sigkin\kn_fbx_importer.cpp" />
-    <ClCompile Include="..\src\sigkin\kn_ik_solver.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\src\sigkin\kn_ik.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\src\sigkin\kn_ik_body.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\src\sigkin\kn_ik_manipulator.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|x64'">false</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="..\src\sigkin\kn_ik_solver.cpp" />
+    <ClCompile Include="..\src\sigkin\kn_ik.cpp" />
+    <ClCompile Include="..\src\sigkin\kn_ik_body.cpp" />
+    <ClCompile Include="..\src\sigkin\kn_ik_manipulator.cpp" />
     <ClCompile Include="..\src\sigkin\kn_joint.cpp" />
     <ClCompile Include="..\src\sigkin\kn_joint_euler.cpp" />
     <ClCompile Include="..\src\sigkin\kn_joint_name.cpp" />
@@ -215,6 +189,7 @@
       <CompileAs>Default</CompileAs>
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile />
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>
@@ -241,6 +216,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <PrecompiledHeaderFile>
       </PrecompiledHeaderFile>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
     </ClCompile>
     <ResourceCompile>
       <Culture>0x0409</Culture>

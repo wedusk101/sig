@@ -5,8 +5,8 @@ REM q:quiet m:minimum n:normal
 set "PARAMS=/m /nr:false /nologo /verbosity:q /t:Build /p:Platform=x86"
 
 rem ========== build cmds ==========
-call :build sigfull.sln Release
-call :build siglibs.sln ReleaseDLL
+call :build sigfull.sln ReleaseDLL
+call :build siglibs.sln Release
 call :build siglibs.sln Debug
 pause
 goto end
