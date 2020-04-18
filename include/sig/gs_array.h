@@ -396,7 +396,7 @@ class GsArray : protected GsArrayBase
 		The output format is [e0 e1 ... en] */
 	friend GsOutput& operator<< ( GsOutput& o, const GsArray<X>& a )
 	{	o << '[';
-		for ( int i=0; i<a.size(); i++ ) o  << ' ' << a[i];
+		for ( int i=0; i<a.size(); i++ ) o << ' ' << a[i];
 		return o << ' ' << ']';
 	}
 
@@ -482,6 +482,10 @@ class GsArrayPt : protected GsArray<X*>
 
 	/* Swap stored pointers in the two positions. */
 	void swap ( int i, int j ) { X* tmp; GS_SWAP(GsArray<X*>::get(i),GsArray<X*>::get(j)); }
+
+	/*! Output all elements. Element type X must have its output operator << available. */
+	friend GsOutput& operator<< ( GsOutput& o, const GsArrayPt<X>& a )
+	{	for ( int i=0; i<a.size(); i++ ) o<<*a[i]<<gsnl; return o; }
 };
 
 /*! \class GsArrayRef gs_array.h
