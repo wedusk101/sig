@@ -297,7 +297,7 @@ class GsVec
 	static int compare ( const GsVec& v1, const GsVec& v2 );
 
 	/*! Same as the other lexicographical compare method but with parameters as pointers. */
-	inline static int compare ( const GsVec* v1, const GsVec* v2 ) { return gs_compare(*v1,*v2); }
+	//xxx inline static int compare ( const GsVec* v1, const GsVec* v2 ) { return gs_compare(*v1,*v2); }
 
 	/*! Returns the linear interpolation of v1 v2 in parameter t ( v1(1-t)+v2(t) ). */
 	friend GsVec mix ( const GsVec& v1, const GsVec& v2, float t )
@@ -323,8 +323,8 @@ float anglenorm ( const GsVec& v1, const GsVec& v2 );
 GsVec normal ( const GsPnt& a, const GsPnt& b, const GsPnt& c );
 GsVec barycentric ( const GsPnt& a, const GsPnt& b, const GsPnt& c, const GsVec &p );
 void transbarycentric ( GsPnt& a, GsPnt& b, GsPnt& c, const GsVec &k, const GsVec& v );
-int compare ( const GsVec& v1, const GsVec& v2 );
-int compare ( const GsVec* v1, const GsVec* v2 );
+//int compare ( const GsVec& v1, const GsVec& v2 );
+//int compare ( const GsVec* v1, const GsVec* v2 );
 GsVec mix ( const GsVec& v1, const GsVec& v2, float t );
 
 /*! Returns the normalized vector v, ie, v scaled to have length 1. */
