@@ -335,6 +335,7 @@
     <ClCompile Include="..\src\sig\gs_tree.cpp" />
     <ClCompile Include="..\src\sig\gs_val.cpp" />
     <ClCompile Include="..\src\sig\gs_var.cpp" />
+    <ClCompile Include="..\src\sig\gs_tri_intersection.cpp" />
     <ClCompile Include="..\src\sig\gs_vars.cpp" />
     <ClCompile Include="..\src\sig\gs_vec.cpp" />
     <ClCompile Include="..\src\sig\gs_vec2.cpp" />
@@ -430,6 +431,7 @@
     <ClInclude Include="..\include\sig\gs_trace.h" />
     <ClInclude Include="..\include\sig\gs_trackball.h" />
     <ClInclude Include="..\include\sig\gs_tree.h" />
+    <ClInclude Include="..\include\sig\gs_tri_intersection.h" />
     <ClInclude Include="..\include\sig\gs_val.h" />
     <ClInclude Include="..\include\sig\gs_var.h" />
     <ClInclude Include="..\include\sig\gs_vars.h" />

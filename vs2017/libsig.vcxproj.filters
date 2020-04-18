@@ -258,6 +258,9 @@
     <ClCompile Include="..\src\sig\gs_table.cpp">
       <Filter>containers</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\sig\gs_tri_intersection.cpp">
+      <Filter>graphics and system</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\sig\cd_implementation.h">
@@ -505,6 +508,9 @@
     </ClInclude>
     <ClInclude Include="..\include\sig\gs_table.h">
       <Filter>containers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sig\gs_tri_intersection.h">
+      <Filter>graphics and system</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

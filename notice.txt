@@ -7,5 +7,8 @@ The author is thankful to the University of California for being supportive of t
 
 This software includes public domain files stb_image.h and stb_image_write.h.
 
-[new acknowledgements to be appended here]
+This software includes in files tri_intersection.h and tri_intersection.cpp code available
+under the MIT License from the following JGT repository:
+https://github.com/erich666/jgt-code/tree/master/Volume_08/Number_1/Guigue2003
 
+[new acknowledgements to be appended here]
