@@ -50,9 +50,6 @@ class GsVar
 	/*! Constructs a type 'f' GsVar with the given name and float value */
 	GsVar ( const char* name, float value );
 
-	/*! Constructs a type 'f' GsVar with the given name and double value */
-	GsVar ( const char* name, double value ) { GsVar ( name, float(value) ); }
-
 	/*! Constructs a type 's' GsVar with the given name and value */
 	GsVar ( const char* name, const char* value );
 
