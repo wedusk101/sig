@@ -1,5 +1,5 @@
 //
-// Default sig shaders - (c) Marcelo Kallmann 2016-2019
+// Generated with SIG genpredefinedshaders.py - (c) Marcelo Kallmann 2016-2020
 //
 
 static const char* pds_2dcolored_vert=
@@ -380,9 +380,12 @@ static const char* pds_shadefunc_glsl=
 "vec3 v=normalize(vec3(0,0,1));"
 "vec3 r=reflect(-l,n);"
 "float dotln=dot(l,n);"
+"if(dotln<0)dotln=-dotln;"
+"float dotvr=dot(v,r);"
+"if(dotvr<0)dotvr=-dotvr;"
 "vec3 amb=la*ka;"
-"vec3 dif=ld*kd*max(dotln,0.0);"
-"vec3 spe=max(dotln,0.0)*ls*ks*pow(max(dot(v,r),0.0),sh);"
+"vec3 dif=ld*kd*dotln;"
+"vec3 spe=dotln*ls*ks*pow(dotvr,sh);"
 "return vec4(amb + dif + spe + emi,alpha);"
 "}"
 ;
