@@ -32,7 +32,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{D439ED53-23FE-4EC8-9A4F-F0EE1EF50085}</ProjectGuid>
     <ProjectName>polyeditor</ProjectName>
-    <WindowsTargetPlatformVersion>10.0.18362.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseDll|Win32'" Label="Configuration">
