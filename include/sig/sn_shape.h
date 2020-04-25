@@ -110,14 +110,16 @@ class SnShape : public SnNode
 	/*! Returns true if the material is being overrriden, and false otherwise. */
 	bool material_is_overriden () const { return _material_is_overriden==1; }
 
-	/*! Sets the material to be used for the shape */
+	/*! Access the material to be used for the shape */
 	void material ( const GsMaterial& m );
-	const GsMaterial& material () const { return _material; }
+	GsMaterial& material () { _changed=MaterialChanged; return _material; }
+	const GsMaterial& cmaterial () const { return _material; }
 
-	/*! Sets the diffuse color of the shape material. Note that when rendering
+	/*! Access the diffuse color of the shape material. When rendering
 		shapes without lighting, only the diffuse color is used. */
 	void color ( GsColor c );
-	GsColor color () const { return _material.diffuse; }
+	GsColor& color () { _changed=MaterialChanged; return _material.diffuse; }
+	GsColor ccolor () const { return _material.diffuse; }
 
 	/*! Returns if the node parameters have changed, requiring
 		the re-generation of the associated render lists. */
