@@ -505,52 +505,60 @@ void GsModel::remove_redundant_normals ( float prec )
 	}
  }
 
-void GsModel::merge_redundant_vertices ( float prec )
- {
-   prec = prec*prec;
-   
-   int fsize = F.size();
-   int vsize = V.size();
-   int i, j;
+void GsModel::remove_redundant_vertices ( float prec, bool chkunused )
+{
+	int fsize = F.size();
+	int vsize = V.size();
+	int i, j;
+	GsArray<int> iarray; // iarray for marking replacements
+	iarray.size ( vsize );
 
-   // build iarray marking replacements:
-   GsArray<int> iarray;
-   iarray.size ( vsize );
-   for ( i=0; i<vsize; i++ ) iarray[i]=i;
-   
-   for ( i=0; i<vsize; i++ )
-	for ( j=0; j<vsize; j++ )
-	 { if ( i==j ) break; // keep i < j
-	   if ( dist2(V[i],V[j])<prec ) // equal
-		{ iarray[j]=i;
+	if ( chkunused ) // xxx: test all modifs!
+	{	iarray.setall ( -1 );
+		for ( i=0; i<fsize; i++ ) // mark used vertices
+		{	iarray[ F[i].a ] = F[i].a;
+			iarray[ F[i].b ] = F[i].b;
+			iarray[ F[i].c ] = F[i].c;
 		}
-	 }
-
-   // fix face indices:
-   for ( i=0; i<fsize; i++ )
-	{ F[i].a = iarray[ F[i].a ];
-	  F[i].b = iarray[ F[i].b ];
-	  F[i].c = iarray[ F[i].c ];
+	}
+	else // start as all vertices used:
+	{	for ( i=0; i<vsize; i++ ) iarray[i]=i;
 	}
 
-   // compress indices:   
-   int ind=0;
-   bool newv;
-   for ( i=0; i<vsize; i++ )
-	{ newv = iarray[i]==i;
-	  V[ind] = V[i];
-	  iarray[i] = ind;
-	  if ( newv ) ind++;
+	if ( prec>=0 )
+	{	// remap redundant vertices:
+		prec = prec*prec;
+		for ( i=0; i<vsize; i++ )
+		{	for ( j=0; j<i; j++ )
+			{	if ( V[i]==V[j] || dist2(V[i],V[j])<prec )
+				{	iarray[j]=i; }
+			}
+		}
+		// fix face indices:
+		for ( i=0; i<fsize; i++ )
+		{	F[i].a = iarray[ F[i].a ];
+			F[i].b = iarray[ F[i].b ];
+			F[i].c = iarray[ F[i].c ];
+		}
 	}
-   V.size ( ind );
 
-   // fix face indices again:
-   for ( i=0; i<fsize; i++ )
-	{ F[i].a = iarray[ F[i].a ];
-	  F[i].b = iarray[ F[i].b ];
-	  F[i].c = iarray[ F[i].c ];
+	// remove vertices not needed:
+	int ind=0;
+	for ( i=0; i<vsize; i++ )
+	{	if ( iarray[i]==i )
+		{	V[ind]=V[i]; iarray[i]=ind++; }
+		else
+		{	iarray[i]=ind; }
 	}
- }
+	V.size ( ind );
+
+	// set final face indices:
+	for ( i=0; i<fsize; i++ )
+	{	F[i].a = iarray[ F[i].a ];
+		F[i].b = iarray[ F[i].b ];
+		F[i].c = iarray[ F[i].c ];
+	}
+}
 
 void GsModel::flat ( bool comp )
 {

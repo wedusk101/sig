@@ -191,8 +191,9 @@ class GsModel : public GsShareable
 		Only applicable if Fn.size()>0 (Hybrid GeoMode). */
 	void remove_redundant_normals ( float prec=gstiny );
 
-	/*! Check and remove redundant vertices */
-	void merge_redundant_vertices ( float prec=gstiny );
+	/*! Check and remove redundant vertices. If precision is given as <0 the O(n^2) distance
+		check between all vertices is not performed and only non-used vertices are removed. */
+	void remove_redundant_vertices ( float prec=gstiny, bool chkunused=true );
 
 	/*! Clear the N and Fn arrays, with compression (if last param is true), then adjust mode. */
 	void flat ( bool comp=true );
