@@ -191,9 +191,12 @@ class GsModel : public GsShareable
 		Only applicable if Fn.size()>0 (Hybrid GeoMode). */
 	void remove_redundant_normals ( float prec=gstiny );
 
-	/*! Check and remove redundant vertices. If precision is given as <0 the O(n^2) distance
-		check between all vertices is not performed and only non-used vertices are removed. */
-	void remove_redundant_vertices ( float prec=gstiny, bool chkunused=true );
+	/*! Check and remove redundant vertices and then remove collapsed faces.
+		If precision prec is given as <0 the O(n^2) distance check between all vertices is not performed.
+		If chkunused is given as true (the default) non-used vertices are removed.
+		If comp is given as true (the default) arrays V and F will be compressed.
+		Note: only V and F are processed, if other data arrays are used they might become invalid. */
+	void remove_redundant_vertices ( float prec=gstiny, bool chkunused=true, bool comp=true );
 
 	/*! Clear the N and Fn arrays, with compression (if last param is true), then adjust mode. */
 	void flat ( bool comp=true );
