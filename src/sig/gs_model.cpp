@@ -566,7 +566,7 @@ void GsModel::remove_unused_vertices ( bool comp )
 	int i, j;
 	int fsize = F.size();
 	int vsize = V.size();
-	GsArray<gscbool> iarray(vsize);
+	GsArray<int> iarray(vsize);
 
 	// mark used face indices:
 	iarray.setall ( 0 );
