@@ -505,15 +505,14 @@ void GsModel::remove_redundant_normals ( float prec )
 	}
  }
 
-void GsModel::remove_redundant_vertices ( float prec, bool chkunused, bool comp )
+void GsModel::remove_redundant_vertices ( float prec, bool remunused, bool comp )
 {
+	int i, j;
 	int fsize = F.size();
 	int vsize = V.size();
-	int i, j;
-	GsArray<int> iarray; // iarray for marking replacements
-	iarray.size ( vsize );
+	GsArray<int> iarray(vsize); // iarray for marking replacements
 
-	if ( chkunused )
+	if ( remunused )
 	{	iarray.setall ( -1 );
 		for ( i=0; i<fsize; i++ ) // mark used vertices
 		{	iarray[ F[i].a ] = F[i].a;
@@ -546,8 +545,7 @@ void GsModel::remove_redundant_vertices ( float prec, bool chkunused, bool comp 
 
 	// remove vertices not needed:
 	for ( j=0, i=0; i<vsize; i++ )
-	{	if ( iarray[i]==i )	{ V[j]=V[i]; iarray[i]=j++; }
-	}
+	{	if ( iarray[i]==i )	{ V[j]=V[i]; iarray[i]=j++; } }
 	V.size ( j );
 
 	// set final face indices:
@@ -561,6 +559,36 @@ void GsModel::remove_redundant_vertices ( float prec, bool chkunused, bool comp 
 
 	// compress:
 	if ( comp ) { V.compress(); F.compress(); }
+}
+
+void GsModel::remove_unused_vertices ( bool comp )
+{
+	int i, j;
+	int fsize = F.size();
+	int vsize = V.size();
+	GsArray<gscbool> iarray(vsize);
+
+	// mark used face indices:
+	iarray.setall ( 0 );
+	for ( i=0; i<fsize; i++ )
+	{	iarray[ F[i].a ] = 1;
+		iarray[ F[i].b ] = 1;
+		iarray[ F[i].c ] = 1;
+	}
+
+	// compress indices:   
+	for ( i=0,j=0; i<vsize; i++ )
+	{	if ( iarray[i] ) { V[j]=V[i]; iarray[i]=j++; }
+	}
+	V.size ( j );
+	if ( comp ) V.compress();
+
+	// set final face indices:
+	for ( i=0; i<fsize; i++ )
+	{	F[i].a = iarray[ F[i].a ];
+		F[i].b = iarray[ F[i].b ];
+		F[i].c = iarray[ F[i].c ];
+	}
 }
 
 void GsModel::flat ( bool comp )
