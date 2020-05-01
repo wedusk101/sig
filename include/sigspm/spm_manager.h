@@ -37,7 +37,7 @@ public:
 	bool SaveSPM( int i, const std::string& spmPath, const std::string& raPath ) const;
 
 	// Computes an SPM. Overwrites 'spm' if not null, otherwise creates new SPM and inserts it into the list. Returns a pointer to the computed SPM
-	ShortestPathMap* Compute( GlContext* context, ShortestPathMap* spm = nullptr );
+	ShortestPathMap* Compute( GlContext* context, ShortestPathMap* spm = nullptr, bool loadFromGPU = false );
 
 	// Defines the domain of the environment:
 	// Domain has to be a closed rectangular-like polygon

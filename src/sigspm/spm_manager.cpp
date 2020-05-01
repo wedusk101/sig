@@ -92,10 +92,7 @@ bool ShortestPathMapManager::SaveSPM( int i, const std::string& spmPath, const s
 	return true;
 }
 
-//SpmTodo: fix problem when there are no obstacles
-//SpmTodo: add method to change the WxH frame buffer resolution
-
-ShortestPathMap* ShortestPathMapManager::Compute( GlContext* context, ShortestPathMap* spm )
+ShortestPathMap* ShortestPathMapManager::Compute( GlContext* context, ShortestPathMap* spm, bool loadFromGpu )
 {
 	if( initialized == false )
 		Initialize();
@@ -235,8 +232,19 @@ ShortestPathMap* ShortestPathMapManager::Compute( GlContext* context, ShortestPa
 		spm = CreateSPM();
 
 	spm->SetBufferDimensions( bufferWidth, bufferHeight );
-	spm->LoadResultArrayFromGPU( ShaderStorageArray.size() );
-	spm->LoadMapFromGPU( framebufferId, colorAttachments[ DrawTexId ] );
+	spm->SetOrthoProjectionMatrix( OrthoProjectionCompleteMatrix );
+
+	if( loadFromGpu == false )
+	{
+		spm->Invalidate();
+		spm->SetShaderStorageBufferVariables( shaderStorageBufferId, ShaderStorageArray.size() );
+		spm->SetBufferIds( framebufferId, textureId[ DrawTexId ], colorAttachments[ DrawTexId ] );
+	}
+	else
+	{
+		spm->LoadResultArrayFromGPU( shaderStorageBufferId, ShaderStorageArray.size() );
+		spm->LoadMapFromGPU( framebufferId, colorAttachments[ DrawTexId ] );
+	}
 
 	glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
 	glBindFramebuffer( GL_FRAMEBUFFER, 0 ); // bind the default framebuffer again for the rest of the application
@@ -588,7 +596,6 @@ void ShortestPathMapManager::CreateBuffers( void )
 		glTexParameterf( GL_TEXTURE_RECTANGLE, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 		glTexImage2D( GL_TEXTURE_RECTANGLE, 0, GL_RGBA32F, bufferWidth, bufferHeight, 0, GL_RGBA, GL_FLOAT, 0 );
 		//glTexImage2D( GL_TEXTURE_RECTANGLE, 0, GL_RGBA, bufferWidth, bufferHeight, 0, GL_RGBA, GL_FLOAT, 0 );
-		//gsout<<textureId[i]<<gsnl;
 	}
 
 	// Attach texture objects to the framebuffer color attachment points
