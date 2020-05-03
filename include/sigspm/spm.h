@@ -64,6 +64,10 @@ public:
 
 	void SetBufferDimensions( int w, int h );
 	void SetOrthoProjectionMatrix( const GsMat& mat );
+	void SetShaderStorageBufferVariables( GLuint _ssbId, size_t n );
+	void SetBufferIds( GLuint _fbId, GLuint _tId, GLenum _rbId );
+	void Invalidate();
+	bool IsReadyToQuery();
 
 	//---------------------------------------------------------------------------------------------
 	//	RESULT ARRAY
@@ -73,7 +77,8 @@ public:
 	const std::vector< SpmVertexPos >& GetResultArray() const;
 
 	// Load the ResultArray from the shader storage buffer object
-	void LoadResultArrayFromGPU( size_t n, bool print_info = false );
+	void LoadResultArrayFromGPU();
+	void LoadResultArrayFromGPU( GLuint _ssbId, size_t n, bool print_info = false );
 
 	// Load a saved ResultArray from a file
 	bool LoadResultArrayFromFile( const std::string& filepath );
@@ -89,7 +94,8 @@ public:
 	const std::vector< float >& GetMap() const;
 
 	// Load SPM from the GPU
-	void LoadMapFromGPU( GLuint framebufferId, GLenum readbufferId );
+	void LoadMapFromGPU();
+	void LoadMapFromGPU( GLuint _fbId, GLenum _rbId );
 
 	// Load SPM from an image file
 	bool LoadMapFromImageFile( const std::string& filepath );
@@ -104,6 +110,9 @@ public:
 	//	ACCESS
 	//---------------------------------------------------------------------------------------------
 
+	// Load necessary things for SPM to be usable
+	void LoadSPM();
+
 	// Return a pointer to the spm buffer
 	const float* GetMapBuffer () const { return &(Map[0]); }
 
@@ -114,14 +123,14 @@ public:
 	int Height () const { return bufferHeight; }
 
 	// Find the closest (parent) point of the point whose 1d coordinate in the map is 'pos'
-	int FindClosestPoint( int pos ) const;
+	int FindClosestPoint( int pos );
 
 	// Find the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
-	bool GetShortestPath( float _x, float _y, std::vector< GsVec >& path ) const;
+	bool GetShortestPath( float _x, float _y, std::vector< GsVec >& path );
 
 	// Find the next direction on the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
 	// Parent points that are closer than threshold will be skipped
-	bool GetNextDirection( float _x, float _y, GsVec& dir, float threshold = 0.01f ) const;
+	bool GetNextDirection( float _x, float _y, GsVec& dir, float threshold = 0.01f );
 
 private:
 	std::vector< float > Map;
@@ -130,4 +139,13 @@ private:
 	std::string Name;
 	int bufferWidth, bufferHeight;
 	GsMat OrthoProjectionCompleteMatrix;
+
+	// variables to load array/map from GPU
+	GLuint shaderStorageBufferId;
+	size_t shaderStorageBufferSize;
+	GLuint framebufferId;
+	GLuint textureId;
+	GLenum readbufferId;
+
+	bool readyToQuery; // when false, SPM will load buffers from GPU when prompted to answer a path query
 };

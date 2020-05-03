@@ -33,6 +33,13 @@ ShortestPathMap::ShortestPathMap()
 
 	bufferWidth  = 0;
 	bufferHeight = 0;
+
+	shaderStorageBufferId = 0;
+	shaderStorageBufferSize = 0;
+	framebufferId = 0;
+	readbufferId  = 0;
+
+	readyToQuery = false;
 }
 
 ShortestPathMap::~ShortestPathMap()
@@ -64,6 +71,29 @@ void ShortestPathMap::SetOrthoProjectionMatrix( const GsMat& mat )
 	OrthoProjectionCompleteMatrix = mat;
 }
 
+void ShortestPathMap::SetShaderStorageBufferVariables( GLuint _ssbId, size_t n )
+{
+	shaderStorageBufferId = _ssbId;
+	shaderStorageBufferSize = n;
+}
+
+void ShortestPathMap::SetBufferIds( GLuint _fbId, GLuint _tId, GLenum _rbId )
+{
+	framebufferId = _fbId;
+	textureId = _tId;
+	readbufferId  = _rbId;
+}
+
+void ShortestPathMap::Invalidate( void )
+{
+	readyToQuery = false;
+}
+
+bool ShortestPathMap::IsReadyToQuery()
+{
+	return readyToQuery;
+}
+
 /*=================================================================================================
 	RESULT ARRAY
 =================================================================================================*/
@@ -73,10 +103,19 @@ const std::vector< SpmVertexPos >& ShortestPathMap::GetResultArray( void ) const
 	return ResultArray;
 }
 
-void ShortestPathMap::LoadResultArrayFromGPU( size_t n, bool print_info )
+void ShortestPathMap::LoadResultArrayFromGPU( void )
+{
+	LoadResultArrayFromGPU( shaderStorageBufferId, shaderStorageBufferSize );
+}
+
+void ShortestPathMap::LoadResultArrayFromGPU( GLuint _ssbId, size_t n, bool print_info )
 {
 	ResultArray.resize( n );
+
+	//glBindFramebuffer( GL_FRAMEBUFFER, framebufferId );
+	glBindBuffer( GL_SHADER_STORAGE_BUFFER, _ssbId );
 	glGetBufferSubData( GL_SHADER_STORAGE_BUFFER, 0, SpmVertexPosSize * ResultArray.size(), &ResultArray[ 0 ] );
+	glBindBuffer( GL_SHADER_STORAGE_BUFFER, 0 );
 
 	if( print_info )
 	{
@@ -164,7 +203,12 @@ const std::vector< float >& ShortestPathMap::GetMap( void ) const
 	return Map;
 }
 
-void ShortestPathMap::LoadMapFromGPU( GLuint framebufferId, GLenum readbufferId )
+void ShortestPathMap::LoadMapFromGPU( void )
+{
+	LoadMapFromGPU( framebufferId, readbufferId );
+}
+
+void ShortestPathMap::LoadMapFromGPU( GLuint _fbId, GLenum _rbId )
 {
 	if( bufferWidth == 0 || bufferHeight == 0 )
 		return;
@@ -174,10 +218,10 @@ void ShortestPathMap::LoadMapFromGPU( GLuint framebufferId, GLenum readbufferId 
 
 	Map.resize( no_floats );
 
-	glBindFramebuffer( GL_FRAMEBUFFER, framebufferId );
-	glReadBuffer( readbufferId );
-	//glNamedFramebufferReadBuffer( framebufferId, readbufferId );
+	glBindFramebuffer( GL_FRAMEBUFFER, _fbId );
+	glReadBuffer( _rbId );
 	glReadPixels( 0, 0, bufferWidth, bufferHeight, GL_RGBA, GL_FLOAT, &Map[0] );
+	//glReadnPixels( 0, 0, bufferWidth, bufferHeight, GL_RGBA, GL_FLOAT, no_floats, &Map[0] );
 }
 
 bool ShortestPathMap::LoadMapFromImageFile( const std::string& filepath )
@@ -237,9 +281,20 @@ bool ShortestPathMap::SaveMapToImageFile( const std::string& filepath ) const
 	ACCESS
 =================================================================================================*/
 
-int ShortestPathMap::FindClosestPoint( int pos ) const
+void ShortestPathMap::LoadSPM( void )
 {
-	if( Map.empty() == true || ResultArray.empty() == true || pos < 0 || pos >= (int)Map.size() - 3 )
+	//LoadResultArrayFromGPU();
+	//LoadMapFromGPU();
+
+	if( Map.empty() == true || ResultArray.empty() == true )
+		readyToQuery = false;
+	else
+		readyToQuery = true;
+}
+
+int ShortestPathMap::FindClosestPoint( int pos )
+{
+	if( pos < 0 || pos >= (int)Map.size() - 3 )
 		return -1;
 
 	float x = Map[ pos     ];
@@ -273,10 +328,13 @@ int ShortestPathMap::FindClosestPoint( int pos ) const
 	return minIdx;
 }
 
-bool ShortestPathMap::GetShortestPath( float _x, float _y, vector< GsVec >& path ) const
+bool ShortestPathMap::GetShortestPath( float _x, float _y, vector< GsVec >& path )
 {
-	if( Map.empty() == true || ResultArray.empty() == true )
-		return false;
+	if( readyToQuery == false ) {
+		LoadSPM();
+		if( readyToQuery == false )
+			return false;
+	}
 
 	// first point (agent's coordinates)
 	GsVec current = { _x, _y, 0.0f };
@@ -360,7 +418,7 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector< GsVec >& path
 	return true;
 }
 
-bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec& dir, float threshold ) const
+bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec& dir, float threshold )
 {
 	dir.x = 0.0f;
 	dir.y = 0.0f;
