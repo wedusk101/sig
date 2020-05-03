@@ -56,11 +56,11 @@ class UiElement : public GsShareable
 	gscenum _type;		// specialized type of this element
 	gscenum _state;		// activation state
 	gscbool _separated; // if display separator line between this and the prior element
-	gscenum	_changed;	 // 0:no change, 1:needs redraw, 2:needs build
+	gscenum	_changed;	// 0:no change, 1:needs redraw, 2:needs build
 	gsbyte	_xspc,_yspc; // spacing between rect borders and the element's contents
 	gsbyte	_pspc,_nspc; // prior and next spacing outside the element's rect (in its panel)
-	gsuint16	_minw,_minh; // minimum size of the element, user-specified and updated during build()
-	gsbyte	_lxs;		 // group alignment spacing, from border to label, used in build and resize, specified by derived classes
+	gsbyte	_lxs;		// group alignment spacing, from border to label, used in build and resize, specified by derived classes
+	gsuint16 _minw,_minh; // minimum size of the element, user-specified and updated during build()
 
    protected : // constructor below requires a type and should only be used by derived elements
 
