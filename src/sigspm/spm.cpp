@@ -423,7 +423,7 @@ bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec& dir, float th
 	dir.x = 0.0f;
 	dir.y = 0.0f;
 
-	vector< GsVec > path; // SpmTodo: only first point needed to retrieve a direction:
+	vector<GsVec> path; // SpmTodo: only the first point should be needed to retrieve a direction!
 	if( GetShortestPath( _x, _y, path ) == false || path.size() < 2 )
 		return false;
 

@@ -20,18 +20,18 @@
 
 class SpmViewer : public WsViewer
 {  public: // ui:
-	enum MenuEv { EvBuild, EvAutoBuild, EvMode, EvExit,
-	              EvContourLines, EvContourLinesInterval, EvContourLinesThickness, EvDistanceField, EvBufferSize };
+	enum MenuEv { EvBuild, EvAutoBuild, EvMode,
+	              EvViewContours, EvContoursInterval, EvContoursThickness, EvViewDistanceField, EvBufferSize,
+				  EvExit };
 	UiRadioButton *_obstbut, *_sinkbut;
 	UiCheckButton *_abbut, *_contourbut, *_distfieldbut;
-	UiSlider *_contourIntervalSlider, *_contourThicknessSlider, *_bufferSizeSlider;
+	UiSlider *_intervalslider, *_thicknesslider, *_resolutionslider;
    public: // scene:
 	SnPolygons *_domain;
 	SnPolyEditor *_sinks;
 	SnPolyEditor *_obstacles;
-	SnPlanarObjects* SpmPlane;
-	SnSpm* SnSpmPlane;
 	SnLines *_path;
+	SnSpm* _snspm;
    public: // spm data:
 	GlTexture SpmTexture;
 	ShortestPathMap* Spm;
@@ -65,21 +65,12 @@ SpmViewer::SpmViewer ( int x, int y, int w, int h, const char* l ) : WsViewer( x
 
 	SnGroup* g = rootg();
 
-	// Define a plane to display the spm as a texture:
-	//SpmPlane = new SnPlanarObjects;
-	//g->add ( SpmPlane ); // will initialize plane after 1st spm is built
-	//GsRect rect ( minx, miny, maxx-minx, maxy-miny );
-	//SpmPlane->zcoordinate = -0.01f;
-	//SpmPlane->start_group ( SnPlanarObjects::Textured, 0 ); // texture id will be set after ogl is initialized
-	//SpmPlane->push_rect ( rect, GsColor::gray );
-	//SpmPlane->setT ( 0, GsPnt2( 0, 0 ), GsPnt2( 1, 0 ), GsPnt2( 1, 1 ), GsPnt2( 0, 1 ) );
-
-	g->add ( SnSpmPlane = new SnSpm( &SpmManager ) );
-	SnSpmPlane->minx = minx;
-	SnSpmPlane->miny = miny;
-	SnSpmPlane->width = maxx-minx;
-	SnSpmPlane->height = maxy-miny;
-	SnSpmPlane->color( GsColor::gray );
+	// Use SnSpm to draw the spm:
+	g->add ( _snspm = new SnSpm(&SpmManager) );
+	_snspm->minx = minx;
+	_snspm->miny = miny;
+	_snspm->width = maxx-minx;
+	_snspm->height = maxy-miny;
 
 	// Define the non-editable domain polygon:
 	g->add ( _domain = new SnPolygons );
@@ -119,35 +110,35 @@ SpmViewer::SpmViewer ( int x, int y, int w, int h, const char* l ) : WsViewer( x
 	}
 
 	// Build ui:
-	UiPanel *p, *mode_p, *viz_p;
+	UiPanel *p, *subp;
 	p = uim()->add_panel ( 0, UiPanel::HorizLeft, UiPanel::Top );
 	p->add ( new UiButton ( "build", EvBuild ) );
-	p->add ( new UiButton ( "mode", mode_p = new UiPanel(0,UiPanel::Vertical) ) );
-	{
-		UiPanel* p = mode_p;
+	p->add ( new UiButton ( "mode", subp = new UiPanel(0,UiPanel::Vertical) ) );
+	{	UiPanel* p = subp;
 		p->add( _obstbut = new UiRadioButton( "obstacles", EvMode, true ) );
 		p->add( _sinkbut = new UiRadioButton( "sink", EvMode, false ) );
 		p->add( _abbut = new UiCheckButton( "auto build", EvAutoBuild, true ) ); p->top()->separate();
 	}
-	p->add ( new UiButton ( "visualization", viz_p = new UiPanel(0,UiPanel::Vertical) ) );
-	{
-		UiPanel* p = viz_p;
+	p->add ( new UiButton ( "view", subp=new UiPanel(0,UiPanel::Vertical) ) );
+	{	UiPanel* p = subp;
+		p->add( _distfieldbut = new UiCheckButton ( "distance field", EvViewDistanceField, false ) );
+		p->add( _contourbut = new UiCheckButton ( "contour lines", EvViewContours, true ) );
 
-		p->add( _distfieldbut = new UiCheckButton ( "Show distance field", EvDistanceField, false ) );
-		p->add( _contourbut = new UiCheckButton ( "Show contour lines", EvContourLines, true ) );
-
-		p->add( new UiElement( "interval:" ) );
-		p->add( _contourIntervalSlider = new UiSlider( "", EvContourLinesInterval ) );
-		_contourIntervalSlider->configure( 0.005f, 0.05f, 0.005f, 1, 3 );
-		_contourIntervalSlider->value( 0.02f );
+		p->add( new UiElement( "interval:" ) ); p->top()->separate();
+		p->add( _intervalslider = new UiSlider( 0, EvContoursInterval, 0, 0, 120 ) );
+		_intervalslider->configure ( 0.005f, 0.1f, 0.005f, 3, 3 );
+		_intervalslider->value ( _snspm->contourInterval );
+		_intervalslider->all_events ( true );
 
 		p->add( new UiElement( "thickness:" ) );
-		p->add( _contourThicknessSlider = new UiSlider( "", EvContourLinesThickness ) );
-		_contourThicknessSlider->configure( 0.001f, 0.01f, 0.0005f, 1, 5 );
-		_contourThicknessSlider->value( 0.002f );
+		p->add( _thicknesslider = new UiSlider( 0, EvContoursThickness ) );
+		_thicknesslider->configure ( 0.001f, 0.02f, 0.0005f, 3, 3 );
+		_thicknesslider->value ( _snspm->contourThickness );
+		_thicknesslider->all_events ( true );
 
+		//SpmTodo: fix ability to change map resolution
 		//p->add( new UiElement( "Buffer size:" ) ); p->top()->separate();
-		//p->add( _bufferSizeSlider = new UiSlider( "", EvBufferSize ) );
+		//p->add( _resolutionlider = new UiSlider( "", EvBufferSize ) );
 		//_bufferSizeSlider->configure( 100, 4000, 100, 1, 0 );
 		//_bufferSizeSlider->value( 1000 );
 	}
@@ -158,17 +149,12 @@ void SpmViewer::build ( bool loadFromGPU )
 {
 	activate_ogl_context();
 	Spm = SpmManager.Compute ( glrenderer()->glcontext(), Spm, loadFromGPU );
-	//SpmTexture.data ( Spm->GetMapBuffer(), Spm->Width(), Spm->Height(), GlTexture::Linear );
-	//SpmPlane->G[0].texid = SpmTexture.id; // only needed for first time the id is created
-	//SnSpmPlane->drawId = SpmManager.GetDrawTexId();
 }
 
 void SpmViewer::get_path ( float x, float y )
 {
 	if ( !Spm ) return;
-
-	if( Spm->IsReadyToQuery() == false )
-		build( true );
+	if ( !Spm->IsReadyToQuery() ) build(true); // SpmTodo: fix bringing map from GPU without rebuilding it
 
 	Spm->GetShortestPath ( x, y, SpmPath );
 	_path->init ();
@@ -193,34 +179,17 @@ int SpmViewer::uievent ( int e )
 
 		case EvBuild: build(); refresh(); break;
 
-		case EvContourLines: {
-			SnSpmPlane->contourLines = _contourbut->value();
-			break;
-		}
+		case EvViewContours:	  _snspm->contourLines=_contourbut->value(); break;
+		case EvContoursInterval:  _snspm->contourInterval=_intervalslider->value(); refresh(); break;
+		case EvContoursThickness: _snspm->contourThickness=_thicknesslider->value(); refresh(); break;
+		case EvViewDistanceField: _snspm->distanceField=_distfieldbut->value();	break;
 
-		case EvContourLinesInterval: {
-			SnSpmPlane->contourInterval = _contourIntervalSlider->value();
-			refresh();
-			break;
-		}
-
-		case EvContourLinesThickness: {
-			SnSpmPlane->contourThickness = _contourThicknessSlider->value();
-			refresh();
-			break;
-		}
-
-		case EvDistanceField: {
-			SnSpmPlane->distanceField = _distfieldbut->value();
-			break;
-		}
-
-		case EvBufferSize: {
+		case EvBufferSize: { // SpmTodo: resolution change is not working properly
 			// rounds to closest 100
-			int width = ( _bufferSizeSlider->valuei() + 50 ) / 100 * 100;
-			int height = width;
-			SpmManager.SetBufferDimensions( width, height );
-			refresh();
+			//int width = ( _resolutionlider->valuei() + 50 ) / 100 * 100;
+			//int height = width;
+			//SpmManager.SetBufferDimensions( width, height );
+			//refresh();
 			break;
 		}
 
@@ -231,15 +200,15 @@ int SpmViewer::uievent ( int e )
 
 int SpmViewer::handle_scene_event ( const GsEvent& e )
 {
-	if( Spm && e.type == GsEvent::Release && _abbut->value() == false )
-	{
-		//Spm->LoadSPM();
-
-		//build();
-		//if ( !_path->empty() ) get_path( SpmPath[0].x, SpmPath[0].y );
-	}
-	else
-	if( Spm && e.alt && e.button1 && ( e.type == GsEvent::Push || e.type == GsEvent::Drag ) )
+	// SpmTodo: revisit automatic SPM loading at mouse release button
+	//if ( Spm && e.type==GsEvent::Release && _abbut->value()==false )
+	//{
+	//	Spm->LoadSPM();
+	//	build();
+	//	if ( !_path->empty() ) get_path( SpmPath[0].x, SpmPath[0].y );
+	//}
+	//else
+	if ( Spm && e.alt && e.button1 && ( e.type==GsEvent::Push || e.type==GsEvent::Drag ) )
 	{
 		get_path( e.mousep.x, e.mousep.y );
 		render();
@@ -262,7 +231,7 @@ int main ( int argc, char** argv )
 	v->refresh ();	// forces window to show and OpenGL to initialize now
 	v->root()->visible(true); // after initialization we can draw the scene
 	v->build ();	// now we can use OpenGL to draw the first spm
-	v->message ( "Press Esc to switch between polygon creation and edition mode. Alt-left click to query path." );
+	v->message ( "Press Esc to switch between polygon creation and edition mode. Alt + left-click to query path." );
 
 	ws_run ();
 	return 1;

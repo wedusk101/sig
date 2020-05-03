@@ -1,3 +1,9 @@
+/*=======================================================================
+   Copyright (c) 2020 Renato Farias and M. Kallmann.
+   This software is distributed under the Apache License, Version 2.0.
+   All copies must contain the full copyright notice licence.txt located
+   at the base folder of the distribution. 
+  =======================================================================*/
 
 # include "sigspm/sn_spm.h"
 # include "sigspm/glr_spm.h"
@@ -33,30 +39,23 @@ void GlrSpm::init ( SnShape* s )
 	GS_TRACE2( "Generating program objects" );
 	// Initialize program and buffers if needed:
 	if( !Prog )
-	{
-		bool MyShaders = true;
-		if( MyShaders ) // Example of how to load specific shader files:
-		{
-			const GlShader* MyVtxShader = GlResources::declare_shader( GL_VERTEX_SHADER, "MySpmDrawVertShader", "../../sig/src/sigspm/shaders/spm_draw.vert", 0 );
-			const GlShader* MyFragShader = GlResources::declare_shader( GL_FRAGMENT_SHADER, "MySpmDrawFragShader", "../../sig/src/sigspm/shaders/spm_draw.frag", 0 );
-			const GlProgram* p = GlResources::declare_program( "MySpmProgram", 2, MyVtxShader, MyFragShader );
-			GlResources::declare_uniform( p, 0, "vProj" );
-			GlResources::declare_uniform( p, 1, "vView" );
-			GlResources::declare_uniform( p, 2, "bufferDim" );
-			GlResources::declare_uniform( p, 3, "drawTexId" );
-			GlResources::declare_uniform( p, 4, "contourLines" );
-			GlResources::declare_uniform( p, 5, "contourInterval" );
-			GlResources::declare_uniform( p, 6, "contourThickness" );
-			GlResources::declare_uniform( p, 7, "distanceField" );
-			GlResources::compile_program( p );
-			Prog = p; // Save in Prog a direct pointer to the program used by this node!
-		}
-		else // Here we just reuse an internal shader:
-		{
-			Prog = GlResources::get_program( "3dsmoothsc" );
-		}
+	{	// M. Kallmann: below we retrieve the predefined shaders, and use SIG's shader management to allow shaders to be shared by other scene nodes:
+		const char* pdrawvert = ((SnSpm*)s)->manager()->GetPredefSpmDrawVertShader();
+		const char* pdrawfrag = ((SnSpm*)s)->manager()->GetPredefSpmDrawFragShader();
+		const GlShader* VtxShader = GlResources::declare_shader( GL_VERTEX_SHADER, "SpmDrawVert", "../../sig/src/sigspm/shaders/spm_draw.vert", pdrawvert );
+		const GlShader* FragShader = GlResources::declare_shader( GL_FRAGMENT_SHADER, "SpmDrawFrag", "../../sig/src/sigspm/shaders/spm_draw.frag", pdrawfrag );
+		const GlProgram* p = GlResources::declare_program( "MySpmProgram", 2, VtxShader, FragShader );
+		GlResources::declare_uniform( p, 0, "vProj" );
+		GlResources::declare_uniform( p, 1, "vView" );
+		GlResources::declare_uniform( p, 2, "bufferDim" );
+		GlResources::declare_uniform( p, 3, "drawTexId" );
+		GlResources::declare_uniform( p, 4, "contourLines" );
+		GlResources::declare_uniform( p, 5, "contourInterval" );
+		GlResources::declare_uniform( p, 6, "contourThickness" );
+		GlResources::declare_uniform( p, 7, "distanceField" );
+		GlResources::compile_program( p );
+		Prog = p; // Save in Prog a direct pointer to the program used by this node!
 	}
-
 	_glo.gen_vertex_arrays( 1 );
 	_glo.gen_buffers( 2 );
 }
@@ -97,10 +96,10 @@ void GlrSpm::render ( SnShape* s, GlContext* ctx )
 	}
 
 	// 2. Enable/bind needed elements and draw:
-	if( spm.manager != nullptr )
+	if( spm.manager() ) // protection
 	{
 		GS_TRACE2( "Rendering SPM with custom scene node..." );
-		unsigned int drawId = spm.manager->GetDrawTexId();
+		unsigned int drawId = spm.manager()->GetDrawTexId();
 
 		glActiveTexture( GL_TEXTURE0 + drawId );
 		glBindTexture( GL_TEXTURE_RECTANGLE, drawId );
@@ -112,7 +111,7 @@ void GlrSpm::render ( SnShape* s, GlContext* ctx )
 		glUniformMatrix4fv( Prog->uniloc[1], 1, GLTRANSPMAT, ctx->modelview()->e );
 
 		// GPU buffer dimensions
-		int dim[2] = { spm.manager->GetBufferWidth(), spm.manager->GetBufferHeight() };
+		int dim[2] = { spm.manager()->GetBufferWidth(), spm.manager()->GetBufferHeight() };
 		glUniform2iv( Prog->uniloc[2], 1, dim );
 
 		// texture ID to read from

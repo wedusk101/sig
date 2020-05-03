@@ -27,6 +27,12 @@ public:
 	// Test if shaders can be loaded from given source folder
 	bool CanLoadShaders ();
 
+	// Access to the pre-defined vertex shader for displaying the SPM
+	const char* GetPredefSpmDrawVertShader ();
+
+	// Access to the pre-defined fragment shader for displaying the SPM
+	const char* GetPredefSpmDrawFragShader ();
+
 	// Creates a new empty SPM with initial buffer dimensions and projection matrix. Use this instead of pushing into the vector directly
 	ShortestPathMap* CreateSPM();
 

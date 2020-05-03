@@ -1,15 +1,17 @@
+/*=======================================================================
+   Copyright (c) 2020 Renato Farias and M. Kallmann.
+   This software is distributed under the Apache License, Version 2.0.
+   All copies must contain the full copyright notice licence.txt located
+   at the base folder of the distribution. 
+  =======================================================================*/
+
 # pragma once
 
-# include <sig/gs_vec.h>
 # include <sig/sn_shape.h>
 # include <sigspm/spm_manager.h>
 
-class GsPolygon; // forward declaration
-class GsFontStyle; // forward declaration
-class UiLabel; // forward declaration
-
 class SnSpm : public SnShape
-{  public :
+{ public:
 	GsVec center;
 	GsVec normal;
 
@@ -22,29 +24,33 @@ class SnSpm : public SnShape
 	float contourInterval, contourThickness;
 	bool distanceField;
 
-	ShortestPathMapManager* manager; // assumed to always be valid
+  protected:
+	ShortestPathMapManager* _manager; // assumed to always be valid
 
-public :
-	static const char* class_name; //<! Contains string SnLines2
+  public: // required declarations
+	static const char* class_name;
 	SN_SHAPE_RENDERER_DECLARATIONS;
 
-public :
+  public:
 
-	/* Default constructor. */
-	SnSpm ( ShortestPathMapManager* _m );
+	/* Default constructor */
+	SnSpm ( ShortestPathMapManager* m );
 
-	/* Destructor. */
+	/* Destructor */
 	~SnSpm ();
+
+	/*! Method touch has to be called to force sending new data to shaders
+		when geometry-related parameters are changed. */
+	void touch () { SnShape::touch(); }
+
+	/*! Access to the always-valid SPM manager */
+	ShortestPathMapManager* manager() { return _manager; }
 
 	/*! Returns the bounding box, can be empty. */
 	virtual void get_bounding_box ( GsBox &b ) const override;
 };
 
-/*	The method below has to be called before drawing SnCircle in order to connect SnCircle
-to its renderer. In this example it is automatically called the first time SnCircle is
-used, with a call from SnCircle's constructor. However, if a SnNode is to be used
-independently from its renderer, the connection should be called from another initilization
-function, so that the node does not need to include or be linked with one particular renderer,
-also allowing connections to diferent renderers when/if needed.
-In sig there is a single initializer for all included renderers in the sigogl module. */
+/*	The function below is automatically called the first time SnSpm is used,
+	with a call from SnSpm's constructor. SnSpm will need to be modified if
+	connection to a different renderer is needed. */
 void SnSpmRegisterRenderer ();

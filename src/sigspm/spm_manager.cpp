@@ -36,7 +36,6 @@ void ShortestPathMapManager::Initialize( void )
 	CreateShaders();
 	CreateBuffers();
 	CreateQuadVbo();
-
 	initialized = true;
 }
 
@@ -110,8 +109,7 @@ ShortestPathMap* ShortestPathMapManager::Compute( GlContext* context, ShortestPa
 	// M. Kallmann integration notes: here we save the context state using GlContext methods; however,
 	// ideally OpenGL states modified by the SPM library should be saved and later restored
 	// directly using OpenGL functions (without using GlContext), in order to become independent of
-	// GlContext and to include any states that are not tracked by GlContext. This will be important
-	// when linking to external projects using OpenGL.
+	// GlContext and to include any states that are not tracked by GlContext.
 	int viewport_w = context->w();
 	int viewport_h = context->h();
 	GsColor clear_color = context->clear_color();
@@ -777,6 +775,17 @@ void ShortestPathMapManager::ReloadShaders( void )
 }
 
 # include "spm_predef_shaders.inc"
+
+// M. Kallmann: added access to predefined shaders:
+const char* ShortestPathMapManager::GetPredefSpmDrawVertShader ()
+{
+	return pds_spm_draw_vert;
+}
+
+const char* ShortestPathMapManager::GetPredefSpmDrawFragShader ()
+{
+	return pds_spm_draw_frag;
+}
 
 void ShortestPathMapManager::CreateShaders( bool* loadtest )
 {
