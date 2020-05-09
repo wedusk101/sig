@@ -45,6 +45,7 @@ class GsModel : public GsShareable
 		Face ( int i, int j, int k ) { a=i; b=j; c=k; }
 		void set ( int i, int j, int k ) { a=i; b=j; c=k; }
 		void validate () { if (a<0) a=-a; if (b<0) b=-b; if (c<0) c=-c; }
+		operator int* () { return &a; }
 		friend GsOutput& operator<< ( GsOutput& o, const Face& f ) { return o<<f.a<<gspc<<f.b<<gspc<<f.c; }
 		friend GsInput& operator>> ( GsInput& i, Face& f ) { return i>>f.a>>f.b>>f.c; }
 	};

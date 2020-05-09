@@ -138,7 +138,7 @@ class GsVec2
 	const float& operator() ( int i ) const { return e[i]; }
 
 	/*! Convertion to a float pointer. */
-	operator const float* () const { return e; }
+	operator float* () { return e; }
 
 	/*! Assignment operator from another GsVec2. Implemented inline. */
 	void operator = ( const GsVec2& v ) { set(v); }
