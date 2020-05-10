@@ -36,7 +36,7 @@ class GsVisGraphNode : public GsGraphNode
 	GS_GRAPH_NODE_CASTED_METHODS(GsVisGraphNode,GsVisGraphLink);
 	GsVisGraphNode () : GsGraphNode() {}
 	GsVisGraphNode ( const GsVisGraphNode& n ) : GsGraphNode(), p(n.p) {}
-	GsVisGraphNode ( const GsPnt& q ) : GsGraphNode(), p(q) {}
+	GsVisGraphNode ( const GsPnt& q ) : GsGraphNode(), p(q.e) {}
    ~GsVisGraphNode () {}
 	friend GsOutput& operator<< ( GsOutput& out, const GsVisGraphNode& n ) { return out<<n.p; }
 	friend GsInput& operator>> ( GsInput& inp, GsVisGraphNode& n ) { return inp>>n.p; }
