@@ -17,36 +17,6 @@ GsBox::GsBox ( const GsBox& x, const GsBox& y )
 {
 }
 
-bool GsBox::empty () const
-{
-	return a.x>b.x || a.y>b.y || a.z>b.z;
-}
-
-float GsBox::volume () const
-{
-	return (b.x-a.x) * (b.y-a.y) * (b.z-a.z);
-}
-
-GsVec GsBox::center () const 
-{
-	return (a+b)/2.0f; // == a + (b-a)/2 == a + b/2 - a/2
-}
-
-void GsBox::center ( const GsPnt& p )
-{
-	(*this) += p-center();
-}
-
-void GsBox::size ( const GsVec& v )
-{
-	b = a+v;
-}
-
-GsVec GsBox::size () const 
-{
-	return b-a; 
-}
-
 float GsBox::maxsize () const
 {
 	GsVec s = b-a;
@@ -163,18 +133,6 @@ void GsBox::rotate ( const GsQuat& q )
 	v.y=a.y; x.extend(q.apply(v));
 	v.x=a.x; x.extend(q.apply(v));
 	*this = x;
-}
-
-void GsBox::operator += ( const GsVec& v )
-{
-	a += v;
-	b += v;
-}
-
-void GsBox::operator *= ( float s )
-{
-	a *= s;
-	b *= s;
 }
 
 //============================== friends ========================================

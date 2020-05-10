@@ -69,23 +69,23 @@ class GsBox
 
 	/*! Returns true if the box is empty (or invalid), ie, when 
 		some coordinate of a is greater than b. */
-	bool empty () const;
+	bool empty () const { return a.x>b.x || a.y>b.y || a.z>b.z; }
 
 	/*! Returns the volume of the box. */
-	float volume () const;
+	float volume () const { return (b.x-a.x) * (b.y-a.y) * (b.z-a.z); }
 
-	/*! Returns the center point of the box (b+a)/2. */
-	GsPnt center () const;
+	/*! Returns the center point of the box (a+b)/2. */
+	GsPnt center () const {	return (a+b)/2.0f; }
 
 	/*! Translates GsBox to have its center in p. */
-	void center ( const GsPnt& p );
+	void center ( const GsPnt& p ) { (*this) += p-center(); }
 
 	/*! Changes the position of the maximum vertex b of the box in order to
 		achieve the desired dimensions given in v (b=a+v). */
-	void size ( const GsVec& v );
+	void size ( const GsVec& v ) { b = a+v; }
 
 	/*! Returns the dimensions in each axis (b-a). */
-	GsVec size () const;
+	GsVec size () const { return b-a; }
 
 	/*! Returns the maximum dimension of the box. */
 	float maxsize () const;
@@ -134,10 +134,10 @@ class GsBox
 	void rotate ( const GsQuat& q );
 
 	/* Translates GsBox by v. */
-	void operator += ( const GsVec& v );
+	void operator += ( const GsVec& v ) { a+=v;	b+=v; }
 
 	/* Scales GsBox by the factor s. */
-	void operator *= ( float s );
+	void operator *= ( float s ) { a*=s; b*=s; }
 
 	/* Returns the bounding box of the transformed vertices vM of b. */
 	friend GsBox operator * ( const GsBox& b, const GsMat& m );
