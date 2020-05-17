@@ -322,7 +322,7 @@ GsVec barycentric ( const GsPnt& a, const GsPnt& b, const GsPnt& c, const GsVec 
 void transbarycentric ( GsPnt& a, GsPnt& b, GsPnt& c, const GsVec &k, const GsVec& v );
 GsVec mix ( const GsVec& v1, const GsVec& v2, float t );
 
-/*! Returns the normalized vector v, ie, v scaled to have length 1. */
+/*! Returns the normalized vector v. Note: v needs to be passed by value. */
 inline GsVec normalize ( GsVec v ) { v.normalize(); return v; }
 
 //============================== end of file ===============================
