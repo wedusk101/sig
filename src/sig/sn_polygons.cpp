@@ -159,8 +159,10 @@ static void draw_polygon (	const GsPolygon& pol, GsColor color,
 			}
 			o.set_zero_index();
 			o.push_points ( V->size(), color );
+			GS_TRACE2 ( "Rebuilding Vsize()="<<V->size()<<" Tsize="<<T.size() );
 			for ( i=0; i<V->size(); i++ ) o.set ( i, V->cget(i) );
 			for ( i=0; i<T.size(); i+=3 ) o.push_indices ( T[i], T[i+1], T[i+2] );
+			o.touch();
 		}
 		if ( solid==2 || T.empty() )
 		{	if ( multicolor ) l.push ( color );

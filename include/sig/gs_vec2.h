@@ -68,6 +68,9 @@ class GsVec2
 	/*! Set coordinates from the two given float values. Implemented inline. */
 	void set ( float a, float b ) { x=a; y=b; }
 
+	/*! Set coordinates from the float pointer. Implemented inline. */
+	void set ( float* v ) { x=v[0]; y=v[1]; }
+
 	/*! Set coordinates from the two given int values. Implemented inline. */
 	void set ( int a, int b ) { x=float(a); y=float(b); }
 
