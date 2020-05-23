@@ -86,7 +86,7 @@ void SnPolyEditor::polygons ( GsPolygons* p )
 void SnPolyEditor::solid_drawing ( gscenum dm )
 {
 	_solid = dm;
-	_polygons->draw_mode ( _solid, _mode==ModeEdit? 1:0 );
+	_polygons->draw_mode ( (int)_solid, _mode==ModeEdit? 1:0 );
 	touch ();
 }
 
@@ -269,7 +269,7 @@ void SnPolyEditor::add_polygon_selection ( int i )
 		pt = &poly;
 	}
 	else // _seltype==Polygon
-	{ // pt already points to the polygon
+	{	// pt already points to the polygon
 	}
 
 	const GsPolygon& p = *pt;
@@ -541,11 +541,11 @@ int SnPolyEditor::handle_key_press ( const GsEvent& e )
 		return 1;
 	}
 	else if ( e.key=='d' )
-	{	solid_drawing ( ++_solid%3 );
+	{	solid_drawing ( _solid=(_solid+1)%3 );
 		return 1;
 	}
 	else if ( e.key=='t' )
-	{	selection_type ( SelType(++_seltype%3) );
+	{	selection_type ( SelType(_seltype=(_seltype+1)%3) );
 		return 1;
 	}
 	else if ( e.key==GsEvent::KeyEnter && _selpol>=0 )

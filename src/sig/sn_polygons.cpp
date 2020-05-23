@@ -102,6 +102,7 @@ void SnPolygons::resolution ( float lw, float ps )
 { 
 	lines()->line_width(lw);
 	points()->point_size(ps);
+	touch();
 }
 
 void SnPolygons::polygons ( GsPolygons* p )
@@ -126,7 +127,7 @@ void SnPolygons::use_external_triangulator ( void (*f) (const GsPolygon& p,GsArr
 
 static void draw_polygon (	const GsPolygon& pol, GsColor color,
 							SnPlanarObjects& o, SnLines2& l, SnPoints& p, GsArray<GsPnt2>& P, GsArray<int>& T,
-							gscenum solid, gscbool vertices, gscbool multicolor )
+							int solid, bool vertices, bool multicolor )
 {
 	GS_TRACE2 ( "Rebuilding poly size: "<<pol.size() );
 
@@ -198,12 +199,7 @@ void SnPolygons::rebuild ()
 	l->init();
 	p->init();
 
-	if ( _vertices )
-	{	p->visible ( true );
-	}
-	else
-	{	p->visible ( false );
-	}
+	p->visible ( _vertices==1 );
 
 	GsArray<GsPnt2> P;
 	GsArray<int> T;

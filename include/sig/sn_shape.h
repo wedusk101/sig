@@ -112,13 +112,13 @@ class SnShape : public SnNode
 
 	/*! Access the material to be used for the shape */
 	void material ( const GsMaterial& m );
-	GsMaterial& material () { _changed=MaterialChanged; return _material; }
+	GsMaterial& material () { _changed|=MaterialChanged; return _material; }
 	const GsMaterial& cmaterial () const { return _material; }
 
 	/*! Access the diffuse color of the shape material. When rendering
 		shapes without lighting, only the diffuse color is used. */
 	void color ( GsColor c );
-	GsColor& color () { _changed=MaterialChanged; return _material.diffuse; }
+	GsColor& color () { _changed|=MaterialChanged; return _material.diffuse; }
 	GsColor ccolor () const { return _material.diffuse; }
 
 	/*! Returns if the node parameters have changed, requiring

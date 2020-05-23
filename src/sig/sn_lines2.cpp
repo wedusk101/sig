@@ -151,11 +151,6 @@ void SnLines2::push_polygon ( const GsArray<GsVec2>& a, bool open )
 	push_polygon ( a[0].e, a.size(), open );
 }
 
-void SnLines2::push_polygon ( const GsPolygon& p )
-{
-	push_polygon ( p.fpt(), p.size(), p.open() );
-}
-
 void SnLines2::push_lines ( const float* pt, int nl )
 {
 	if ( nl<4 ) return;

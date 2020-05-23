@@ -16,9 +16,9 @@
 # include <sig/gs_vec2.h>
 # include <sig/gs_color.h>
 # include <sig/gs_array.h>
+# include <sig/gs_polygon.h>
 # include <sig/sn_shape.h>
 
-class GsPolygon; // forward declaration
 class GsFontStyle; // forward declaration
 class UiLabel; // forward declaration
 
@@ -117,7 +117,7 @@ class SnLines2 : public SnShape
 	void push_polyline ( const GsArray<GsVec2>& a ) { push_polygon(a,true); }
 
 	/*! Push polygon p according to p.open() */
-	void push_polygon ( const GsPolygon& p );
+	void push_polygon ( const GsPolygon& p ) { push_polygon ( p.fpt(), p.size(), p.open() ); }
 
 	/*! Push nl line segments from the coordinates pointed by pt. Four coordinates are
 		expected per line segment. */
