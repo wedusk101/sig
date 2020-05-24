@@ -21,10 +21,11 @@ SnPrimitive::SnPrimitive () : SnModel ( class_name )
 	GS_TRACE1 ( "Constructor" );
 }
 
-SnPrimitive::SnPrimitive ( GsPrimitive::Type t, float a, float b, float c ) : SnModel ( class_name )
+SnPrimitive::SnPrimitive ( GsPrimitive::Type t, float a, float b, float c, GsColor dc ) : SnModel ( class_name )
 {
-	GS_TRACE1 ( "Constructor with parameters" );
+	GS_TRACE1 ( "Constructor with parameters and color" );
 	set ( t, a, b, c );
+	prim().material.diffuse = dc;
 }
 
 SnPrimitive::~SnPrimitive ()
@@ -59,7 +60,7 @@ const GsPrimitive& SnPrimitive::cprim ()
 
 void SnPrimitive::build ()
 {
-	const GsPrimitive& p = *_model->primitive;
+	const GsPrimitive& p = prim();
 	_model->make_primitive ( p, GsModel::UseNoMtl );
 	material ( p.material );
 	_nodeuptodate = 1;

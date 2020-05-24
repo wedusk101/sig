@@ -27,18 +27,18 @@ class SnPrimitive : public SnModel
 
    public :
 
-	/* Constructor. */
+	/*! Constructor. */
 	SnPrimitive ();
 
-	/* Constructor with primitive parameters. Parameters are passed to 
-	   the respective specification method of GsPrimitive. */
-	SnPrimitive ( GsPrimitive::Type t, float a, float b=0, float c=0 );
+	/*! Constructor with primitive parameters and a diffuse color. The parameters
+		are passed to the respective specification method of GsPrimitive. */
+	SnPrimitive ( GsPrimitive::Type t, float a, float b=0, float c=0, GsColor dc=GsMaterial::DefaultDiffuse );
 
-	/* Destructor. */
+	/*! Destructor. */
    ~SnPrimitive ();
 
-	/* Set primitive parameters by calling the 
-	   the respective specification method of GsPrimitive. */
+	/*! Set primitive parameters by calling the 
+		the respective specification method of GsPrimitive. */
 	void set ( GsPrimitive::Type t, float a, float b=0, float c=0 );
 
 	/*! Access to the primitive specification class. */
