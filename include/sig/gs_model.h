@@ -288,9 +288,10 @@ class GsModel : public GsShareable
 		For primitive models, each primitive radius is also scaled.  */
 	void scale ( float factor );
 
-	/*! Translates so that the bounding box center becomes (0,0,0).
+	/*! Translates so that the bounding box center becomes (0,0,0). If non-null,
+		the bounding box is returned in the GsBox pointed by parameter boxpt.
 		Primitive models correctly handled. */
-	void centralize ();
+	void centralize ( GsBox* boxpt=0 );
 
 	/*! Multiply array V and N by the given transformation matrix.
 		N is transformed without translation and with renormalization.

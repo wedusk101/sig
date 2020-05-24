@@ -992,12 +992,13 @@ void GsModel::scale ( float factor )
 	if ( primitive ) { primitive->ra*=factor; primitive->rb*=factor; primitive->rc*=factor; }
 }
 
-void GsModel::centralize ()
+void GsModel::centralize ( GsBox* boxpt )
 {
 	GsBox box;
-	get_bounding_box(box);
+	get_bounding_box ( box );
 	GsVec v = box.center() * -1.0;
 	translate ( v );
+	if ( boxpt ) { box+=v; *boxpt=box; }
 }
 
 void GsModel::transform ( const GsMat& mat, bool primtransf )
