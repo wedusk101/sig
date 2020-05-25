@@ -68,10 +68,10 @@ enum bool { false, true }; //!< use this for old compilers without bool/true/fal
 # endif
 
 // Main typical types used:
-typedef signed char   gschar;  //!< 1 byte signed int, from -127 to 128
-typedef unsigned char gsbyte;  //!< 1 byte unsigned int, from 0 to 255
+typedef signed char   gschar;  //!< 1 byte signed char, from -127 to 128
+typedef unsigned char gsbyte;  //!< 1 byte unsigned char, from 0 to 255
 typedef unsigned char gscbool; //!< 1 byte char type intended to store a boolean value
-typedef unsigned char gscenum; //!< 1 byte signed char type intended to store an enumerator
+typedef unsigned char gscenum; //!< 1 byte unsigned char type intended to store an enumerator
 typedef signed int	  gsint;   //!< usually 4 bytes signed integer
 typedef unsigned int  gsuint;  //!< usually 4 bytes unsigned integer
 
