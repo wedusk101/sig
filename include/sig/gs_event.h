@@ -67,8 +67,8 @@ class GsEvent
    public : //--- scene-related information :
 	mutable GsVec2 mouse;	//!< Current mouse position in normalized coords [-1,1]
 	mutable GsVec2 lmouse;  //!< Last mouse position in normalized coords [-1,1]
-	mutable GsPnt  mousep;  //!< mouse point in scene coordinates at plane z=0
-	mutable GsPnt  lmousep; //!< last mouse point in scene coordinates at plane z=0
+	mutable GsPnt  mousep;  //!< mouse point in scene coordinates at plane at camera center with normal camera eye-center
+	mutable GsPnt  lmousep; //!< last mouse point in scene coordinates at plane at camera center with normal camera eye-center
 	mutable GsLine ray;		//!< current mouse ray in scene coordinates
 	mutable GsLine lray;	//!< last mouse ray in scene coordinates
 	mutable float pixelsize; //!< the average size of a screen pixel in scene units
