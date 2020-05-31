@@ -126,10 +126,9 @@ float angle ( const GsVec& v1, const GsVec& v2 )
 
 float anglenorm ( const GsVec& v1, const GsVec& v2 )
 {
-	return acosf ( dot(v1,v2) );
-	double n = double(v1.x*v2.x + v1.y*v2.y + v1.z*v2.z);
-	if ( n<-1.0 ) n=-1.0; else if ( n>1.0 ) n=1.0;
-	return (float) acos ( n );
+	double d = double(v1.x)*double(v2.x) + double(v1.y)*double(v2.y) + double(v1.z)*double(v2.z);
+	if ( d<-1.0 ) d=-1.0; else if ( d>1.0 ) d=1.0;
+	return (float) acos ( d );
 }
 
 GsVec normal ( const GsPnt& a, const GsPnt& b, const GsPnt& c )
