@@ -1,5 +1,5 @@
 /*=======================================================================
-   Copyright (c) 2018-2019 Marcelo Kallmann.
+   Copyright (c) 2018-2020 Marcelo Kallmann.
    This software is distributed under the Apache License, Version 2.0.
    All copies must contain the full copyright notice licence.txt located
    at the base folder of the distribution. 
@@ -585,9 +585,11 @@ void GsPolygon::arc ( const GsPnt2& c, const GsVec2& v1, const GsVec2& v2, float
 
 	GsVec2 n1=v1; n1.len(radius);
 	GsVec2 n2=v2; n2.len(radius);
-	float ang = angle(n1,n2);
+	float ang = oriangle(n1,n2);
+	if ( ang<0 ) ang+=gs2pi;
+
 	bool inv=false;
-	if ( dang<0 ) { inv=true; dang=-dang; }
+	if ( dang<0 ) { inv=true; dang=-dang; ang=gs2pi-ang; }
 
 	int i, n = 1+(int)(ang/dang);
 	if ( n==1 )
