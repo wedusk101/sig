@@ -18,8 +18,8 @@
 # include <sig/gs_rect.h>
 # include <sig/sn_shape.h>
 
-/*! \class SnPlanarObjects sn_triangles.h
-	\brief node to display planar objects absed on non-indexed 2D triangles
+/*! \class SnPlanarObjects sn_planar_objects.h
+	\brief node to display planar objects based on 2D triangles
 	SnPlanarObjects stores arrays in two ways:
 	if G is empty, T is empty and only P,C,I are used to draw colored indexed triangles; otherwise,
 	P,C,T have the same size and G is used to define mixed group types */

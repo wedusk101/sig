@@ -394,7 +394,7 @@ double gs_tangent ( double px, double py, double cx, double cy, double r,
 	cx = (cx-px)/d; // c-p unit vector 
 	cy = (cy-py)/d;
    
-	double sa = r/d; // get sinus and cosinus
+	double sa = r/d; // get sine and cosine
 	double ca = s/d;
 	t1x = (cx*ca-cy*sa) * s + px; // rotate and scale
 	t1y = (cx*sa+cy*ca) * s + py;

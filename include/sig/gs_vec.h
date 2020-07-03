@@ -181,6 +181,9 @@ class GsVec
 	/*! Parenthesis allows const member access. */
 	const float& operator() ( int i ) const { return e[i]; }
 
+	/*! Convertion to a const float pointer. */
+	operator const float* () const { return e; }
+
 	/*! Convertion to a float pointer. */
 	operator float* () { return e; }
 

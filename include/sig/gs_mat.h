@@ -235,7 +235,7 @@ class GsMat
 	/*! Makes a rotation transformation around z axis of given angle in radians. */
 	void rotz ( float radians );
 
-	/*! Rotation around an axis of given angle, given by its sinus and cosinus.
+	/*! Rotation around an axis of given angle, given by its sine and cosine.
 		The given axis of rotation vec is not required to be normalized. */
 	void rot ( const GsVec& vec, float sa, float ca );
 
