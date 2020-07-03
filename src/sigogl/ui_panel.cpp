@@ -268,7 +268,7 @@ void UiPanel::resize ( float w, float h )
 	changed(NeedsRedraw);
 }
 
-static void check_grouped_elements ( const GsArrayRef<UiElement>& ea, UiElement* e, int i, UiElement::Type t, GsArray<int>& g )
+static void check_grouped_elements ( const GsArraySh<UiElement>& ea, UiElement* e, int i, UiElement::Type t, GsArray<int>& g )
 {
 	// this method is only called when e->type()==t
 	if ( g.empty() )

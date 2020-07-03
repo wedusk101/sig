@@ -61,7 +61,7 @@ int main ( int argc, char **argv )
 
 static SnGroup* get_skin_models ( KnFbxImporter& fbximp )
 {
-	const GsArrayRef<GsModel>& m = fbximp.models();
+	const GsArraySh<GsModel>& m = fbximp.models();
 	if ( m.empty() ) return 0;
 	SnGroup* g = new SnGroup;
 	for ( int i=0; i<m.size(); i++ )

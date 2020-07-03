@@ -57,7 +57,7 @@ class KnFbxImporter : public GsShareable
 	GsTablePt<Texture> Txt;  // all parsed textures
 	GsTablePt<Material> Mtl; // all parsed materials
 	GsTablePt<Geom> G;		 // all parsed geometries
-	GsArrayRef<GsModel> GSM; // gsmodels created
+	GsArraySh<GsModel> GSM; // gsmodels created
 	GsArray<Geom*> GSMG;	 // for each element in GSM here goes the pointer to its Geom
 
 	//=== deformers info ===
@@ -91,7 +91,7 @@ class KnFbxImporter : public GsShareable
 	bool get_skeleton ( KnSkeleton *sk );
 
 	/*!	Access to all models built from the most recent fbx file loaded. */
-	const GsArrayRef<GsModel>& models () { return  GSM; }
+	const GsArraySh<GsModel>& models () { return  GSM; }
 
    protected : // loading of motions not yet implemented:
 	int num_motions () { return 0; }

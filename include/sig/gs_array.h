@@ -413,6 +413,53 @@ class GsArray : protected GsArrayBase
 	}
 };
 
+/*! GsArrayRef is a utility class to reference array data externally allocated.
+	It contains a type cast operator to a const GsArray<> class such that it can
+	be used to reference array data from other data structures for const
+	access by the const methods of GsArray<>. The destructor will automatically
+	call GsArray::abandon() in order to not delete the referenced data. */
+template <typename X>
+class GsArrayRef
+{  private:
+	GsArray<X> _gsa;
+
+   public:
+	/*! Constructor from an existing data pointer */
+	GsArrayRef ( const X* pt, int n ) : _gsa((void*)pt,n,n) {}
+
+	/*! Destructor prevents deletion of the referenced data */
+   ~GsArrayRef () { _gsa.abandon(); }
+
+	/*! Method to make this class reference another data array */
+	void set ( const X* pt, int n ) { _gsa.abandon(); _gsa.adopt(pt,n); }
+
+	/*! Type cast operator to a const GsArray<X>& referencing the data */
+	operator const GsArray<X>& () const { return (const GsArray<X>&)_gsa; }
+
+	/*! Type cast operator to a const pointer to the referenced buffer */
+	operator const X* () const { return (X*)_gsa.pt(); }
+
+	/*! Returns a non-const pointer to the internal referenced buffer. */
+	X* pt () const { return (X*)_gsa.pt(); }
+
+	/*! Method to retrieve a const GsArray<X>& referencing the data */
+	const GsArray<X>& gsa() const { return (const GsArray<X>&)_gsa; }
+
+	/*! Returns the size of the referenced array */
+	int size () const { return _gsa.size(); }
+
+	/*! Access operator, no checkings are done to ensure that i is valid. */
+	X& operator[] ( int i ) const { return _gsa[i]; }
+
+	/*! Returns a reference to the last element, ie, with index size()-1.
+		The array must not be empty when calling this method. */
+	X& top () const { return _gsa.top(); }
+
+	/*! Returns a reference to the i-th element below the last element, ie, with index size()-i-1.
+		The referenced position must exist in the array. */
+	X& top ( int i ) const { return _gsa.top(i); }
+};
+
 /*! \class GsArrayPt gs_array.h
 	\brief GsArray extension for pointers
 
@@ -488,19 +535,19 @@ class GsArrayPt : protected GsArray<X*>
 	{	for ( int i=0; i<a.size(); i++ ) o<<*a[i]<<gsnl; return o; }
 };
 
-/*! \class GsArrayRef gs_array.h
+/*! \class GsArraySh gs_array.h
 	\brief GsArray extension for GsShareable pointers
 
-	GsArrayRef maintains an array of pointers to shared classes derived
+	GsArraySh maintains an array of pointers to shared classes derived
 	from GsShareable, automatically managing ref/unref calls as needed. */
 template <typename X>
-class GsArrayRef : protected GsArray<X*>
+class GsArraySh : protected GsArray<X*>
 {  public:
 	/*! Only the default constructor is provided here */
-	GsArrayRef () : GsArray<X*> () {}
+	GsArraySh () : GsArray<X*> () {}
 
 	/*! Destructor unrefs each element in the array */
-   ~GsArrayRef () { while(size()) pop(); }
+   ~GsArraySh () { while(size()) pop(); }
 
 	/*! Unrefs each element in the array and set size to 0 */
 	void init () { while(size()) pop(); }
@@ -561,7 +608,7 @@ class GsArrayRef : protected GsArray<X*>
 	const X* operator() ( int i ) const { return GsArray<X*>::operator()(i); }
 
 	/* Copy operator assumes X has a copy constructor. */
-	void operator = ( const GsArrayRef<X>& a )
+	void operator = ( const GsArraySh<X>& a )
 	{	init(); while ( size()<a.size() ) push ( new X(*a[size()])); }
 
 	/* Performs linear search to find the entry, return position if found, -1 if not. */

@@ -51,8 +51,8 @@ class UiManager : public SnEditor
 	GsMat _projmat;		// projection matrix sent to the renderer for setting window coordinates
 	float _rbx, _rby, _rbmx, _rbmy;
 	UiPanel* _rbpanel;	// panel to open on a right button click, if not null
-	GsArrayRef<UiPanel> _rbpanelsubs; // panels open by the right-button menu
-	GsArrayRef<UiPanel> _panels; // top-level panels attached to the manager
+	GsArraySh<UiPanel> _rbpanelsubs; // panels open by the right-button menu
+	GsArraySh<UiPanel> _panels; // top-level panels attached to the manager
 	bool _display;
 	bool _newevent;
 	gscenum _changed; // 0:no change, 1:needs draw, 2:needs build

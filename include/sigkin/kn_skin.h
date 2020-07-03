@@ -29,7 +29,7 @@ class KnSkin : public GsShareable
    protected :
 	GsArrayPt<GsArray<Influence>> _infs;
 	GsArray<int> _infstart; // starting indices for each model, same size as _models
-	GsArrayRef<GsModel> _models;
+	GsArraySh<GsModel> _models;
 	KnSkeleton* _skeleton;
 
    public :

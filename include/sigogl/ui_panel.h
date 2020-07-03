@@ -44,7 +44,7 @@ class UiPanel : public UiElement
 	UiManager* _uimparent; // uim pointer or null if not directly under a UiManager
 	SnPlanarObjects* _pobs;
 	SnGroup* _sngroup;
-	GsArrayRef<UiElement> _elements;
+	GsArraySh<UiElement> _elements;
 
    protected :
 	friend UiButton;
