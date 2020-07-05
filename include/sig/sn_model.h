@@ -39,8 +39,8 @@ class SnModel : public SnShape
 
    public :
 
-	/* Constructor may receive a GsModel to reference. If the
-	   given pointer is null (the default) a new one is used. */
+	/* Constructor may receive a GsModel to reference. If the given pointer
+	   is null (the default) a new one is allocated and referenced. */
 	SnModel ( GsModel* m=0 );
 
 	/* Destructor. */

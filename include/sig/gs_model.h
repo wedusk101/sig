@@ -147,7 +147,7 @@ class GsModel : public GsShareable
 	/*! Returns true if the model has no faces, and false otherwise */
 	bool empty () const { return F.empty(); }
 
-	/*! Sets to an empty model. Mode is updated and used memory is freed. */
+	/*! Sets to an empty model, freeing all memory of used arrays, and setting mode to Empty-NoMtl. */
 	void init ();
 
 	/*! Sends to the output summary information about the model. Char sep is used to separate the information. */
