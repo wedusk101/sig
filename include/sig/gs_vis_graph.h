@@ -8,8 +8,8 @@
 # ifndef GS_VIS_GRAPH_H
 # define GS_VIS_GRAPH_H
 
-/** \file gs_polygons.h
- * maintains an array of polygons
+/** \file gs_vis_graph.h
+ * visibility graph construction and query
  */
 
 # include <sig/gs_vec.h>
