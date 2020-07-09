@@ -123,11 +123,15 @@ double gs_point_segment_dist2 ( double px, double py,
 								double p1x, double p1y, double p2x, double p2y, 
 								double& t, double& qx, double& qy );
 
-/*! Returns the minimum distance between segment (p1,p2) and segment (p3,p4) */
+/*! Returns the minimum distance between segment (p1,p2) and segment (p3,p4).
+	The returned value is a correct distance only for non-intersecting segments.
+	Function gs_segments_intersect() can be used to detect intersecting segments. */
 double gs_segment_segment_dist ( double p1x, double p1y, double p2x, double p2y,
 								 double p3x, double p3y, double p4x, double p4y );
 
-/*! Returns the square of the minimum distance between segment (p1,p2) and segment (p3,p4) */
+/*! Returns the square of the minimum distance between segment (p1,p2) and segment (p3,p4).
+	The returned value is a correct distance only for non-intersecting segments.
+	Function gs_segments_intersect() can be used to detect intersecting segments. */
 double gs_segment_segment_dist2 ( double p1x, double p1y, double p2x, double p2y,
 								  double p3x, double p3y, double p4x, double p4y );
 
