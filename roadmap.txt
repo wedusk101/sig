@@ -9,6 +9,7 @@
 - Implement improvement to cos of phong equation in shaders
 - Review file loading by GsModel and KnSkeleton
 - Review and complete modelviewer
+- Test and fix glfw integration in all examples in linux
 
 ===== Searchable Labels Tracking Work in Progress =====
 
@@ -29,3 +30,4 @@
 - uidemo: review alignment in panels including key cmds
 - skelviewer: complete motions and skin integration
 - modelviewer: complete manipulation and processing of multiple models
+- spmtest: do makefiles and test in linux
