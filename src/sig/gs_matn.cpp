@@ -22,21 +22,21 @@ static GsBuffer<double>* DBuff=0;
 # define MAT(m,n) _data[_col*m+n]
 
 GsMatn::GsMatn () : _lin(0), _col(0)
- {
-   GS_TRACE1 ("Default Constructor");
- }
+{
+	GS_TRACE1 ("Default Constructor");
+}
 
 GsMatn::GsMatn ( const GsMatn& m ) : _lin(m._lin), _col(m._col)
- {
-   GS_TRACE1 ("Copy Constructor\n");
-   _data = m._data;
- }
+{
+	GS_TRACE1 ("Copy Constructor\n");
+	_data = m._data;
+}
 
 GsMatn::GsMatn ( int m, int n ) : _lin(m), _col(n)
- {
-   GS_TRACE1 ("Size Constructor\n");
-   _data.size ( _lin*_col );
- }
+{
+	GS_TRACE1 ("Size Constructor\n");
+	_data.size ( _lin*_col );
+}
 
 /*GsMatn::~GsMatn ()
  {
@@ -44,383 +44,385 @@ GsMatn::GsMatn ( int m, int n ) : _lin(m), _col(n)
  }*/
 
 void GsMatn::size ( int m, int n )
- {
-   _data.size ( m*n );
-   _lin=m; _col=n;
- }
+{
+	_data.size ( m*n );
+	_lin=m; _col=n;
+}
 
 void GsMatn::resize ( int m, int n )
- {
-   int lin = GS_MIN(m,_lin);
-   int col = GS_MIN(n,_col);
-   GsMatn mat ( m, n );
+{
+	int lin = GS_MIN(m,_lin);
+	int col = GS_MIN(n,_col);
+	GsMatn mat ( m, n );
 
-   int i, j;
-   for ( i=0; i<lin; i++ )
-	for ( j=0; j<col; j++ )
-	  mat(i,j) = _data[_col*j+i];
+	int i, j;
+	for ( i=0; i<lin; i++ )
+		for ( j=0; j<col; j++ )
+			mat(i,j) = _data[_col*j+i];
 
-   for ( i=lin; i<m; i++ )
-	for ( j=col; j<n; j++ )
-	  mat(i,j) = 0;
+	for ( i=lin; i<m; i++ )
+		for ( j=col; j<n; j++ )
+			mat(i,j) = 0;
 
-   adopt ( mat );
- }
+	adopt ( mat );
+}
 
 void GsMatn::submat ( const GsMatn &m, int li, int le, int ci, int ce )
- {
-   size ( le-li+1, ce-ci+1 );
+{
+	size ( le-li+1, ce-ci+1 );
 
-   for ( int i=li; i<=le; i++ )
-	for ( int j=ci; j<=ce; j++ )
-	  set ( i-li, j-ci, m.get(i,j) );
- }
+	for ( int i=li; i<=le; i++ )
+		for ( int j=ci; j<=ce; j++ )
+			set ( i-li, j-ci, m.get(i,j) );
+}
 
 void GsMatn::submat ( int l, int c, const GsMatn &m,  int li, int le, int ci, int ce )
- {
-   for ( int i=li; i<=le; i++ )
-	for ( int j=ci; j<=ce; j++ )
-	  set ( l+i-li, c+j-ci, m.get(i,j) );
- }
+{
+	for ( int i=li; i<=le; i++ )
+		for ( int j=ci; j<=ce; j++ )
+			set ( l+i-li, c+j-ci, m.get(i,j) );
+}
 
 void GsMatn::column ( const GsMatn &m, int s )
- {
-   size ( m.lin(), 1 );
+{
+	size ( m.lin(), 1 );
 
-   for ( int i=0; i<_lin; i++ )
-	 set ( i, 0, m.get(i,s) );
- }
+	for ( int i=0; i<_lin; i++ )
+		set ( i, 0, m.get(i,s) );
+}
 
 void GsMatn::column ( int c, const GsMatn &m, int mc )
- {
-   for ( int i=0; i<_lin; i++ )
-	 set ( i, c, m.get(i,mc) );
- }
+{
+	for ( int i=0; i<_lin; i++ )
+		set ( i, c, m.get(i,mc) );
+}
 
 void GsMatn::identity ()
- {
-   int i, s=_data.size(), d=_col+1;
-   for ( i=0; i<s; i++ )
-	_data[i] = i%d? 0.0:1.0;
- }
+{
+	int i, s=_data.size(), d=_col+1;
+	for ( i=0; i<s; i++ )
+		_data[i] = i%d? 0.0:1.0;
+}
 
 void GsMatn::transpose ()
- {
-   int i, j;
+{
+	int i, j;
 
-   if ( _lin==_col )
-	{ double tmp;
-	  for ( i=0; i<_lin; i++ )
-	   for ( j=i+1; j<_col; j++ )
-		 GS_SWAP ( _data[_col*i+j], _data[_col*j+i] );
+	if ( _lin==_col )
+	{	double tmp;
+		for ( i=0; i<_lin; i++ )
+			for ( j=i+1; j<_col; j++ )
+				GS_SWAP ( _data[_col*i+j], _data[_col*j+i] );
 	}
-   else if ( _lin==1 || _col==1 )
-	{ int tmp;
-	  GS_SWAP ( _lin, _col );
+	else if ( _lin==1 || _col==1 )
+	{	int tmp;
+		GS_SWAP ( _lin, _col );
 	}
-   else
-	{ GsMatn m ( _col, _lin );
-	  for ( i=0; i<_lin; i++ )
-	   for ( j=0; j<_col; j++ )
-		m(j,i) = get(i,j);
-	  adopt ( m );
+	else
+	{	GsMatn m ( _col, _lin );
+		for ( i=0; i<_lin; i++ )
+			for ( j=0; j<_col; j++ )
+				m(j,i) = get(i,j);
+		adopt ( m );
 	}
- }
+}
 
 void GsMatn::swaplines ( int l1, int l2 )
- {
-   int i;
-   double tmp, *p1, *p2;
-   p1 = &_data[0]+(_col*l1);
-   p2 = &_data[0]+(_col*l2);
-   for ( i=0; i<_col; i++ ) GS_SWAP ( p1[i], p2[i] ); 
- }
+{
+	double tmp, *p1, *p2;
+	p1 = &_data[0]+(_col*l1);
+	p2 = &_data[0]+(_col*l2);
+	for ( int i=0; i<_col; i++ ) GS_SWAP ( p1[i], p2[i] ); 
+}
 
 void GsMatn::swapcolumns ( int c1, int c2 )
- {
-   int i;
-   double tmp;
-   for ( i=0; i<_lin; i++ ) GS_SWAP ( MAT(i,c1), MAT(i,c2) ); 
- }
+{
+	double tmp;
+	for ( int i=0; i<_lin; i++ ) GS_SWAP ( MAT(i,c1), MAT(i,c2) ); 
+}
 
 void GsMatn::random ( double inf, double sup )
- {
-   int i=_data.size();
-   while ( i ) _data[--i] = gs_random(inf,sup);
- }
+{
+	int i=_data.size();
+	while ( i ) _data[--i] = gs_random(inf,sup);
+}
 
 void GsMatn::random ( float inf, float sup )
- {
-   int i=_data.size();
-   while ( i ) _data[--i] = (double)gs_random(inf,sup);
- }
+{
+	int i=_data.size();
+	while ( i ) _data[--i] = (double)gs_random(inf,sup);
+}
 
 double GsMatn::norm () const
- {
-   if ( !_data ) return 0.0;
+{
+	if ( !_data ) return 0.0;
 
-   int s = size();
-   double sum = 0.0;
-   for ( int i=0; i<s; i++ ) sum += _data[i]*_data[i];
+	int s = size();
+	double sum = 0.0;
+	for ( int i=0; i<s; i++ ) sum += _data[i]*_data[i];
 
-   return sqrt ( sum );
- }
+	return sqrt ( sum );
+}
 
 void GsMatn::add ( const GsMatn& m1, const GsMatn& m2 )
- { 
-   size ( m1.lin(), m1.col() );
-   int s = size();
-   for ( int i=0; i<s; i++ ) _data[i] = m1._data[i] + m2._data[i];
- }
+{ 
+	size ( m1.lin(), m1.col() );
+	int s = size();
+	for ( int i=0; i<s; i++ ) _data[i] = m1._data[i] + m2._data[i];
+}
 
 void GsMatn::sub ( const GsMatn& m1, const GsMatn& m2 )
- {
-   size ( m1.lin(), m1.col() );
-   int s = size();
-   for ( int i=0; i<s; i++ ) _data[i] = m1._data[i] - m2._data[i];
- }
+{
+	size ( m1.lin(), m1.col() );
+	int s = size();
+	for ( int i=0; i<s; i++ ) _data[i] = m1._data[i] - m2._data[i];
+}
 
 void GsMatn::mult ( const GsMatn& m1, const GsMatn& m2 )
- {
-   int l, c, i, j, k, klast; 
-   double sum;
+{
+	int l, c, i, j, k, klast; 
+	double sum;
 
-   GsMatn *m = (&m1==this || &m2==this)? new GsMatn : this;
+	GsMatn *m = (&m1==this || &m2==this)? new GsMatn : this;
 
-   l = m1._lin;
-   c = m2._col;
-   m->size(l,c);
+	l = m1._lin;
+	c = m2._col;
+	m->size(l,c);
 
-   klast = GS_MIN(m1._col,m2._lin);
-   for ( i=0; i<l; i++ )
-	for ( j=0; j<c; j++ )
-	 { sum = 0;
-	   for ( k=0; k<klast; k++ ) sum += m1.get(i,k) * m2.get(k,j);
-	   m->set(i,j,sum);
-	 }
+	klast = GS_MIN(m1._col,m2._lin);
+	for ( i=0; i<l; i++ )
+	{	for ( j=0; j<c; j++ )
+		{	sum = 0;
+			for ( k=0; k<klast; k++ ) sum += m1.get(i,k) * m2.get(k,j);
+			m->set(i,j,sum);
+		}
+	}
 
-   if ( m!=this ) { *this=*m; delete m; }
- }
+	if ( m!=this ) { *this=*m; delete m; }
+}
 
 void GsMatn::abandon ( GsBuffer<double>& buf )
- {
-   buf.adopt ( _data );
-   _lin = _col = 0;
- }
+{
+	buf.adopt ( _data );
+	_lin = _col = 0;
+}
 
 void GsMatn::adopt ( GsMatn& m )
- {
-   if ( this==&m ) return;
-   _data.adopt ( m._data );
-   _lin  = m._lin;  m._lin=0;
-   _col  = m._col;  m._col=0;
- }
+{
+	if ( this==&m ) return;
+	_data.adopt ( m._data );
+	_lin  = m._lin;  m._lin=0;
+	_col  = m._col;  m._col=0;
+}
 
 void GsMatn::adopt ( GsBuffer<double>& buf, int m, int n )
- {
-   _data.adopt ( buf );
-   _lin = m;
-   _col = n;
- }
+{
+	_data.adopt ( buf );
+	_lin = m;
+	_col = n;
+}
 
 //============================ Operators =========================================
 
 void GsMatn::operator = ( const GsMatn& m )
- {
-   if ( this != &m )
-	{ _data = m._data;
-	  _lin  = m._lin;
-	  _col  = m._col;
+{
+	if ( this != &m )
+	{	_data = m._data;
+		_lin  = m._lin;
+		_col  = m._col;
 	}
- }
+}
 
 void GsMatn::operator += ( const GsMatn& m )
- {
-   int i = size();
-   while ( --i>=0 ) _data[i]+=m.get(i);
- }
+{
+	int i = size();
+	while ( --i>=0 ) _data[i]+=m.get(i);
+}
 
 void GsMatn::operator -= ( const GsMatn& m )
- {
-   int i = size();
-   while ( --i>=0 ) _data[i]-=m.get(i);
- }
+{
+	int i = size();
+	while ( --i>=0 ) _data[i]-=m.get(i);
+}
 
 void GsMatn::operator *= ( float s )
- {
-   int i = size();
-   while ( --i>=0 ) _data[i] *= s;
- }
+{
+	int i = size();
+	while ( --i>=0 ) _data[i] *= s;
+}
 
 //================================= friends ==================================
 
 GsOutput& operator << ( GsOutput &o, const GsMatn &m )
- {
-   for ( int i=0; i<m.lin(); i++ )
-	{ for ( int j=0; j<m.col(); j++ )
-	   { o<<m.get(i,j)<<gspc; }
-	  o<<gsnl;
+{
+	for ( int i=0; i<m.lin(); i++ )
+	{	for ( int j=0; j<m.col(); j++ )
+		{	o<<m.get(i,j)<<gspc; }
+		o<<gsnl;
 	}
-   return o;
- }
+	return o;
+}
+
+//================================= functions ==================================
 
 double dist ( const GsMatn &a, const GsMatn &b )
- {
-   GsMatn m ( a.lin(), a.col() );
-   m.sub ( a, b );
-   return m.norm();
- }
+{
+	GsMatn m ( a.lin(), a.col() );
+	m.sub ( a, b );
+	return m.norm();
+}
 
 # define TINY 1.0e-20;
 
 const int *ludcmp ( GsMatn &a, double *d, bool pivoting )
- {
-   int i, j, k, imax=0;
-   double big, sum, tmp;
-   int n=a._lin;
-   double *vv=0;	// vv stores the implicit scaling of each row
-   int *indx=0;	 // row permutation buffer
+{
+	int i, j, k, imax=0;
+	double big, sum, tmp;
+	int n=a.lin();
+	double *vv=0;	// vv stores the implicit scaling of each row
+	int *indx=0;	 // row permutation buffer
 
-   DBUFF ( vv, n );   // use static buffer for that
-   IBUFF ( indx, n ); // use static buffer for that
+	DBUFF ( vv, n );   // use static buffer for that
+	IBUFF ( indx, n ); // use static buffer for that
 
-   if (d) *d=1.0; // no row interchanges yet
+	if (d) *d=1.0; // no row interchanges yet
 
-   for ( i=0; i<n; i++ ) // loop over rows to get the scaling
-	{ big = 0.0;
-	  for ( j=0; j<n; j++ ) { tmp=GS_ABS(a(i,j)); if ( tmp>big ) big=tmp; }
-	  if ( big==0.0 ) { gsout.warning("Singular matrix in routine ludcmp"); return 0; }
-	  vv[i]=1.0/big; // save the scaling
+	for ( i=0; i<n; i++ ) // loop over rows to get the scaling
+	{	big = 0.0;
+		for ( j=0; j<n; j++ ) { tmp=GS_ABS(a(i,j)); if ( tmp>big ) big=tmp; }
+		if ( big==0.0 ) { gsout.warning("Singular matrix in routine ludcmp"); return 0; }
+		vv[i]=1.0/big; // save the scaling
 	}
 
-   for ( j=0; j<n; j++ ) // loop over columns of the Crout's method
-	{ for ( i=0; i<j; i++ ) 
-	   { sum = a(i,j);
-		 for ( k=0; k<i; k++ ) sum -= a(i,k)*a(k,j);
-		 a(i,j)=sum;
-	   }
-	  big = 0.0; // search for largest pivot element
-	  for ( i=j; i<n; i++ ) 
-	   { sum = a(i,j);
-		 for ( k=0; k<j; k++ ) sum -= a(i,k)*a(k,j);
-		 a(i,j) = sum;
-		 tmp = vv[i]*GS_ABS(sum);
-		 if ( tmp>=big) { big=tmp; imax=i; }
-	   }
+	for ( j=0; j<n; j++ ) // loop over columns of the Crout's method
+	{	for ( i=0; i<j; i++ ) 
+		{	sum = a(i,j);
+			for ( k=0; k<i; k++ ) sum -= a(i,k)*a(k,j);
+			a(i,j)=sum;
+		}
+		big = 0.0; // search for largest pivot element
+		for ( i=j; i<n; i++ ) 
+		{	sum = a(i,j);
+			for ( k=0; k<j; k++ ) sum -= a(i,k)*a(k,j);
+			a(i,j) = sum;
+			tmp = vv[i]*GS_ABS(sum);
+			if ( tmp>=big) { big=tmp; imax=i; }
+		}
 	  
-	  if ( pivoting )
-	   { if ( j!=imax ) // interchange rows if needed
-		  { for ( k=0; k<n; k++ ) GS_SWAP ( a(imax,k), a(j,k) );
-			if (d) *d = -*d;
-			vv[imax]=vv[j];
-		  }
-		 indx[j]=imax;
-	   }
-	  else indx[j]=j;
+		if ( pivoting )
+		{	if ( j!=imax ) // interchange rows if needed
+			{	for ( k=0; k<n; k++ ) GS_SWAP ( a(imax,k), a(j,k) );
+				if (d) *d = -*d;
+				vv[imax]=vv[j];
+			}
+			indx[j]=imax;
+		}
+		else indx[j]=j;
 
-	  if ( a(j,j)==0.0 ) a(j,j)=TINY;
-	  if ( j!=n-1 )
-	   { tmp = 1.0/a(j,j);
-		 for ( i=j+1; i<n; i++ ) a(i,j) *= tmp;
-	   }
+		if ( a(j,j)==0.0 ) a(j,j)=TINY;
+		if ( j!=n-1 )
+		{	tmp = 1.0/a(j,j);
+			for ( i=j+1; i<n; i++ ) a(i,j) *= tmp;
+		}
 	}
-   return indx;
- }
+	return indx;
+}
 
 bool ludcmp ( const GsMatn &a, GsMatn &l, GsMatn &u )
- {
-   u = a;
-   const int *indx = ludcmp(u,0,false);
-   if ( !indx ) return false;
+{
+	u = a;
+	const int *indx = ludcmp(u,0,false);
+	if ( !indx ) return false;
 
-   int n = a.lin();
-   l.size ( n, n );
+	int n = a.lin();
+	l.size ( n, n );
 
-   for ( int i=0; i<n; i++ )
-	for ( int j=0; j<n; j++ )
-	 { if ( i>j ) { l(i,j)=u(i,j); u(i,j)=0.0; }
-		else { l(i,j) = i==j? 1.0:0.0; }
-	 }
+	for ( int i=0; i<n; i++ )
+	{	for ( int j=0; j<n; j++ )
+		{	if ( i>j ) { l(i,j)=u(i,j); u(i,j)=0.0; }
+			else { l(i,j) = i==j? 1.0:0.0; }
+		}
+	}
 
-   return true;
- }
+	return true;
+}
 
 void lubksb ( const GsMatn &a, GsMatn &b, const int *indx )
- {
-   int i, ii=-1, ip, j;
-   double sum;
-   int n=a.lin();
+{
+	int i, ii=-1, ip, j;
+	double sum;
+	int n=a.lin();
 
-   for ( i=0; i<n; i++ )
-	{ ip = indx[i];
-	  sum = b[ip];
-	  b[ip] = b[i];
-	  if (ii>=0) { for ( j=ii; j<=i-1; j++ ) sum -= a.get(i,j)*b[j]; }
-	   else if (sum) ii=i;
-	  b[i]=sum;
+	for ( i=0; i<n; i++ )
+	{	ip = indx[i];
+		sum = b[ip];
+		b[ip] = b[i];
+		if (ii>=0) { for ( j=ii; j<=i-1; j++ ) sum -= a.get(i,j)*b[j]; }
+		else if (sum) ii=i;
+		b[i]=sum;
 	}
 
-   for ( i=n-1; i>=0; i-- ) 
-	{ sum = b[i];
-	  for ( j=i+1; j<n; j++ ) sum -= a.get(i,j)*b[j];
-	  b[i] = sum/a.get(i,i);
+	for ( i=n-1; i>=0; i-- ) 
+	{	sum = b[i];
+		for ( j=i+1; j<n; j++ ) sum -= a.get(i,j)*b[j];
+		b[i] = sum/a.get(i,i);
 	}
- }
+}
 
 bool lusolve ( GsMatn &a, GsMatn &b )
- {
-   const int *indx = ludcmp ( a );
-   if ( !indx ) return false;
-   lubksb ( a, b, indx );
-   return true;
- }
+{
+	const int *indx = ludcmp ( a );
+	if ( !indx ) return false;
+	lubksb ( a, b, indx );
+	return true;
+}
 
 bool lusolve ( const GsMatn &a, const GsMatn &b, GsMatn &x )
- {
-   GsMatn lu(a);
-   x = b;
-   return lusolve ( lu, x );
- }
+{
+	GsMatn lu(a);
+	x = b;
+	return lusolve ( lu, x );
+}
 
 bool inverse ( GsMatn &a, GsMatn &inva )
- {
-   int j, k, n = a.lin();
-   inva.size(n,n);
-   double* buf=0;
+{
+	int j, k, n = a.lin();
+	inva.size(n,n);
+	double* buf=0;
 
-   DBUFF ( buf, n ); // use static buffer
-   GsMatn b; b.adopt(*DBuff,n,1);
+	DBUFF ( buf, n ); // use static buffer
+	GsMatn b; b.adopt(*DBuff,n,1);
 
-   const int *indx = ludcmp ( a );
-   if ( !indx ) return false;
+	const int *indx = ludcmp ( a );
+	if ( !indx ) return false;
 
-   for ( j=0; j<n; j++ )
-	{ for ( k=0; k<n; k++ ) buf[k]=0.0; // buf and b point to the same data
-	  buf[j]=1.0;
-	  lubksb ( a, b, indx );
-	  for ( k=0; k<n; k++ ) inva(k,j)=b[k]; // same as: inva.set_column(j,b,0);
+	for ( j=0; j<n; j++ )
+	{	for ( k=0; k<n; k++ ) buf[k]=0.0; // buf and b point to the same data
+		buf[j]=1.0;
+		lubksb ( a, b, indx );
+		for ( k=0; k<n; k++ ) inva(k,j)=b[k]; // same as: inva.set_column(j,b,0);
 	}
    
-   b.abandon ( *DBuff );
-   return true;
- }
+	b.abandon ( *DBuff );
+	return true;
+}
 
 bool invert ( GsMatn &a )
- {
-   GsMatn inva;
-   if ( !inverse(a,inva) ) return false;
-   a.adopt(inva);
-   return true;
- }
+{
+	GsMatn inva;
+	if ( !inverse(a,inva) ) return false;
+	a.adopt(inva);
+	return true;
+}
 
 double det ( GsMatn &a )
- {
-   int n = a.lin();
-   double d;
-   ludcmp ( a, &d );
-   for ( int i=0; i<n; i++ ) d *= a(i,i);
-   return d;
- }
+{
+	int n = a.lin();
+	double d;
+	ludcmp ( a, &d );
+	for ( int i=0; i<n; i++ ) d *= a(i,i);
+	return d;
+}
 
 /* adapted from num recipes code (but not yet ok) : */
 /*
@@ -491,43 +493,42 @@ bool gauss2 ( GsMatn &a, GsMatn &b, GsMatn &x )
 */
 
 // my gauss implementation :
-bool gauss ( const GsMatn &a, const GsMatn &b, GsMatn &x )
- {
-   int i, j, k, n, piv_lin;
-   double tmp, piv_val;
-   static GsMatn m;
+bool gauss ( const GsMatn &a, const GsMatn &b, GsMatn &x, GsMatn &m )
+{
+	int i, j, k, n, piv_lin;
+	double tmp, piv_val;
 
-   n = a.lin();
-   x.size ( n, 1 );
-   m.size ( n, n+1 );
-   m.submat ( 0, 0, a, 0, n-1, 0, n-1 );
-   m.column ( n, b, 0 );
+	n = a.lin();
+	x.size ( n, 1 );
+	m.size ( n, n+1 );
+	m.submat ( 0, 0, a, 0, n-1, 0, n-1 );
+	m.column ( n, b, 0 );
 
-   for ( i=0; i<n; i++ ) // loop lines
+	for ( i=0; i<n; i++ ) // loop lines
 	{
-	  piv_lin=i; piv_val=GS_ABS(m(i,i));
-	  for ( k=i+1; k<n; k++ ) // loop lines below i
-		{ tmp=GS_ABS(m(k,i));
-		  if ( tmp>piv_val ) { piv_lin=k; piv_val=tmp; }
+		piv_lin=i; piv_val=GS_ABS(m(i,i));
+		for ( k=i+1; k<n; k++ ) // loop lines below i
+		{	tmp=GS_ABS(m(k,i));
+			if ( tmp>piv_val ) { piv_lin=k; piv_val=tmp; }
 		}
-	  if ( i!=piv_lin ) m.swaplines(i,piv_lin);
+		if ( i!=piv_lin ) m.swaplines(i,piv_lin);
 
-	  tmp = m(i,i);
-	  if ( tmp==0.0 ) { gsout.warning("singular matrix in gauss\n"); return false; }
-	  for ( k=i+1; k<n; k++ )
-		for ( j=n; j>=i; j-- )
-		   m(k,j) = m(k,j)-m(i,j)*m(k,i)/tmp;
+		tmp = m(i,i);
+		if ( tmp==0.0 ) { gsout.warning("singular matrix in gauss\n"); return false; }
+		for ( k=i+1; k<n; k++ )
+			for ( j=n; j>=i; j-- )
+				m(k,j) = m(k,j)-m(i,j)*m(k,i)/tmp;
 	}
 
-   for ( i=n-1; i>=0; i-- )
-	{ tmp = 0.0;
-	  for ( k=i+1; k<n; k++ ) tmp += m(i,k)*x[k];
-	  if ( m(i,i)==0.0 ) { gsout.warning("singular matrix in gauss (2)\n"); return false; }
-	  x[i] = (m(i,n)-tmp) / m(i,i);
+	for ( i=n-1; i>=0; i-- )
+	{	tmp = 0.0;
+		for ( k=i+1; k<n; k++ ) tmp += m(i,k)*x[k];
+		if ( m(i,i)==0.0 ) { gsout.warning("singular matrix in gauss (2)\n"); return false; }
+		x[i] = (m(i,n)-tmp) / m(i,i);
 	}
 
-   return true;
- }
+	return true;
+}
 
 /* Adapted from num. rec., it works fine. a,b,c are the vectors of each column
 of the tridiagonal matrix m, to find u such that m*u=r. n is the number of lines of m

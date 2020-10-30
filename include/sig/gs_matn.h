@@ -26,8 +26,8 @@ class GsMatn
  { private :
 	GsBuffer<double> _data;
 	int _lin, _col;
-   public :
 
+   public :
 	/*! Default Constructor */
 	GsMatn ();
 
@@ -58,11 +58,10 @@ class GsMatn
 		[l,c] of this GsMatn. */
 	void submat ( int l, int c, const GsMatn &m,  int li, int le, int ci, int ce );
 
-	/*! Resizes GsMatn as a column vector containing the data of the 
-		s column of m. */
+	/*! Resizes GsMatn as a column vector containing the data of the s column of m */
 	void column ( const GsMatn &m, int s );
 
-	/*! Copies the data of the column mc of m to the column c of GsMat. */
+	/*! Copies the data of the column mc of m to the column c of GsMat */
 	void column ( int c, const GsMatn &m, int mc );
 
 	int lin () const { return _lin; }
@@ -76,9 +75,10 @@ class GsMatn
 	void random ( double inf, double sup );
 	void random ( float inf, float sup );
 
-	/*! Returns the (lin*col)-dimensional vector norm. */
+	/*! Returns the (lin*col)-dimensional vector norm */
 	double norm () const;
 
+	/* const double type cast operator */
 	operator const double* () const { return _data; }
 
 	/*! indices start from 0. */
@@ -110,59 +110,60 @@ class GsMatn
 	void operator *= ( float s );
 
 	friend GsOutput& operator << ( GsOutput &o, const GsMatn &m );
-
-	/*! Returns the norm of the matrix a-b. */
-	friend double dist ( const GsMatn &a, const GsMatn &b );
-
-	/* Transforms a into its encoded LU decomposition. The L and U are returned
-	   in the same matrix a. L can be retrieved by making L=a and then setting 
-	   all elements of the diagonal to 1 and those above the diagonal to 0. U is 
-	   retrieved by making U=a, and then setting all elements below the diagonal
-	   to 0. Then the multiplication LU will give a', where a' is a with some
-	   row permutations. The row permutation history is stored in the returned
-	   int array, that tells, beginning from the first row, the other row index
-	   to swap sequentially the rows. This swap sequence will transform a to a'. 
-	   If pivoting is set to false, then no pivoting is done and a' will be equal
-	   to a. Parameter d returns +1 or -1, depending on whether the number of 
-	   row interchanges was even or odd, respectively. The function returns null
-	   if a is singular. See Numerical Recipes page 46. */
-	friend const int* ludcmp ( GsMatn &a, double *d=0, bool pivoting=true );
-
-	/*! Returns the explicit LU decomposition of a. Here we decompose the result
-		of the encoded ludcmp version (without pivoting), returning the exact 
-		l and u matrices so that lu=a.*/
-	friend bool ludcmp ( const GsMatn &a, GsMatn &l, GsMatn &u );
-
-	/*! Solves the linear equations ax=b. Here a is a n dimension square matrix,
-		given in its LU encoded decomposition, b is a n dimensional column vector,
-		that will be changed to return the solution vector x. indx is the row 
-		permutation vector returned by ludcmp. */
-	friend void lubksb ( const GsMatn &a, GsMatn &b, const int *indx );
-
-	/*! Solve the system of linear equations ax=b using a LU decomposition. 
-		Matrix a is changed to its encoded LU decomposition, and matrix b
-		will be changed to contain the solution x. */
-	friend bool lusolve ( GsMatn &a, GsMatn &b );
-
-	/*! Same as the other lusolve(), but here const qualifiers are respected,
-		what implies some extra temporary buffers allocation deallocation. */ 
-	friend bool lusolve ( const GsMatn &a, const GsMatn &b, GsMatn &x );
-
-	/*! Will change a to its encoded LU decomposition and return in inva
-		the inverse matrix of a. */
-	friend bool inverse ( GsMatn &a, GsMatn &inva );
-
-	/*! Will put in a its inverse. */
-	friend bool invert ( GsMatn &a );
-
-	/* Returns the determinant of a using the LU decomposition method. The 
-	   given matrix a is transformed into the result of the ludcmp() function.
-	   See Numerical Recipes page 49. */
-	friend double det ( GsMatn &a );
-
-	/*! Solve the system ax=b, using the Gauss Jordan method. */
-	friend bool gauss ( const GsMatn &a, const GsMatn &b, GsMatn &x );
 };
+
+/*! Returns the norm of the matrix a-b. */
+double dist ( const GsMatn &a, const GsMatn &b );
+
+/* Transforms a into its encoded LU decomposition. The L and U are returned
+   in the same matrix a. L can be retrieved by making L=a and then setting 
+   all elements of the diagonal to 1 and those above the diagonal to 0. U is 
+   retrieved by making U=a, and then setting all elements below the diagonal
+   to 0. Then the multiplication LU will give a', where a' is a with some
+   row permutations. The row permutation history is stored in the returned
+   int array, that tells, beginning from the first row, the other row index
+   to swap sequentially the rows. This swap sequence will transform a to a'. 
+   If pivoting is set to false, then no pivoting is done and a' will be equal
+   to a. Parameter d returns +1 or -1, depending on whether the number of 
+   row interchanges was even or odd, respectively. The function returns null
+   if a is singular. See Numerical Recipes page 46. */
+const int* ludcmp ( GsMatn &a, double *d=0, bool pivoting=true );
+
+/*! Returns the explicit LU decomposition of a. Here we decompose the result
+    of the encoded ludcmp version (without pivoting), returning the exact 
+    l and u matrices so that lu=a.*/
+bool ludcmp ( const GsMatn &a, GsMatn &l, GsMatn &u );
+
+/*! Solves the linear equations ax=b. Here a is a n dimension square matrix,
+    given in its LU encoded decomposition, b is a n dimensional column vector,
+    that will be changed to return the solution vector x. indx is the row 
+    permutation vector returned by ludcmp. */
+void lubksb ( const GsMatn &a, GsMatn &b, const int *indx );
+
+/*! Solve the system of linear equations ax=b using a LU decomposition. 
+    Matrix a is changed to its encoded LU decomposition, and matrix b
+    will be changed to contain the solution x. */
+bool lusolve ( GsMatn &a, GsMatn &b );
+
+/*! Same as the other lusolve(), but here const qualifiers are respected,
+    what implies some extra temporary buffers allocation deallocation. */ 
+bool lusolve ( const GsMatn &a, const GsMatn &b, GsMatn &x );
+
+/*! Will change a to its encoded LU decomposition and return in inva
+    the inverse matrix of a. */
+bool inverse ( GsMatn &a, GsMatn &inva );
+
+/*! Will put in a its inverse. */
+bool invert ( GsMatn &a );
+
+/*! Returns the determinant of a using the LU decomposition method. The 
+	given matrix a is transformed into the result of the ludcmp() function.
+	See Numerical Recipes page 49. */
+double det ( GsMatn &a );
+
+/*! Solves the system ax=b, using the Gauss Jordan method. Matrix tmp is
+	set to size (a.lin(),a.lin()+1) for internal use */
+bool gauss ( const GsMatn &a, const GsMatn &b, GsMatn &x, GsMatn &tmp );
 
 //============================== end of file ===============================
 
