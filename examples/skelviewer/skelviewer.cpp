@@ -313,7 +313,7 @@ void MySkelViewer::build_prim_panel ( int jid )
 	_psl[3]->range ( 0, 40 );
 	_psl[3]->format ( 2, 0 );
 	_psl[3]->all_events ( true );
-	for ( int i=4; i<7; i++ ) { GS_UPDMAX(max,-p->center.e[i]); GS_UPDMAX(max,p->center.e[i]); }
+	for ( int i=0; i<3; i++ ) { GS_UPDMAX(max,-p->center.e[i]); GS_UPDMAX(max,p->center.e[i]); }
 	for ( int i=4; i<7; i++ )
 	{	_psl[i]->range ( -max, max );
 		_psl[i]->all_events ( true );
