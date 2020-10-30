@@ -61,8 +61,8 @@ static void test_gauss ( int n )
    gsout << "a :\n" << a;
    gsout << "b :\n" << b;
   
-   GsMatn x, b2;
-   gauss ( a, b, x );
+   GsMatn x, b2, tmp;
+   gauss ( a, b, x, tmp );
 
    gsout << "x :\n" << x;
 
