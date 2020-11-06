@@ -328,12 +328,11 @@ int ShortestPathMap::FindClosestPoint( int pos )
 	return minIdx;
 }
 
-bool ShortestPathMap::GetShortestPath( float _x, float _y, vector< GsVec >& path )
+bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, int maxnp )
 {
-	if( readyToQuery == false ) {
-		LoadSPM();
-		if( readyToQuery == false )
-			return false;
+	if( !readyToQuery )
+	{	LoadSPM();
+		if( !readyToQuery )	return false;
 	}
 
 	// first point (agent's coordinates)
@@ -407,9 +406,9 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector< GsVec >& path
 			}
 
 			path.push_back( current );
+			if ( path.size()==maxnp ) break;
 
-			if( curPos == (int)ResultArray[ ( curPos + 1 ) * 2 + 1 ].XYZW[ 3 ] )
-				break;
+			if( curPos == (int)ResultArray[ ( curPos + 1 ) * 2 + 1 ].XYZW[ 3 ] ) break;
 
 			curPos = (int)ResultArray[ ( curPos + 1 ) * 2 + 1 ].XYZW[ 3 ];
 		}
@@ -418,23 +417,22 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector< GsVec >& path
 	return true;
 }
 
-bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec& dir, float threshold )
+bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec& dir, float threshold, float normalize, int maxnp )
 {
 	dir.x = 0.0f;
 	dir.y = 0.0f;
 
 	vector<GsVec> path; // SpmTodo: only the first point should be needed to retrieve a direction!
-	if( GetShortestPath( _x, _y, path ) == false || path.size() < 2 )
-		return false;
+	if( !GetShortestPath( _x, _y, path, maxnp ) || path.size()<2 ) return false;
 
 	GsVec origin( _x, _y, 0.0f );
 
-	for( int i = 1; i < (int)path.size(); ++i )
+	for( int i=1; i<(int)path.size(); ++i )
 	{
 		if( gs_dist( origin.x, origin.y, path[ i ].x, path[ i ].y ) >= threshold || i == path.size() - 1 )
 		{
 			dir = path[ i ] - origin;
-			dir.normalize();
+			if ( normalize ) dir.normalize();
 			break;
 		}
 	}

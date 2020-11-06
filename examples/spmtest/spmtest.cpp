@@ -10,6 +10,7 @@
 # include <sig/sn_lines.h>
 # include <sigogl/gl_texture.h>
 # include <sigogl/gl_resources.h>
+# include <sigogl/ui_dialogs.h>
 # include <sigogl/ui_radio_button.h>
 # include <sigogl/ui_slider.h>
 # include <sigogl/ws_viewer.h>
@@ -20,17 +21,19 @@
 
 class SpmViewer : public WsViewer
 {  public: // ui:
-	enum MenuEv { EvBuild, EvAutoBuild, EvMode,
-	              EvViewContours, EvContoursInterval, EvContoursThickness, EvViewDistanceField, EvBufferSize,
+	enum MenuEv { EvSave, EvLoad, EvBuild, EvAutoBuild, EvMode,
+	              EvViewContours, EvViewVectorField, EvViewDistanceField, EvContoursInterval, EvContoursThickness, EvBufferSize,
 				  EvExit };
 	UiRadioButton *_obstbut, *_sinkbut;
-	UiCheckButton *_abbut, *_contourbut, *_distfieldbut;
+	UiCheckButton *_abbut, *_contourbut, *_distfieldbut, *_vecfieldbut;
 	UiSlider *_intervalslider, *_thicknesslider, *_resolutionslider;
+	GsString _lfname;
    public: // scene:
 	SnPolygons *_domain;
 	SnPolyEditor *_sinks;
 	SnPolyEditor *_obstacles;
-	SnLines *_path;
+	SnLines2 *_path;
+	SnLines2 *_vfield;
 	SnSpm* _snspm;
    public: // spm data:
 	GlTexture SpmTexture;
@@ -40,8 +43,9 @@ class SpmViewer : public WsViewer
    public:
 	SpmViewer ( int x, int y, int w, int h, const char* l );
 	void refresh () { render(); ws_fast_check(); }
-	void build ( bool loadFromGPU = false );
+	void build ( bool loadFromGPU=false );
 	void get_path ( float x, float y );
+	void update_vector_field ();
 	virtual int uievent ( int e ) override;
 	virtual int handle_scene_event ( const GsEvent& e ) override;
 };
@@ -55,6 +59,7 @@ static void polyeditor_callback ( SnPolyEditor* pe, SnPolyEditor::Event e, int p
 	{	v->build();
 		//if ( !v->_path->empty() ) v->get_path( v->SpmPath[0].x, v->SpmPath[0].y );
 		if ( !v->_path->empty() ) v->_path->init();
+		v->update_vector_field();
 	}
 }
 
@@ -95,8 +100,9 @@ SpmViewer::SpmViewer ( int x, int y, int w, int h, const char* l ) : WsViewer( x
 	_obstacles->callback ( polyeditor_callback, this );
 	_obstacles->polygons()->push().setpoly ( "-2 -5 0 0 -2 5" ); // define one obstacle
 
-	// Define scene node to show a path:
-	g->add ( _path = new SnLines );
+	// Define scene node to show path and vector field:
+	g->add ( _path = new SnLines2 );
+	g->add ( _vfield = new SnLines2 );
 
 	// Initiaze Spm objects:
 	Spm = 0;
@@ -112,6 +118,11 @@ SpmViewer::SpmViewer ( int x, int y, int w, int h, const char* l ) : WsViewer( x
 	// Build ui:
 	UiPanel *p, *subp;
 	p = uim()->add_panel ( 0, UiPanel::HorizLeft, UiPanel::Top );
+	p->add ( new UiButton ( "file", subp = new UiPanel(0,UiPanel::Vertical) ) );
+	{	UiPanel* p = subp;
+		p->add( new UiButton( "save", EvSave ) );
+		p->add( new UiButton( "load", EvLoad ) );
+	}
 	p->add ( new UiButton ( "build", EvBuild ) );
 	p->add ( new UiButton ( "mode", subp = new UiPanel(0,UiPanel::Vertical) ) );
 	{	UiPanel* p = subp;
@@ -121,6 +132,7 @@ SpmViewer::SpmViewer ( int x, int y, int w, int h, const char* l ) : WsViewer( x
 	}
 	p->add ( new UiButton ( "view", subp=new UiPanel(0,UiPanel::Vertical) ) );
 	{	UiPanel* p = subp;
+		p->add( _vecfieldbut = new UiCheckButton ( "vector field", EvViewVectorField, false ) );
 		p->add( _distfieldbut = new UiCheckButton ( "distance field", EvViewDistanceField, false ) );
 		p->add( _contourbut = new UiCheckButton ( "contour lines", EvViewContours, true ) );
 
@@ -155,7 +167,6 @@ void SpmViewer::get_path ( float x, float y )
 {
 	if ( !Spm ) return;
 	if ( !Spm->IsReadyToQuery() ) build(true); // SpmTodo: fix bringing map from GPU without rebuilding it
-
 	Spm->GetShortestPath ( x, y, SpmPath );
 	_path->init ();
 	_path->line_width ( 2.0f );
@@ -165,10 +176,57 @@ void SpmViewer::get_path ( float x, float y )
 	_path->end_polyline();
 }
 
+void SpmViewer::update_vector_field ()
+{
+	_vfield->init();
+	_vfield->color ( GsColor::black );
+	if ( !_vecfieldbut->value() ) return;
+	if ( !Spm ) return;
+	if ( !Spm->IsReadyToQuery() ) build(true);
+
+	float spmw = _snspm->width;
+	float spmh = _snspm->height;
+	float x, incx=spmw/GS_ROUND(spmw);
+	float y, incy=spmh/GS_ROUND(spmh);
+	float maxx = _snspm->minx+spmw + incx/2.0f;
+	float maxy = _snspm->miny+spmh + incy/2.0f;
+
+	GsVec v;
+	float vlen=0.75f, al=0.2f, aw=0.15f;
+
+	for ( x=_snspm->minx; x<maxx; x+=incx )
+	{	for ( y=_snspm->miny; y<maxy; y+=incy )
+		{	if ( Spm->GetNextDirection(x,y,v,0,false,2) )
+			{	float l = v.len();
+				if ( l<vlen ) continue;
+				v.len(vlen);
+				_vfield->push_arrow ( GsPnt2(x,y), GsPnt2(x+v.x,y+v.y), al, aw );
+			}
+		}
+	}
+
+	refresh();
+}
+
 int SpmViewer::uievent ( int e )
 {
 	switch( e )
-	{
+	{	case EvSave:
+		{	const char* fname = ui_input_file ( "File to save:", _lfname, "*.txt;*.m" ); _lfname=fname;
+			GsOutput out;
+			if ( fname && out.open(fname) ) out<<*_obstacles->polygons()<<gsnl<<*_sinks->polygons()<<gsnl;
+			break;
+		}
+		case EvLoad:
+		{	const char* fname = ui_select_file ( "File to load:", _lfname, "*.txt;*.m" ); _lfname=fname;
+			GsInput inp;
+			if ( !Spm || !fname || !inp.open(fname) ) break;
+			inp>>*_obstacles->polygons()>>*_sinks->polygons();
+			if ( !Spm->IsReadyToQuery() ) build(true);
+			refresh();
+			break;
+		}
+
 		case EvMode: {
 			_obstacles->mode( _obstbut->value() ? SnPolyEditor::ModeEdit : SnPolyEditor::ModeNoEdition );
 			_sinks->mode( _sinkbut->value() ? SnPolyEditor::ModeEdit : SnPolyEditor::ModeNoEdition );
@@ -182,7 +240,8 @@ int SpmViewer::uievent ( int e )
 		case EvViewContours:	  _snspm->contourLines=_contourbut->value(); break;
 		case EvContoursInterval:  _snspm->contourInterval=_intervalslider->value(); refresh(); break;
 		case EvContoursThickness: _snspm->contourThickness=_thicknesslider->value(); refresh(); break;
-		case EvViewDistanceField: _snspm->distanceField=_distfieldbut->value();	break;
+		case EvViewDistanceField: _snspm->distanceField=_distfieldbut->value(); break;
+		case EvViewVectorField:   update_vector_field(); break;
 
 		case EvBufferSize: { // SpmTodo: resolution change is not working properly
 			// rounds to closest 100

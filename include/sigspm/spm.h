@@ -126,11 +126,12 @@ public:
 	int FindClosestPoint( int pos );
 
 	// Find the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
-	bool GetShortestPath( float _x, float _y, std::vector< GsVec >& path );
+	// If maxnp>0, the returned path may be truncated in order to contain only up to maxnp points
+	bool GetShortestPath( float _x, float _y, std::vector<GsVec>& path, int maxnp=-1 );
 
 	// Find the next direction on the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
-	// Parent points that are closer than threshold will be skipped
-	bool GetNextDirection( float _x, float _y, GsVec& dir, float threshold = 0.01f );
+	// A maximum of maxnp points in the shortest path are retrieved and parent points that are closer than threshold will be skipped
+	bool GetNextDirection( float _x, float _y, GsVec& dir, float threshold=0.01f, float normalize=true, int maxnp=3 );
 
 private:
 	std::vector< float > Map;
