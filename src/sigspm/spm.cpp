@@ -351,6 +351,10 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, 
 
 	int pos = 4 * ( iy * bufferWidth + ix );
 
+	// SpmTodo:
+	// -remove call to FindClosestPoint() and instead store in the buffer the index of
+	//  the closest point for each pixel, such that we achieve O(1) time!
+	// -optimize entire method
 	int curPos = FindClosestPoint( pos );
 	if( curPos == -1 )
 	{
