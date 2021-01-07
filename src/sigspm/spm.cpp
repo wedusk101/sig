@@ -311,9 +311,9 @@ int ShortestPathMap::FindClosestPoint( int pos )
 	int minIdx = -1;
 	double minDist = -1.0f;
 
-	for( unsigned int i = 0; i < ( ResultArray.size() - 3 ) / 2; ++i )
+	for( unsigned int i = 2; i < ResultArray.size() - 1; i += 2 )
 	{
-		const SpmVertexPos& originalPoint = ResultArray[ ( i + 1 ) * 2 ];
+		const SpmVertexPos& originalPoint = ResultArray[ i ];
 		GsVec p = OrthoProjectionCompleteMatrix * GsVec( originalPoint.XYZW[ 0 ], originalPoint.XYZW[ 1 ], 0.0f );
 
 		double dist = gs_dist( p.x, p.y, x, y );
@@ -330,6 +330,9 @@ int ShortestPathMap::FindClosestPoint( int pos )
 
 bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, int maxnp )
 {
+	// SpmTodo:
+	// -optimize entire method
+
 	if( !readyToQuery )
 	{	LoadSPM();
 		if( !readyToQuery )	return false;
@@ -351,32 +354,13 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, 
 
 	int pos = 4 * ( iy * bufferWidth + ix );
 
-	// SpmTodo:
-	// -remove call to FindClosestPoint() and instead store in the buffer the index of
-	//  the closest point for each pixel, such that we achieve O(1) time!
-	// -optimize entire method
-	int curPos = FindClosestPoint( pos );
-	if( curPos == -1 )
-	{
-		//return false;
-		int extraPos[ 4 ] = { 4 * ( ( iy + 1 ) * bufferWidth + ix - 1 ),
-		                      4 * ( ( iy + 1 ) * bufferWidth + ix + 1 ),
-		                      4 * ( ( iy - 1 ) * bufferWidth + ix + 1 ),
-		                      4 * ( ( iy - 1 ) * bufferWidth + ix - 1 ) };
-
-		int extraPosIt = 0;
-		while( curPos == -1 && extraPosIt < 4 )
-			curPos = FindClosestPoint( extraPos[ extraPosIt++ ] );
-
-		if( curPos == -1 )
-			return false;
-		else
-			pos = extraPos[ extraPosIt - 1 ];
-	}
+	int curPos = (int)Map[ pos + 3 ];
+	if( curPos < 2 )
+		return false;
 
 	// if the pixel points directly to source, just use its parent coordinates
 	// note: this depends on the pixel storing xy coordinates, and not color information
-	if( curPos == (int)ResultArray[ ( curPos + 1 ) * 2 + 1 ].XYZW[ 3 ] )
+	if( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] )
 	{
 		current.x = Map[ pos     ];
 		current.y = Map[ pos + 1 ];
@@ -392,8 +376,8 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, 
 	{
 		while( true )
 		{
-			const SpmVertexPos& originalPoint1 = ResultArray[ ( curPos + 1 ) * 2     ];
-			const SpmVertexPos& originalPoint2 = ResultArray[ ( curPos + 1 ) * 2 + 1 ];
+			const SpmVertexPos& originalPoint1 = ResultArray[ curPos     ];
+			const SpmVertexPos& originalPoint2 = ResultArray[ curPos + 1 ];
 
 			GsVec projectedPoint1 = GsVec( originalPoint1.XYZW[ 0 ], originalPoint1.XYZW[ 1 ], 0.0f );
 			GsVec projectedPoint2 = GsVec( originalPoint2.XYZW[ 0 ], originalPoint2.XYZW[ 1 ], 0.0f );
@@ -412,9 +396,9 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, 
 			path.push_back( current );
 			if ( path.size()==maxnp ) break;
 
-			if( curPos == (int)ResultArray[ ( curPos + 1 ) * 2 + 1 ].XYZW[ 3 ] ) break;
+			if( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] ) break;
 
-			curPos = (int)ResultArray[ ( curPos + 1 ) * 2 + 1 ].XYZW[ 3 ];
+			curPos = (int)ResultArray[ curPos + 1 ].XYZW[ 3 ];
 		}
 	}
 

@@ -48,12 +48,8 @@ static const char* pds_spm_cone_frag=
 "parent=sgen1;"
 "float dist=distance(spos,parent);"
 "float depth=(dist*Vert[1].z)+ Vert[0].z;"
-"if(draw_value.w==0.0 || depth < draw_value.z){"
-"if(Vert[1].z !=1.0)"
-"frag_Color=vec4(parent.xy,depth,1.1);"
-"else\n"
-"frag_Color=vec4(parent.xy,depth,1.0);"
-"}"
+"if(draw_value.w==0.0 || depth < draw_value.z)"
+"frag_Color=vec4(parent.xy,depth,Vert[1].w);"
 "}"
 ;
 static const char* pds_spm_cone_vert=
@@ -250,7 +246,7 @@ static const char* pds_spm_search_comp=
 "{"
 "Vert[0]=Vert[ minIdx  ];"
 "Vert[1]=Vert[ minIdx+1 ];"
-"Vert[1].w=minIdx/2-1;"
+"Vert[1].w=minIdx;"
 "Vert[ minIdx ].w=0.5;"
 "}"
 "}"

@@ -37,7 +37,7 @@ void main()
 	{
 		Vert[0] = Vert[ minIdx   ];
 		Vert[1] = Vert[ minIdx+1 ];
-		Vert[1].w = minIdx/2-1;
+		Vert[1].w = minIdx;
 		Vert[ minIdx ].w = 0.5;
 	}
 }
