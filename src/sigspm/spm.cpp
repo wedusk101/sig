@@ -69,6 +69,7 @@ void ShortestPathMap::SetBufferDimensions( int w, int h )
 void ShortestPathMap::SetOrthoProjectionMatrix( const GsMat& mat )
 {
 	OrthoProjectionCompleteMatrix = mat;
+	OrthoProjectionCompleteMatrixInv = OrthoProjectionCompleteMatrix.inverse();
 }
 
 void ShortestPathMap::SetShaderStorageBufferVariables( GLuint _ssbId, size_t n )
@@ -315,7 +316,7 @@ int ShortestPathMap::FindClosestPoint( int pos )
 	{
 		const SpmVertexPos& originalPoint = ResultArray[ i ];
 		GsVec p = OrthoProjectionCompleteMatrix * GsVec( originalPoint.XYZW[ 0 ], originalPoint.XYZW[ 1 ], 0.0f );
-
+//xxx
 		double dist = gs_dist( p.x, p.y, x, y );
 
 		if( minIdx == -1 || dist < minDist )
@@ -368,7 +369,7 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path,
 		current.x = ( current.x * 2.0f ) - 1.0f;
 		current.y = ( current.y * 2.0f ) - 1.0f;
 
-		OrthoProjectionCompleteMatrix.inverse().mult2d ( current );
+		OrthoProjectionCompleteMatrixInv.mult2d ( current );
 
 		path.push_back( current );
 	}

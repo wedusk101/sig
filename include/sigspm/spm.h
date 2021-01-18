@@ -140,6 +140,7 @@ private:
 	std::string Name;
 	int bufferWidth, bufferHeight;
 	GsMat OrthoProjectionCompleteMatrix;
+	GsMat OrthoProjectionCompleteMatrixInv;
 
 	// variables to load array/map from GPU
 	GLuint shaderStorageBufferId;
