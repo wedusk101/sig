@@ -354,7 +354,7 @@ void ShortestPathMapManager::FillShaderStorageArray( void )
 	ShaderStorageArray.push_back( empty );
 
 	// this keeps track of the current point id in the buffer
-	unsigned int curId = 0;
+	unsigned int curId = 2;
 
 	//---------------------------------------------------------------------------------------------
 	// add source points & source segment endpoints
@@ -362,7 +362,7 @@ void ShortestPathMapManager::FillShaderStorageArray( void )
 	for( int j = 0; j < envSinks->size(); ++j )
 	{
 		const GsPolygon& poly = envSinks->get(j);
-		for( int i = 0; i < poly.size(); ++i, ++curId )
+		for( int i = 0; i < poly.size(); ++i, curId += 2 )
 		{
 			ShaderStorageArray.push_back( { { poly[i].x, poly[i].y, 0.0f, wSourceVert  } } );
 			ShaderStorageArray.push_back( { { poly[i].x, poly[i].y, 1.0f, (float)curId } } );
@@ -372,7 +372,7 @@ void ShortestPathMapManager::FillShaderStorageArray( void )
 	//---------------------------------------------------------------------------------------------
 	// add segment source critical points
 	//---------------------------------------------------------------------------------------------
-	for( int i = 0; i+1 < (int)CriticalPointsSS.size(); i += 2, ++curId )
+	for( int i = 0; i+1 < (int)CriticalPointsSS.size(); i += 2, curId += 2 )
 	{
 		ShaderStorageArray.push_back( { { CriticalPointsSS[i  ].x, CriticalPointsSS[i  ].y, 0.0f, wSourceSegment } } );
 		ShaderStorageArray.push_back( { { CriticalPointsSS[i+1].x, CriticalPointsSS[i+1].y, 1.0f, (float)curId   } } );
@@ -391,7 +391,7 @@ void ShortestPathMapManager::FillShaderStorageArray( void )
 	{
 		const GsPolygon& poly = envObstacles->get(j);
 
-		for( int i = 0; i < poly.size(); ++i, ++curId )
+		for( int i = 0; i < poly.size(); ++i, curId += 2 )
 		{
 			// calculate slightly offset coordinates (for visibility purposes only)
 			const GsPnt2& pPrev = poly[ i > 0 ? i - 1 : poly.size() - 1 ];

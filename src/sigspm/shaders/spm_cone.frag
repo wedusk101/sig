@@ -66,12 +66,7 @@ void main(void)
 	float depth = ( dist * Vert[1].z ) + Vert[0].z;
 
 	// update distance if the pixel has none or if new distance is smaller
-	//if( draw_value.w == 0.0 || depth < draw_value.z )
+	if( draw_value.w == 0.0 || depth < draw_value.z )
+		frag_Color = vec4( parent.xy, depth, Vert[1].w );
 		//frag_Color = vec4( parent.xy, depth, 1.0 );
-	if( draw_value.w == 0.0 || depth < draw_value.z ) {
-		if( Vert[1].z != 1.0 )
-			frag_Color = vec4( parent.xy, depth, 1.1 );
-		else
-			frag_Color = vec4( parent.xy, depth, 1.0 );
-	}
 }
