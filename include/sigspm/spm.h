@@ -134,7 +134,8 @@ public:
 
 	// Get the direction on the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
 	// A maximum of maxnp points in the shortest path are retrieved and parent points that are closer than threshold will be skipped
-	bool GetFilteredDirection( float _x, float _y, GsVec2& dir, float threshold=0.01f, float normalize=true, int maxnp=3 );
+	// Considered points are returned in path
+	bool GetFilteredDirection( float _x, float _y, GsVec2& dir, std::vector<GsVec2>& path, float threshold=0.01f, float normalize=true, int maxnp=3 );
 
 private:
 	std::vector< float > Map;

@@ -427,22 +427,24 @@ bool ShortestPathMap::GetDirection( float _x, float _y, GsVec2& dir, float norma
 	return true;
 }
 
-bool ShortestPathMap::GetFilteredDirection( float _x, float _y, GsVec2& dir, float threshold, float normalize, int maxnp )
+// The usefulness of this function is not clear, it is here as a template for possible application-specific situations
+bool ShortestPathMap::GetFilteredDirection( float _x, float _y, GsVec2& dir, std::vector<GsVec2>& path, float threshold, float normalize, int maxnp )
 {
 	dir.x = 0.0f;
 	dir.y = 0.0f;
-	vector<GsVec2> path;
 	if( !GetShortestPath( _x, _y, path, maxnp ) || path.size()<2 ) return false;
-	GsVec origin( _x, _y, 0.0f );
+	dir = path[ 1 ] - path [ 0 ];
 
-	for( unsigned i=1; i<path.size(); ++i )
+	double th2 = double(threshold)*double(threshold); // so that we can do squared comparisons
+	for( unsigned i=2; i<path.size(); i++ )
 	{
-		if( gs_dist( origin.x, origin.y, path[ i ].x, path[ i ].y ) >= threshold || i == path.size() - 1 )
+		if( gs_dist2( path[0].x, path[0].y, path[i-1].x, path[i-1].y ) < th2 )
 		{
-			dir = path[ i ] - origin;
-			if ( normalize ) dir.normalize();
+			dir = path[ i ] - path[ 0 ];
 			break;
 		}
 	}
+
+	if ( normalize ) dir.normalize();
 	return true;
 }
