@@ -360,8 +360,8 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path,
 	int curPos = (int)Map[ pos + 3 ];
 	if ( curPos < 2 ) return false; // no path available
 
-	// If the pixel points directly to source, use its parent coordinates, considering seg sources
-	// note: this depends on the pixel storing xy coordinates, and not color information
+	// Here we depend on pixels storing xy coordinates, and not color information
+	// If the pixel points directly to source, use its parent coordinates, to take into account seg sources:
 	if( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] )
 	{
 		current.set ( Map[pos], Map[pos+1] );
@@ -371,23 +371,22 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path,
 		path.push_back( current );
 	}
 	else
-	{
-		while( true )
-		{	// SpmTodo: review if this portion was necessary:
-			//const SpmVertexPos& originalPoint1 = ResultArray[ curPos   ];
-			//const SpmVertexPos& originalPoint2 = ResultArray[ curPos+1 ];
-			//GsVec2 projectedPoint1 ( originalPoint1.XYZW[ 0 ], originalPoint1.XYZW[ 1 ] );
-			//GsVec2 projectedPoint2 ( originalPoint2.XYZW[ 0 ], originalPoint2.XYZW[ 1 ] );
-			//if( gs_dist( current.x, current.y, projectedPoint1.x, projectedPoint1.y ) < gs_dist( current.x, current.y, projectedPoint2.x, projectedPoint2.y ) )
-			//{	current = projectedPoint1; }
-			//else
-			//{	current = projectedPoint2; }
+	{	bool end=false;
+		for (;;)
+		{	const SpmVertexPos* origPt = &ResultArray[ curPos ];
 
-			const SpmVertexPos& originalPoint1 = ResultArray[ curPos   ];
-			current.set ( originalPoint1.XYZW[ 0 ], originalPoint1.XYZW[ 1 ] );
+			if( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] ) // check when reaching src, to perform seg src test:
+			{
+				const SpmVertexPos* origPt2 = &ResultArray[ curPos+1 ];
+				if( dist2(current,GsPnt2(origPt2->XYZW[0],origPt2->XYZW[1])) < dist2(current,GsVec2(origPt->XYZW[0],origPt->XYZW[1])) )
+				{	origPt = origPt2; }
+				end = true; // end of path, signal exit
+			}
+
+			current.set( origPt->XYZW[0], origPt->XYZW[1] );
+
 			path.push_back( current );
-			if ( path.size()==maxnp ) break;
-			if ( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] ) break;
+			if ( end || path.size()==maxnp ) break;
 			curPos = (int)ResultArray[ curPos + 1 ].XYZW[ 3 ];
 		}
 	}
