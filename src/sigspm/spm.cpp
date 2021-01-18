@@ -315,8 +315,9 @@ int ShortestPathMap::FindClosestPoint( int pos )
 	for( unsigned int i = 2; i < ResultArray.size() - 1; i += 2 )
 	{
 		const SpmVertexPos& originalPoint = ResultArray[ i ];
-		GsVec p = OrthoProjectionCompleteMatrix * GsVec( originalPoint.XYZW[ 0 ], originalPoint.XYZW[ 1 ], 0.0f );
-//xxx
+		GsVec2 p ( originalPoint.XYZW[ 0 ], originalPoint.XYZW[ 1 ] );
+		OrthoProjectionCompleteMatrix.mult2d ( p );
+
 		double dist = gs_dist( p.x, p.y, x, y );
 
 		if( minIdx == -1 || dist < minDist )
@@ -329,76 +330,64 @@ int ShortestPathMap::FindClosestPoint( int pos )
 	return minIdx;
 }
 
-bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path, int maxnp )
+inline int PosFromXY ( const GsVec2& projectedCurrent, int bufferWidth, int bufferHeight )
 {
-	// SpmTodo:
-	// -optimize method
-	// -GsVec -> GsVec2
-   // - precomp OrthoProjectionCompleteMatrix.inverse()
-
-	if( !readyToQuery )
-	{	LoadSPM();
-		if( !readyToQuery )	return false;
-	}
-
-	// first point (agent's coordinates)
-	GsVec2 current(_x,_y), projectedCurrent(_x,_y);
-	OrthoProjectionCompleteMatrix.mult2d(projectedCurrent);
-
-	path.clear();
-	path.push_back( current );
-
-	// Path back to source
 	float x = ( projectedCurrent.x + 1.0f ) / 2.0f;
 	float y = ( projectedCurrent.y + 1.0f ) / 2.0f;
 	int ix = (int)( x * bufferWidth );
 	int iy = (int)( y * bufferHeight );
 	if (ix<0) ix=0; if(ix>=bufferWidth) ix=bufferWidth-1;
 	if (iy<0) iy=0; if(iy>=bufferHeight) iy=bufferHeight-1;
-	int pos = 4 * ( iy * bufferWidth + ix );
-	int curPos = (int)Map[ pos + 3 ];
-	if( curPos < 2 ) return false;
+	return 4 * ( iy * bufferWidth + ix );
+}
 
-	// if the pixel points directly to source, just use its parent coordinates
+bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path, int maxnp )
+{
+	if( !readyToQuery )
+	{	LoadSPM();
+		if( !readyToQuery )	return false;
+	}
+
+	// first point (agent's coordinates)
+	GsVec2 current(_x,_y);
+	path.clear();
+	path.push_back( current );
+
+	// Path back to source
+	GsVec2 projectedCurrent(_x,_y);
+	OrthoProjectionCompleteMatrix.mult2d(projectedCurrent);
+	int pos = PosFromXY ( projectedCurrent, bufferWidth, bufferHeight );
+	int curPos = (int)Map[ pos + 3 ];
+	if ( curPos < 2 ) return false; // no path available
+
+	// If the pixel points directly to source, use its parent coordinates, considering seg sources
 	// note: this depends on the pixel storing xy coordinates, and not color information
 	if( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] )
 	{
-		current.x = Map[ pos     ];
-		current.y = Map[ pos + 1 ];
-
-		current.x = ( current.x * 2.0f ) - 1.0f;
-		current.y = ( current.y * 2.0f ) - 1.0f;
-
+		current.set ( Map[pos], Map[pos+1] );
+		current.x = ( current.x*2.0f ) - 1.0f;
+		current.y = ( current.y*2.0f ) - 1.0f;
 		OrthoProjectionCompleteMatrixInv.mult2d ( current );
-
 		path.push_back( current );
 	}
 	else
 	{
 		while( true )
-		{
-			const SpmVertexPos& originalPoint1 = ResultArray[ curPos     ];
-			const SpmVertexPos& originalPoint2 = ResultArray[ curPos + 1 ];
+		{	// SpmTodo: review if this portion was necessary:
+			//const SpmVertexPos& originalPoint1 = ResultArray[ curPos   ];
+			//const SpmVertexPos& originalPoint2 = ResultArray[ curPos+1 ];
+			//GsVec2 projectedPoint1 ( originalPoint1.XYZW[ 0 ], originalPoint1.XYZW[ 1 ] );
+			//GsVec2 projectedPoint2 ( originalPoint2.XYZW[ 0 ], originalPoint2.XYZW[ 1 ] );
+			//if( gs_dist( current.x, current.y, projectedPoint1.x, projectedPoint1.y ) < gs_dist( current.x, current.y, projectedPoint2.x, projectedPoint2.y ) )
+			//{	current = projectedPoint1; }
+			//else
+			//{	current = projectedPoint2; }
 
-			GsVec projectedPoint1 = GsVec( originalPoint1.XYZW[ 0 ], originalPoint1.XYZW[ 1 ], 0.0f );
-			GsVec projectedPoint2 = GsVec( originalPoint2.XYZW[ 0 ], originalPoint2.XYZW[ 1 ], 0.0f );
-
-			if( gs_dist( current.x, current.y, projectedPoint1.x, projectedPoint1.y ) < gs_dist( current.x, current.y, projectedPoint2.x, projectedPoint2.y ) )
-			{
-				current.x = projectedPoint1.x;
-				current.y = projectedPoint1.y;
-			}
-			else
-			{
-				current.x = projectedPoint2.x;
-				current.y = projectedPoint2.y;
-			}
-
+			const SpmVertexPos& originalPoint1 = ResultArray[ curPos   ];
+			current.set ( originalPoint1.XYZW[ 0 ], originalPoint1.XYZW[ 1 ] );
 			path.push_back( current );
 			if ( path.size()==maxnp ) break;
-
-			if( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] ) break;
-
+			if ( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] ) break;
 			curPos = (int)ResultArray[ curPos + 1 ].XYZW[ 3 ];
 		}
 	}
@@ -406,15 +395,48 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path,
 	return true;
 }
 
-bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec2& dir, float threshold, float normalize, int maxnp )
+bool ShortestPathMap::GetDirection( float _x, float _y, GsVec2& dir, float normalize )
+{
+	if( !readyToQuery )
+	{	LoadSPM();
+		if( !readyToQuery )	return false;
+	}
+
+	// Get index relative to point _x,_y:
+	GsVec2 p(_x,_y);
+	OrthoProjectionCompleteMatrix.mult2d(p);
+	int pos = PosFromXY ( p, bufferWidth, bufferHeight );
+	int curPos = (int)Map[ pos + 3 ];
+	if ( curPos < 2 ) return false; // no path available
+
+	// Get parent parent point p, first check if pixel is visible to source:
+	if( curPos == (int)ResultArray[ curPos + 1 ].XYZW[ 3 ] )
+	{
+		p.set ( Map[pos], Map[pos+1] );
+		p.x = ( p.x*2.0f ) - 1.0f;
+		p.y = ( p.y*2.0f ) - 1.0f;
+		OrthoProjectionCompleteMatrixInv.mult2d ( p );
+	}
+	else // If not get generator point:
+	{
+		const SpmVertexPos& originalPoint1 = ResultArray[ curPos   ];
+		p.set ( originalPoint1.XYZW[ 0 ], originalPoint1.XYZW[ 1 ] );
+	}
+
+	dir = p - GsPnt2(_x,_y);
+	if ( normalize ) dir.normalize();
+	return true;
+}
+
+bool ShortestPathMap::GetFilteredDirection( float _x, float _y, GsVec2& dir, float threshold, float normalize, int maxnp )
 {
 	dir.x = 0.0f;
 	dir.y = 0.0f;
-	vector<GsVec2> path; // SpmTodo: only the first point should be needed to retrieve a direction!
+	vector<GsVec2> path;
 	if( !GetShortestPath( _x, _y, path, maxnp ) || path.size()<2 ) return false;
 	GsVec origin( _x, _y, 0.0f );
 
-	for( int i=1; i<(int)path.size(); ++i )
+	for( unsigned i=1; i<path.size(); ++i )
 	{
 		if( gs_dist( origin.x, origin.y, path[ i ].x, path[ i ].y ) >= threshold || i == path.size() - 1 )
 		{

@@ -196,7 +196,7 @@ void SpmViewer::update_vector_field ()
 
 	for ( x=_snspm->minx; x<maxx; x+=incx )
 	{	for ( y=_snspm->miny; y<maxy; y+=incy )
-		{	if ( Spm->GetNextDirection(x,y,v,0,false,2) )
+		{	if ( Spm->GetDirection(x,y,v,false) )
 			{	float l = v.len();
 				if ( l<vlen ) continue;
 				v.len(vlen);

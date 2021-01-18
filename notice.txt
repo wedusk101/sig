@@ -5,6 +5,11 @@
 
 The author is thankful to the University of California for being supportive of this project.
 
+The source code of this software has received contributions from:
+David Huang
+Mentar Mahmudi
+Renato Farias
+
 This software includes public domain files stb_image.h and stb_image_write.h.
 
 This software includes in files tri_intersection.h and tri_intersection.cpp code available

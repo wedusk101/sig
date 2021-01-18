@@ -125,13 +125,16 @@ public:
 	// Find the closest (parent) point of the point whose 1d coordinate in the map is 'pos'
 	int FindClosestPoint( int pos );
 
-	// Find the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
+	// Get the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
 	// If maxnp>0, the returned path may be truncated in order to contain only up to maxnp points
 	bool GetShortestPath( float _x, float _y, std::vector<GsPnt2>& path, int maxnp=-1 );
 
-	// Find the next direction on the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
+	// Get the SPM vector field direction at coordinates (x,y) in world-space (Optimized version added by MK)
+	bool GetDirection( float _x, float _y, GsVec2& dir, float normalize=true );
+
+	// Get the direction on the shortest path back to the destination (SPM source), starting from coordinates (x,y) in world-space
 	// A maximum of maxnp points in the shortest path are retrieved and parent points that are closer than threshold will be skipped
-	bool GetNextDirection( float _x, float _y, GsVec2& dir, float threshold=0.01f, float normalize=true, int maxnp=3 );
+	bool GetFilteredDirection( float _x, float _y, GsVec2& dir, float threshold=0.01f, float normalize=true, int maxnp=3 );
 
 private:
 	std::vector< float > Map;
