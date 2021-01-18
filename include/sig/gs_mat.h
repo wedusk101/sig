@@ -317,6 +317,9 @@ class GsMat
 	/*! Returns true if dist2(*this,m)<=ds*ds, and false otherwise. */
 	friend bool next ( const GsMat& a, const GsMat& b, float ds ) { return dist2(a,b)<=ds*ds; }
 
+	/*! Applies the affine transformation to vector (v.x,v.y,0) and returns in v the x,y coordinates of the result. */
+	void mult2d ( GsVec2& v ) const { float vx=v.x; v.x=e11*vx+e12*v.y+e14; v.y=e21*vx+e22*v.y+e24; }
+
 	/*! Operator to multiply GsMat by a scalar. */
 	void operator *= ( float r );
 

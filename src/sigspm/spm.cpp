@@ -328,10 +328,12 @@ int ShortestPathMap::FindClosestPoint( int pos )
 	return minIdx;
 }
 
-bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, int maxnp )
+bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path, int maxnp )
 {
 	// SpmTodo:
-	// -optimize entire method
+	// -optimize method
+	// -GsVec -> GsVec2
+   // - precomp OrthoProjectionCompleteMatrix.inverse()
 
 	if( !readyToQuery )
 	{	LoadSPM();
@@ -339,8 +341,8 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, 
 	}
 
 	// first point (agent's coordinates)
-	GsVec current = { _x, _y, 0.0f };
-	GsVec projectedCurrent = OrthoProjectionCompleteMatrix * current;
+	GsVec2 current ( _x, _y );
+	GsVec2 projectedCurrent(current); OrthoProjectionCompleteMatrix.mult2d(projectedCurrent);
 
 	path.clear();
 	path.push_back( current );
@@ -353,8 +355,9 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, 
 	int iy = (int)( y * bufferHeight );
 
 	int pos = 4 * ( iy * bufferWidth + ix );
-
+gsout<<"1\n";
 	int curPos = (int)Map[ pos + 3 ];
+gsout<<"2\n";
 	if( curPos < 2 )
 		return false;
 
@@ -405,14 +408,14 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsVec>& path, 
 	return true;
 }
 
-bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec& dir, float threshold, float normalize, int maxnp )
+bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec2& dir, float threshold, float normalize, int maxnp )
 {
 	dir.x = 0.0f;
 	dir.y = 0.0f;
-
-	vector<GsVec> path; // SpmTodo: only the first point should be needed to retrieve a direction!
+gsout<<"A\n";
+	vector<GsVec2> path; // SpmTodo: only the first point should be needed to retrieve a direction!
 	if( !GetShortestPath( _x, _y, path, maxnp ) || path.size()<2 ) return false;
-
+gsout<<"B\n";
 	GsVec origin( _x, _y, 0.0f );
 
 	for( int i=1; i<(int)path.size(); ++i )
@@ -424,6 +427,6 @@ bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec& dir, float th
 			break;
 		}
 	}
-
+gsout<<"C\n";
 	return true;
 }

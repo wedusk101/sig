@@ -39,7 +39,7 @@ class SpmViewer : public WsViewer
 	GlTexture SpmTexture;
 	ShortestPathMap* Spm;
 	ShortestPathMapManager SpmManager;
-	std::vector<GsVec> SpmPath;
+	std::vector<GsVec2> SpmPath;
    public:
 	SpmViewer ( int x, int y, int w, int h, const char* l );
 	void refresh () { render(); ws_fast_check(); }
@@ -150,7 +150,7 @@ SpmViewer::SpmViewer ( int x, int y, int w, int h, const char* l ) : WsViewer( x
 
 		//SpmTodo: fix ability to change map resolution
 		//p->add( new UiElement( "Buffer size:" ) ); p->top()->separate();
-		//p->add( _resolutionlider = new UiSlider( "", EvBufferSize ) );
+		//p->add( _resolutionslider = new UiSlider( "", EvBufferSize ) );
 		//_bufferSizeSlider->configure( 100, 4000, 100, 1, 0 );
 		//_bufferSizeSlider->value( 1000 );
 	}
@@ -191,7 +191,7 @@ void SpmViewer::update_vector_field ()
 	float maxx = _snspm->minx+spmw + incx/2.0f;
 	float maxy = _snspm->miny+spmh + incy/2.0f;
 
-	GsVec v;
+	GsVec2 v;
 	float vlen=0.75f, al=0.2f, aw=0.15f;
 
 	for ( x=_snspm->minx; x<maxx; x+=incx )
@@ -200,7 +200,7 @@ void SpmViewer::update_vector_field ()
 			{	float l = v.len();
 				if ( l<vlen ) continue;
 				v.len(vlen);
-				_vfield->push_arrow ( GsPnt2(x,y), GsPnt2(x+v.x,y+v.y), al, aw );
+				_vfield->push_arrow ( GsPnt2(x,y), v+GsVec2(x,y), al, aw );
 			}
 		}
 	}
