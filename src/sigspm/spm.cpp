@@ -341,8 +341,8 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path,
 	}
 
 	// first point (agent's coordinates)
-	GsVec2 current ( _x, _y );
-	GsVec2 projectedCurrent(current); OrthoProjectionCompleteMatrix.mult2d(projectedCurrent);
+	GsVec2 current(_x,_y), projectedCurrent(_x,_y);
+	OrthoProjectionCompleteMatrix.mult2d(projectedCurrent);
 
 	path.clear();
 	path.push_back( current );
@@ -350,16 +350,13 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path,
 	// Path back to source
 	float x = ( projectedCurrent.x + 1.0f ) / 2.0f;
 	float y = ( projectedCurrent.y + 1.0f ) / 2.0f;
-
 	int ix = (int)( x * bufferWidth );
 	int iy = (int)( y * bufferHeight );
-
+	if (ix<0) ix=0; if(ix>=bufferWidth) ix=bufferWidth-1;
+	if (iy<0) iy=0; if(iy>=bufferHeight) iy=bufferHeight-1;
 	int pos = 4 * ( iy * bufferWidth + ix );
-gsout<<"1\n";
 	int curPos = (int)Map[ pos + 3 ];
-gsout<<"2\n";
-	if( curPos < 2 )
-		return false;
+	if( curPos < 2 ) return false;
 
 	// if the pixel points directly to source, just use its parent coordinates
 	// note: this depends on the pixel storing xy coordinates, and not color information
@@ -371,7 +368,7 @@ gsout<<"2\n";
 		current.x = ( current.x * 2.0f ) - 1.0f;
 		current.y = ( current.y * 2.0f ) - 1.0f;
 
-		current = OrthoProjectionCompleteMatrix.inverse() * current;
+		OrthoProjectionCompleteMatrix.inverse().mult2d ( current );
 
 		path.push_back( current );
 	}
@@ -412,10 +409,8 @@ bool ShortestPathMap::GetNextDirection( float _x, float _y, GsVec2& dir, float t
 {
 	dir.x = 0.0f;
 	dir.y = 0.0f;
-gsout<<"A\n";
 	vector<GsVec2> path; // SpmTodo: only the first point should be needed to retrieve a direction!
 	if( !GetShortestPath( _x, _y, path, maxnp ) || path.size()<2 ) return false;
-gsout<<"B\n";
 	GsVec origin( _x, _y, 0.0f );
 
 	for( int i=1; i<(int)path.size(); ++i )
@@ -427,6 +422,5 @@ gsout<<"B\n";
 			break;
 		}
 	}
-gsout<<"C\n";
 	return true;
 }
