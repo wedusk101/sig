@@ -1,0 +1,66 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\src\sigspm\spm.cpp" />
+    <ClCompile Include="..\src\sigspm\spm_manager.cpp" />
+    <ClCompile Include="..\src\sigspm\spm_shader.cpp" />
+    <ClCompile Include="..\src\sigspm\spm_shader_program.cpp" />
+    <ClCompile Include="..\src\sigspm\spm_vbo.cpp" />
+    <ClCompile Include="..\src\sigspm\glr_spm.cpp">
+      <Filter>scene node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sigspm\sn_spm.cpp">
+      <Filter>scene node</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\sigspm\spm.h" />
+    <ClInclude Include="..\include\sigspm\spm_manager.h" />
+    <ClInclude Include="..\include\sigspm\spm_shader.h" />
+    <ClInclude Include="..\include\sigspm\spm_shader_program.h" />
+    <ClInclude Include="..\include\sigspm\spm_vbo.h" />
+    <ClInclude Include="..\include\sigspm\glr_spm.h">
+      <Filter>scene node</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\sigspm\sn_spm.h">
+      <Filter>scene node</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\sigspm\shaders\spm_cone.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\sigspm\shaders\spm_cone.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\sigspm\shaders\spm_distance.comp">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\sigspm\shaders\spm_draw.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\sigspm\shaders\spm_draw.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\sigspm\shaders\spm_shadow.frag">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\sigspm\shaders\spm_shadow.geom">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\sigspm\shaders\spm_shadow.vert">
+      <Filter>shaders</Filter>
+    </None>
+    <None Include="..\src\sigspm\shaders\spm_search.comp">
+      <Filter>shaders</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="shaders">
+      <UniqueIdentifier>{7c7034d4-587b-43a3-ad5c-4ef157a30fbc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scene node">
+      <UniqueIdentifier>{f226ea64-e525-4ba5-8ee1-ae9f6054bf8b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
