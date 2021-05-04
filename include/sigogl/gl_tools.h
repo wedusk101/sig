@@ -18,6 +18,7 @@ class GsOutput; // forward delaration
 
 //======================== Versions for Gs Types ===========================
 
+/*! Calls glClearColor (v4.5) to specify the rgba values used when color buffers are cleared */
 void gl_clear_color ( const GsColor& c );
 
 //====================== utilities =====================

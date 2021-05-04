@@ -20,6 +20,7 @@
 # include <sigogl/gl_texture.h>
 # include <sigogl/gl_font.h>
 # include <sigogl/gl_loader.h>
+# include <sigogl/gl_tools.h>
 
 # include <stdarg.h>
 
@@ -755,6 +756,8 @@ void GlResources::print_report ()
 
 	gsout<<"\nLoaded Configuration:\n"<<Vars;
 
+	gsout<<"\nOpenGL Information:\n";
+	gl_print_info ( &gsout );
 	gsout << gsnl;
 }
 
