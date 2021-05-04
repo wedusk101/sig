@@ -126,7 +126,7 @@ UiOutput* WsViewerData::output ()
 		_output = new UiOutput(0,10,24);
 		_output->color().bg.a=0; // no background
 		_output->rect_clip ( false ); // use whole viewer
-		_output->word_wrap ( false );
+		_output->auto_wrap ( false );
 		p->add ( _output );
 		rbpanel->uimparent()->add(p); // insert finalized panel to ensure proper building
 	}
@@ -142,7 +142,7 @@ UiOutput* WsViewerData::message ()
 		p->color().bg.a=0; // no background
 		_message = new UiOutput(0);
 		_message->color().bg.a=0; // no background
-		_message->word_wrap ( false );
+		_message->auto_wrap ( false );
 		p->add ( _message );
 		rbpanel->uimparent()->add(p); // insert finalized panel to ensure proper building
 	}

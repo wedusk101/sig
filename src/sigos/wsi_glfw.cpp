@@ -486,6 +486,7 @@ static void _init_callbacks ( GLFWwindow* gwin )
 # define FILEBUFSIZE 256
 static GsString FileBuf;
 
+// UiDlgDev: complete this implementation, or use internal UI, see browser() method in ui_dialogs.cpp
 // cal call popen ( zenity --file-selection )
 
 // filter format:  "*.txt;*.log"

@@ -17,6 +17,7 @@
 - CamDev:   updates to camera control
 - UiDev:	user interface development
 - UiKeyDev: inclusion of key navigation in UI
+- UiDlgDev: inclusion of file dialogs in Linux
 - LightDev: Shader support for multiple lights and other improvements
 - SgDev:	scene graph development
 - ManipDev: development to include rotation in SnManipulator

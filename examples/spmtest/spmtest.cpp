@@ -212,13 +212,13 @@ int SpmViewer::uievent ( int e )
 {
 	switch( e )
 	{	case EvSave:
-		{	const char* fname = ui_input_file ( "File to save:", _lfname, "*.txt;*.m" ); _lfname=fname;
+		{	const char* fname = ui_input_file ( "File to save:", _lfname, "*.txt;*.spm" ); _lfname=fname;
 			GsOutput out;
 			if ( fname && out.open(fname) ) out<<*_obstacles->polygons()<<gsnl<<*_sinks->polygons()<<gsnl;
 			break;
 		}
 		case EvLoad:
-		{	const char* fname = ui_select_file ( "File to load:", _lfname, "*.txt;*.m" ); _lfname=fname;
+		{	const char* fname = ui_select_file ( "File to load:", _lfname, "*.txt;*.spm" ); _lfname=fname;
 			GsInput inp;
 			if ( !Spm || !fname || !inp.open(fname) ) break;
 			inp>>*_obstacles->polygons()>>*_sinks->polygons();

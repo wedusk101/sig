@@ -22,7 +22,7 @@ class UiOutput : public UiElement
 	gsint16 _event;
 	gscbool _showlabel;
 	gscbool _rectclip;
-	gscbool _wwrap;
+	gscbool _autowrap;
 	void _init ( const char* l );
    public :
 	UiOutput ( const char* l, int x=0, int y=0, int mw=0, int mh=0 );
@@ -30,7 +30,7 @@ class UiOutput : public UiElement
 	const GsString& ctext() const { return _text; }
 	GsString& text();
 	void rect_clip ( bool b ) { _rectclip=(gscbool)b; }
-	void word_wrap ( bool b ) { _wwrap=(gscbool)b; }
+	void auto_wrap ( bool b ) { _autowrap=(gscbool)b; }
 	void set_style ( const UiStyle& s );
 	// Overriden virtual methods:
 	virtual void change_style ( const UiStyle& s ) override;

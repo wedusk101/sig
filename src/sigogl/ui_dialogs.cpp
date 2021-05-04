@@ -229,21 +229,21 @@ const char* ui_input ( const char* msg, const char* input, const char* wintitle 
 
 //static const char* browser ( const char* msg, const char* fname, const char* filter, GsArray<const char*>* multif )
 //{
-//   WsWindow* w = prepare ( "Open File" );
-//   UiPanel* p = new UiPanel ( msg, UiPanel::Vertical, UiPanel::Center, 0, 0, 420, 0 );
-//   UiFileChooser* fc = new UiFileChooser ( fname, eEV );
+//	WsWindow* w = prepare ( "Open File" );
+//	UiPanel* p = new UiPanel ( msg, UiPanel::Vertical, UiPanel::Center, 0, 0, 6400, 0 );
+//	UiFileChooser* fc = new UiFileChooser ( fname, filter, eEV );
 //
-//   p->add ( fc );
-//   p->add ( buttonspanel(eOK,eCANCEL) );
-//   int ev = run ( w, p );
+//	p->add ( fc );
+//	p->add ( buttonspanel(eOK,eCANCEL) );
+//	int ev = run ( w, p );
 //
-//   static GsString ReturnText;
-//   ReturnText = fc->value();
-//   ReturnText.compress();
-//   if ( ReturnText.len()<=0 ) ev=eCANCEL;
+//	static GsString ReturnText;
+//	ReturnText = fc->value();
+//	ReturnText.compress();
+//	if ( ReturnText.len()<=0 ) ev=eCANCEL;
 //
-//   end ( w, p );
-//   return ev==eOK? ReturnText.pt() : 0;
+//	end ( w, p );
+//	return ev==eOK? ReturnText.pt() : 0;
 //}
 
 # include <sigogl/ws_osinterface.h>
@@ -251,7 +251,11 @@ const char* ui_input ( const char* msg, const char* input, const char* wintitle 
 const char* ui_select_file ( const char* msg, const char* fname, const char* filter, GsArray<const char*>* multif )
 {
 	// ImprNote: finish in-window browser: if ( InWindow ) return browser ( msg, fname, filter, multif );
-	// Or use simepe ui_input() call
+	// UiDlgDev: use macro here to switch to file browser, or complete solution in wsi_glfw.cpp
+	# if defined (GS_MSWIN)
+	# else
+	# endif
+	// return browser ( msg, fname, filter, multif );
 	return wsi_open_file_dialog ( msg, fname, filter, multif );
 }
 

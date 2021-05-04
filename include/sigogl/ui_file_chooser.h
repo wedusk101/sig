@@ -25,16 +25,20 @@ class UiFileChooser : public UiPanel
  { protected:
 	UiInput* _inp;  // for filename input
 	UiOutput* _out; // for display of files in current directory
-	GsString _curext;
+	GsStrings _filters; // file filters, without '.' character
 
    public :
 
 	/*! Constructs as a sphere centered at (0,0,0) with radius 1 */
-	UiFileChooser ( const char* fname, int ev, int x=0, int y=0, int mw=220, int mh=120 );
+	UiFileChooser ( const char* fname, const char* filters, int ev, int x=0, int y=0, int mw=220, int mh=120 );
 
 	const char* value () const { return _inp->value(); }
 
-	const GsString& curext () const { return _curext; }
+	/*! Set extension list in string format "*.txt;*.cfg" */
+	void set_filters ( const char* st );
+
+	const GsStrings& filters () const { return _filters; }
+
 	void update_file_list ( const char* fstring );
 
    public :

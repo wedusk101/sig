@@ -97,24 +97,22 @@ void UiOutput::draw ( UiPanel* panel )
 
 	const GsFontStyle& fs = _label.fs();
 
-	if ( _wwrap )
+	if ( _autowrap )
 	{ 	GS_TRACE2 ( "Word-wrapping..." );
 		const GsFont* font = GlResources::get_gsfont ( fs ); // fast retrieval from id in fs
-		int i, c=0;
-		float w=0;
-		c=0;
+		int ini=0, cur=0;
+		float w=0, h=0;
 		while ( true )
-		{	for ( i=c; _text[i] && _text[i]!=' ' && _text[i]!='\t' && _text[i]!='\n'; i++ ) {}
-			if ( !_text[i] ) break;
-			w += font->text_width ( fs, _text+c, i-c+1 );
-			if ( _text[i]=='\n' )
-			{	w=0; }
+		{	if ( !_text[cur] ) break;
+			cur++;
+			w = font->text_width ( fs, _text+ini, cur-ini+1 );
+			if ( _text[ini+cur]=='\n' )
+			{	w=0; h++; ini=cur; }
 			else if ( w>rect().w )
-			{	if (!_text[i]) break; // UiDev: insert a space in the midle of word, and clip on height as well
-				_text[c-1]='\n';
-				w=0;
+			{	if (!_text[cur]) break; // UiDev: clip on height as well
+				_text.insert(cur-2,"\n");
+				w=0; h++; ini=cur-1;
 			}
-			c=i+1;
 		}
 	}
 
