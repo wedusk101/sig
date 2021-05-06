@@ -31,4 +31,11 @@
 - uidemo: review alignment in panels including key cmds
 - skelviewer: complete motions and skin integration
 - modelviewer: complete manipulation and processing of multiple models
-- spmtest: do makefiles and test in linux
+
+===== Linux Port =====
+
+- app window appears away in first display
+- right-click menu starts at 0,0
+- spmtest: add to makefile and test in linux
+- makefile not rebuilding .x
+- test in shapes.x if all shaders are compiling

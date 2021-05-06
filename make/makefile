@@ -1,5 +1,5 @@
 # Names of the modules to be compiled:
-TARGETLIBS = sig sigogl sigos sigkin
+TARGETLIBS = sig sigogl sigos sigkin sigspm
 TARGETEXS = gstests shapes cameratest customnode fontgen modelviewer polyeditor scenetest skelviewer uidemo vgtest
 OBJDIR = obj
 

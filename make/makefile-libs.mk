@@ -7,6 +7,7 @@ OBJECTS = $(notdir $(OBJFILES))
 DEPENDS = $(OBJECTS:.o=.d)
 
 $(LIB): $(OBJECTS)
+	echo "creating:" $(LIB);
 	ar -r $(LIB) $(OBJECTS)
 
 %.o: $(SRCDIR)%.cpp

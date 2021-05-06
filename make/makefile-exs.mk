@@ -1,12 +1,13 @@
 SRCDIR = $(ROOT)/examples/$(TARGET)/
 BIN = $(ROOT)/make/$(TARGET)$(ARCH).x
 
+LIBS = $(shell echo $(LIBDIR)/*.a)
 CPPFILES := $(shell echo $(SRCDIR)*.cpp)
 OBJFILES = $(CPPFILES:.cpp=.o)
 OBJECTS = $(notdir $(OBJFILES))
 DEPENDS = $(OBJECTS:.o=.d)
 
-$(BIN): $(OBJECTS)
+$(BIN): $(OBJECTS) $(LIBS)
 	echo "creating:" $(BIN);
 	$(CC) $(OBJECTS) $(LFLAGS) -o $(BIN)
 
