@@ -300,11 +300,10 @@ int ShortestPathMap::FindClosestPoint( int pos )
 
 	float x = Map[ pos     ];
 	float y = Map[ pos + 1 ];
-	float z = Map[ pos + 2 ];
+	//not used: float z = Map[ pos + 2 ];
 	float w = Map[ pos + 3 ];
 
-	if( w < 1.0f )
-		return -1;
+	if( w < 1.0f ) return -1;
 
 	x = ( x * 2.0f ) - 1.0f;
 	y = ( y * 2.0f ) - 1.0f;
@@ -336,8 +335,10 @@ inline int PosFromXY ( const GsVec2& projectedCurrent, int bufferWidth, int buff
 	float y = ( projectedCurrent.y + 1.0f ) / 2.0f;
 	int ix = (int)( x * bufferWidth );
 	int iy = (int)( y * bufferHeight );
-	if (ix<0) ix=0; if(ix>=bufferWidth) ix=bufferWidth-1;
-	if (iy<0) iy=0; if(iy>=bufferHeight) iy=bufferHeight-1;
+	if (ix<0) ix=0; 
+	if (iy<0) iy=0; 
+	if (ix>=bufferWidth) ix=bufferWidth-1;
+	if (iy>=bufferHeight) iy=bufferHeight-1;
 	return 4 * ( iy * bufferWidth + ix );
 }
 
@@ -386,7 +387,7 @@ bool ShortestPathMap::GetShortestPath( float _x, float _y, vector<GsPnt2>& path,
 			current.set( origPt->XYZW[0], origPt->XYZW[1] );
 
 			path.push_back( current );
-			if ( end || path.size()==maxnp ) break;
+			if ( end || path.size()==(unsigned)maxnp ) break;
 			curPos = (int)ResultArray[ curPos + 1 ].XYZW[ 3 ];
 		}
 	}

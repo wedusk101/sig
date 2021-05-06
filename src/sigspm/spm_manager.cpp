@@ -613,7 +613,8 @@ void ShortestPathMapManager::CreateBuffers( void )
 
 	// Create shader storage buffer
 	glGenBuffers( 1, &shaderStorageBufferId );
-	GLuint block_index = 0, ssbo_binding_point_index = 0;
+	//Not used: GLuint block_index = 0;
+	GLuint ssbo_binding_point_index = 0;
 	glBindBufferBase( GL_SHADER_STORAGE_BUFFER, ssbo_binding_point_index, shaderStorageBufferId );
 }
 
