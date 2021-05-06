@@ -34,6 +34,7 @@
 //# define GS_USE_TRACE6 // more events
 //# define GS_USE_TRACE7 // mouse move event
 //# define GS_USE_TRACE8 // glfw callbacks
+//# define GS_USE_TRACE9 // zenity dialogs
 # include <sig/gs_trace.h>
 
 # ifdef GS_MSWIN
@@ -342,6 +343,7 @@ static void setkeycode ( GsEvent& e, int key )
 	if ( key<=162 ) e.key=key;
 	if ( key>='A' && key<='Z') { e.character=(gsbyte)(e.shift?key:key-'A'+'a'); return; }
 
+	e.key = 1; // assign something
 	e.character = 0;
 
 	# define RET(x) e.key=GsEvent::x; return
@@ -356,14 +358,24 @@ static void setkeycode ( GsEvent& e, int key )
 		case GLFW_KEY_INSERT: RET(KeyIns);	case GLFW_KEY_DELETE: RET(KeyDel);
 		case GLFW_KEY_PAGE_UP: RET(KeyPgUp); case GLFW_KEY_PAGE_DOWN: RET(KeyPgDn);
 
+		case GLFW_KEY_LEFT_SHIFT:   case GLFW_KEY_RIGHT_SHIFT: RET(KeyShift);
+		case GLFW_KEY_LEFT_CONTROL: case GLFW_KEY_RIGHT_CONTROL: RET(KeyCtrl);
+		case GLFW_KEY_LEFT_ALT:     case GLFW_KEY_RIGHT_ALT: RET(KeyAlt);
+
 		case GLFW_KEY_KP_DIVIDE	: RET1('/'); case GLFW_KEY_KP_MULTIPLY: RET1('*');
 		case GLFW_KEY_KP_ADD	: RET1('+'); case GLFW_KEY_KP_SUBTRACT: RET1('-');
+
 		case 192: RET2('`','~'); case 189: RET2('-','_');  case 187: RET2('=','+');
 		case 219: RET2('[','{'); case 221: RET2(']','}');  case 220: RET2('\\','|');
 		case 186: RET2(';',':'); case 222: RET2('\'','"'); case 188: RET2(',','<');
 		case 190: RET2('.','>'); case 191: RET2('/','?');
 	}
-	if ( key>=GLFW_KEY_F1 && key<=GLFW_KEY_F12 ) e.key=GsEvent::KeyF1+(key-GLFW_KEY_F1);
+	# undef RET
+	# undef RET1
+	# undef RET2
+	if ( key>=GLFW_KEY_F1 && key<=GLFW_KEY_F12 ) { e.key=GsEvent::KeyF1+(key-GLFW_KEY_F1); return; }
+	// List of glfw keys here:
+	// https://www.glfw.org/docs/3.3/group__keys.html
 }
 
 static void key_cb ( GLFWwindow* gwin, int key, int scancode, int action, int modifs )
@@ -380,7 +392,8 @@ static void key_cb ( GLFWwindow* gwin, int key, int scancode, int action, int mo
 	if ( key==GLFW_KEY_LEFT_ALT || key==GLFW_KEY_RIGHT_ALT ) { e.alt = action==GLFW_PRESS? 1:0; }
 	else if ( key==GLFW_KEY_LEFT_CONTROL || key==GLFW_KEY_RIGHT_CONTROL ) { e.ctrl = action==GLFW_PRESS? 1:0; }
 	else if ( key==GLFW_KEY_LEFT_SHIFT || key==GLFW_KEY_RIGHT_SHIFT ) { e.shift = action==GLFW_PRESS? 1:0; }
-	//gsout<<modifs<<": A:"<<e.alt<<" C:"<<e.ctrl<<" S:"<<e.shift<<gsnl;
+	
+	//gsout<<"key="<<key<<" modifs="<<modifs<<" A:"<<e.alt<<" C:"<<e.ctrl<<" S:"<<e.shift<<gsnl;
 	osevent ( ow->swin, e );
 }
 
@@ -404,14 +417,14 @@ static void setmousepos ( GsEvent& e, gsint16 x, gsint16 y )
 
 static void mouse_cb ( GLFWwindow* gwin, int but, int action, int modifs )
 {
-	GS_TRACE8 ( "mouse_cb" );
+	double x, y;
+	glfwGetCursorPos ( gwin, &x, &y );
+	GS_TRACE8 ( "mouse_cb "<<x<<" "<<y );
 	OsWin* ow = (OsWin*)glfwGetWindowUserPointer(gwin);
 	GsEvent& e = ow->event;
 	setmouseev ( gwin, e, action==GLFW_PRESS? GsEvent::Push : GsEvent::Release );
 	setmodifs ( e, modifs );
 	e.button = but==GLFW_MOUSE_BUTTON_LEFT? 1 : but==GLFW_MOUSE_BUTTON_RIGHT? 3 : 2;
-	double x, y;
-	glfwGetCursorPos ( gwin, &x, &y );
 	setmousepos ( e, (gsint16)x, (gsint16)y );
 	osevent ( ow->swin, e );
 }
@@ -424,6 +437,16 @@ static void mousepos_cb ( GLFWwindow* gwin, double x, double y )
 	setmouseev ( gwin, e, GsEvent::Move );
 	if ( e.button1 || e.button3 ) e.type=GsEvent::Drag;
 	setmousepos ( e, (gsint16)x, (gsint16)y );
+	osevent ( ow->swin, e );
+}
+
+static void wheel_cb ( GLFWwindow* gwin, double xoffset, double yoffset )
+{
+	GS_TRACE8 ( "wheel_cb "<<xoffset<<", "<<yoffset );
+	OsWin* ow = (OsWin*)glfwGetWindowUserPointer(gwin);
+	GsEvent& e = ow->event;
+	setmouseev ( gwin, e, GsEvent::Wheel );
+	e.wheelclicks = 100*(int)yoffset;
 	osevent ( ow->swin, e );
 }
 
@@ -440,6 +463,7 @@ static void _init_callbacks ( GLFWwindow* gwin )
 	glfwSetWindowRefreshCallback ( gwin, draw_cb );
 	glfwSetWindowSizeCallback ( gwin, resize_cb );
 	glfwSetMouseButtonCallback ( gwin, mouse_cb );
+	glfwSetScrollCallback ( gwin, wheel_cb );
 	glfwSetCursorPosCallback ( gwin, mousepos_cb );
 	glfwSetWindowCloseCallback ( gwin, close_cb );
 
@@ -483,31 +507,113 @@ static void _init_callbacks ( GLFWwindow* gwin )
 
 //=============================== native file dialogs ==========================================
 
-# define FILEBUFSIZE 256
+# define FILEBUFSIZE1 512
+# define FILEBUFSIZE2 2048
 static GsString FileBuf;
 
-// UiDlgDev: complete this implementation, or use internal UI, see browser() method in ui_dialogs.cpp
-// cal call popen ( zenity --file-selection )
-
-// filter format:  "*.txt;*.log"
-static const char* filedlg ( bool open, const char* msg, const char* file, const char* filter, GsArray<const char*>* multif )
+static void set_filters ( GsString& buf, const char* filter )
 {
-	return 0;
- }
+	buf << " --file-filter=\"";
+	const char* pt = filter;
+	while (*pt)
+	{	buf << *pt;
+		pt++;
+		if (*pt==';') { buf<<"\" --file-filter=\""; pt++; }
+	}
+	buf<<"\"";
+}
 
+void set_zenity_string ( const char* extracmd, const char* msg, const char* file, const char* filter, GsArray<const char*>* multif )
+{
+	FileBuf.reserve ( multif? 2048:1024 );
+
+	FileBuf = "zenity --file-selection --modal";
+	if ( extracmd ) FileBuf << " --"<<extracmd;
+	FileBuf << " --title=\"" << msg << '"';
+	FileBuf << " --filename=\"" << file << '"';
+	if ( multif ) FileBuf << " --multiple";
+	if ( filter ) set_filters ( FileBuf, filter );
+	FileBuf << " 2>/dev/null"; 
+}
+
+// UiDlgDev: complete/revise this implementation based on zenity - /usr/bin/zenity options:
+//   --file-selection                                  Display file selection dialog
+//   --filename=FILENAME                               Set the filename
+//   --multiple                                        Allow multiple files to be selected
+//   --directory                                       Activate directory-only selection
+//   --save                                            Activate save mode
+//   --separator=SEPARATOR                             Set output separator character
+//   --confirm-overwrite                               Confirm file selection if filename already exists
+//   --file-filter=NAME | PATTERN1 PATTERN2 ...        Set a filename filter
+
+/*! Opens a file browser. File filter format follows this example: "*.txt;*.log".
+	It returns a string if ok is pressed and null otherwise. 
+	The returned string points to an internal buffer with global lifetime.
+    If pointer multif is non-null, multiple files may be selected and will be returned in multif.
+	In that case, the returned string is the common folder (without ending '\'), and strings in
+	multif contain only filenames, which are stored (concatenated) in the same internal buffer.
+    If a single file is selected its full description is returned and multif will be of size 0. */
 const char* wsi_open_file_dialog ( const char* msg, const char* file, const char* filter, GsArray<const char*>* multif )
 {
-	return filedlg ( true, msg, file, filter, multif );
+	FileBuf.reserve ( multif? FILEBUFSIZE2:FILEBUFSIZE1 );
+	set_zenity_string ( 0, msg, file, filter, multif );
+	GS_TRACE9 ( "Calling ["<<FileBuf<<"]..." );
+
+	FILE *f = popen ( FileBuf.pt(), "r" );
+	char* res = fgets ( (char*)FileBuf.pt(), FileBuf.capacity()-1, f ); 
+	if ( pclose(f)<0 || !res ) return 0;
+	FileBuf.calclen();
+	GS_TRACE9 ( "Received: ["<<FileBuf<<"]" );
+
+	// UiDlgDev: complete multifile support
+	// example received: [/home/.../readme.txt|/home/.../notes.txt]
+	if ( multif )
+	{	GsString s;
+		for ( int i=0; i<FileBuf.len(); i++ )
+		{	if ( FileBuf[i]=='|' )
+			{	FileBuf[i]=0;
+				break;
+			}
+		}
+	}
+
+	FileBuf.trim();
+	GS_TRACE9 ( "Returning: ["<<FileBuf<<"]" );
+	return FileBuf.pt();
 }
 
 const char* wsi_save_file_dialog ( const char* msg, const char* file, const char* filter )
 {
-	return filedlg ( false, msg, file, filter, 0 );
+	FileBuf.reserve ( FILEBUFSIZE1 );
+	set_zenity_string ( "save", msg, file, filter, 0 );
+	GS_TRACE9 ( "Calling ["<<FileBuf<<"]..." );
+
+	FILE *f = popen ( FileBuf.pt(), "r" );
+	char* res = fgets ( (char*)FileBuf.pt(), FileBuf.capacity()-1, f ); 
+	if ( pclose(f)<0 || !res ) return 0;
+	FileBuf.calclen();
+	GS_TRACE9 ( "Received: ["<<FileBuf<<"]" );
+
+	FileBuf.trim();
+	GS_TRACE9 ( "Returning: ["<<FileBuf<<"]" );
+	return FileBuf.pt();
 }
 
 const char* wsi_select_folder ( const char* msg, const char* folder )
 {
-	return 0;
+	FileBuf.reserve ( FILEBUFSIZE1 );
+	set_zenity_string ( "directory", msg, folder, 0, 0 );
+	GS_TRACE9 ( "Calling ["<<FileBuf<<"]..." );
+
+	FILE *f = popen ( FileBuf.pt(), "r" );
+	char* res = fgets ( (char*)FileBuf.pt(), FileBuf.capacity()-1, f ); 
+	if ( pclose(f)<0 || !res ) return 0;
+	FileBuf.calclen();
+	GS_TRACE9 ( "Received: ["<<FileBuf<<"]" );
+
+	FileBuf.trim();
+	GS_TRACE9 ( "Returning: ["<<FileBuf<<"]" );
+	return FileBuf.pt();
 }
 
 //=============================== misc windows functions ==========================================
