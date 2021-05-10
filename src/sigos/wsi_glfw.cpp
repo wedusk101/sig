@@ -149,6 +149,7 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 	glfwWindowHint ( GLFW_ALPHA_BITS, 8 );
 	glfwWindowHint ( GLFW_DOUBLEBUFFER, 1 );
 	glfwWindowHint ( GLFW_DEPTH_BITS, 32 );
+	glfwWindowHint ( GLFW_VISIBLE, GLFW_FALSE ); // will show it after position is set
 	GLFWwindow* sharedwin = AppWindows.size()>0? AppWindows[0]->gwin:NULL;
 	ow->gwin = glfwCreateWindow ( w, h, label, NULL, sharedwin );
 	if ( ow->gwin==NULL) gsout.fatal ( "glfwCreateWindow failed!" );
@@ -170,7 +171,6 @@ void* wsi_new_win ( int x, int y, int w, int h, const char* label, WsWindow* swi
 		glfwSetWindowSizeLimits ( ow->gwin, 16, 8, GLFW_DONT_CARE, GLFW_DONT_CARE ); // added in version 3.2.
 	# endif
 	glfwSetWindowPos ( ow->gwin, x, y );
-	glfwSetWindowSize ( ow->gwin, w, h );
 	_init_callbacks ( ow->gwin );
 
 	AppWindows.push(ow);
