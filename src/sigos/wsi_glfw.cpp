@@ -339,12 +339,11 @@ static void setmodifs ( GsEvent& e, int modifs )
 
 static void setkeycode ( GsEvent& e, int key )
 {
-	//const gsbyte NS[] = { ')', '!', '@', '#', '$', '%', '^', '&', '*', '(' };
-	if ( key<=162 ) e.key=key;
-	if ( key>='A' && key<='Z') { e.character=(gsbyte)(e.shift?key:key-'A'+'a'); return; }
-
-	e.key = 1; // assign something
+	e.key = 0; 
 	e.character = 0;
+
+	if ( key>='A' && key<='Z' ) { e.key=e.character=(gsbyte)(e.shift?key:key-'A'+'a'); return; }
+	if ( key>=' ' && key<='~' ) { e.key=e.character=(gsbyte)key; return; }
 
 	# define RET(x) e.key=GsEvent::x; return
 	# define RET1(x) e.key=x; e.character=(gsbyte)x; return
@@ -373,7 +372,9 @@ static void setkeycode ( GsEvent& e, int key )
 	# undef RET
 	# undef RET1
 	# undef RET2
+
 	if ( key>=GLFW_KEY_F1 && key<=GLFW_KEY_F12 ) { e.key=GsEvent::KeyF1+(key-GLFW_KEY_F1); return; }
+
 	// List of glfw keys here:
 	// https://www.glfw.org/docs/3.3/group__keys.html
 }
