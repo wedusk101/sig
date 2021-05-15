@@ -128,6 +128,9 @@ class SnPolyEditor : public SnEditor
 	/*! Returns selected polygon, or -1 if none selected */
 	int selected_polygon () const { return _selpol; }
 
+	/*! Returns selected vertex, or -1 if none selected */
+	int selected_vertex () const { return _selvtx; }
+
 	/*! Set a user callback that is called each time an event is processed. The 3rd parameter
 		is the selected polygon index. */
 	void callback ( void(*cb)(SnPolyEditor*,Event,int), void* udata ) { _user_cb=cb; _userdata=udata; }
