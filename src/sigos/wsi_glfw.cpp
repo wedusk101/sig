@@ -379,13 +379,21 @@ static void setkeycode ( GsEvent& e, int key )
 	// https://www.glfw.org/docs/3.3/group__keys.html
 }
 
+// Parameter action can be GLFW_PRESS, GLFW_REPEAT or GLFW_RELEASE;
+// key will be GLFW_KEY_UNKNOWN if GLFW lacks a key token for it, like for E-mail and Play keys.
+// See: https://www.glfw.org/docs/3.3/input_guide.html#events
 static void key_cb ( GLFWwindow* gwin, int key, int scancode, int action, int modifs )
 {
 	GS_TRACE8 ( "key_cb" );
 	OsWin* ow = (OsWin*)glfwGetWindowUserPointer(gwin);
 	GsEvent& e = ow->event;
+
 	if ( key>=GLFW_KEY_LEFT_SHIFT && action==GLFW_REPEAT ) return; // do not send repeated modifier event
-	e.type = action==GLFW_RELEASE? GsEvent::KeyRelease : GsEvent::KeyPress;
+
+	if ( action==GLFW_PRESS ) e.type=GsEvent::KeyPress;
+	else if ( action==GLFW_RELEASE ) e.type=GsEvent::KeyRelease;
+	else return; // do not process GLFW_REPEAT
+
 	e.wheelclicks = 0; 
 	e.button = 0;
 	setkeycode ( e, key );
@@ -394,7 +402,7 @@ static void key_cb ( GLFWwindow* gwin, int key, int scancode, int action, int mo
 	else if ( key==GLFW_KEY_LEFT_CONTROL || key==GLFW_KEY_RIGHT_CONTROL ) { e.ctrl = action==GLFW_PRESS? 1:0; }
 	else if ( key==GLFW_KEY_LEFT_SHIFT || key==GLFW_KEY_RIGHT_SHIFT ) { e.shift = action==GLFW_PRESS? 1:0; }
 	
-	//gsout<<"key="<<key<<" modifs="<<modifs<<" A:"<<e.alt<<" C:"<<e.ctrl<<" S:"<<e.shift<<gsnl;
+	// static int N=1; gsout<<(N++)<<": key="<<key<<(e.type==GsEvent::KeyPress?" Press":" Release")<<" modifs="<<modifs<<" A:"<<e.alt<<" C:"<<e.ctrl<<" S:"<<e.shift<<gsnl;
 	osevent ( ow->swin, e );
 }
 
